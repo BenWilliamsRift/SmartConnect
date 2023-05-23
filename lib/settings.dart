@@ -1,0 +1,311 @@
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'actuator pages/list_tiles.dart';
+import 'preference_manager.dart';
+import 'nav_drawer.dart';
+import 'string_consts.dart';
+
+class Settings {
+  // TEMP VAR FOR TESTING ONLY
+  static bool devSettingsEnabled = false;
+  static bool emulateConnectedActuator = false;
+
+  static const int newtonMeter = 0;
+  static const int footPound = 1;
+  static const int inchPound = 2;
+  static const List<String> torqueUnits = [
+    "Newton Meters (nM)",
+    "Foot Pound (ft-lb)",
+    "Inch Pound (in-lb)"
+  ];
+
+  static const int celsius = 0;
+  static const int fahrenheit = 1;
+  static const List<String> temperatureUnits = [
+    "Celsius (\u2103)",
+    "Fahrenheit (\u2109)"];
+
+  static const int hoursMinutesSeconds = 0;
+  static const int monthsWeekDays = 1;
+  static const int seconds = 2;
+  static const int minutes = 3;
+  static const int hours = 4;
+  static const int days = 5;
+  static const int weeks = 6;
+  static const int months = 7;
+
+  static List<String> timeUnits = [
+    "Hours : Minutes : Seconds",
+    "Months (28 days) : Weeks : Days",
+    "Seconds",
+    "Minutes",
+    "Hours",
+    "Days",
+    "Weeks",
+    "Months (28 days)"
+  ];
+
+  static bool isDarkMode = false;
+
+  static bool twelveHourTime = false;
+
+  static bool saveLoginDetails = true;
+
+  static int scrollSensitivity = 25;
+
+  static int selectedTemperatureUnits = celsius;
+  static int selectedTorqueUnits = newtonMeter;
+  static int selectedTimeUnits = hoursMinutesSeconds;
+
+  // TODO: time picker scrolling view instead of content
+  static bool scrollContent = false;
+
+  static int passwordMinLength = 6;
+
+  static double convertTemperatureUnits({required double temp, int source=celsius}) {
+    assert(source == celsius || source == fahrenheit);
+
+    if (source == celsius) {
+      if (selectedTemperatureUnits == fahrenheit) {
+        return (temp * 9 / 5) + 32;
+      }
+
+      return temp;
+    } else if (source == fahrenheit) {
+      if (selectedTorqueUnits == celsius) {
+        return (temp - 32) * 5/9;
+      }
+
+      return temp;
+    }
+
+    // Should never get called
+    return temp;
+  }
+
+  static String getTemperatureUnits() {
+    if (selectedTemperatureUnits == fahrenheit) {
+      // fahrenheit unit
+      return "\u2109";
+    }
+
+    // celsius unit
+    return "\u2103";
+  }
+
+  // by default converts a number from newton meters into either foot pounds or inch pounds
+  // but by changing the source the input can convert to any of the three from any of the three
+  static double convertTorqueUnits({required double torque, int source=newtonMeter, int wanted=-1}) {
+    assert(source == newtonMeter || source == footPound || source == inchPound);
+
+    if (wanted == -1) {
+      wanted == selectedTorqueUnits;
+    }
+
+    if (source == newtonMeter) {
+      if (wanted == footPound) {
+        // foot pound
+        return torque / 1.356;
+      } else if (wanted == inchPound) {
+        // inch pound
+        return torque * 8.851;
+      }
+
+      // newton meters
+      return torque;
+    }
+    else if (source == inchPound) {
+      if (wanted == footPound) {
+        // foot pound
+        return torque / 12;
+      } else if (wanted == newtonMeter) {
+        // newton meters
+        return torque * 0.112984825;
+      }
+
+      // inch pounds
+      return torque;
+    }
+    else if (source == footPound) {
+      if (wanted == inchPound) {
+        // inch pound
+        return torque * 12;
+      } else if (wanted == newtonMeter) {
+        // newton meters
+        return torque * 1.3558179483;
+      }
+
+      return torque;
+    }
+
+    // should never get returned here
+    return torque;
+  }
+
+  static String getTorqueUnits() {
+    if (selectedTorqueUnits == footPound) {
+      // Foot Pound
+      return "ft-lb";
+    } else if (selectedTorqueUnits == inchPound) {
+      // Inch Pound
+      return "in-lb";
+    }
+
+    // newton meters
+    return "Nm";
+  }
+}
+
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({Key? key, this.login = false}) : super(key: key);
+
+  final bool login;
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  late final SharedPreferences prefs;
+
+  int devSettingsCounter = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    getPrefs();
+  }
+
+  void getPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  void writeSettingsToPrefs(String key, dynamic value) {
+    if (value.runtimeType == bool) {
+      prefs.setBool(key, value);
+    } else if (value.runtimeType == int) {
+      prefs.setInt(key, value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ThemeNotification themeNotifier = ThemeNotification();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(StringConsts.settings.title),
+      ),
+      drawer: widget.login ? null : const NavDrawer(),
+      body: ListView(
+        children: [
+          const SizedBox(height: 8),
+          SwitchTile(
+            title: Text(StringConsts.settings.isDarkMode),
+            initValue: Settings.isDarkMode,
+            callback: (bool value) {
+              setState(() {
+                Settings.isDarkMode = value;
+                writeSettingsToPrefs(
+                    "${PreferenceManager.settingsPrefix}-${PreferenceManager.isDarkModeSuffix}", Settings.isDarkMode);
+              });
+              themeNotifier.updateTheme(context);
+            },
+          ),
+          DropDownTile(
+              items: Settings.temperatureUnits,
+              value: Settings.temperatureUnits
+                  .elementAt(Settings.selectedTemperatureUnits),
+              onChanged: (String? unit) {
+                setState(() {
+                  Settings.selectedTemperatureUnits = Settings.temperatureUnits.indexOf(unit!);
+                  writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.temperatureUnitsSuffix}", Settings.selectedTemperatureUnits);
+                });
+
+                return Settings.selectedTemperatureUnits.toString();
+              },
+              title: Text(StringConsts.settings.temperature)),
+          DropDownTile(
+              items: Settings.torqueUnits,
+              value:
+                  Settings.torqueUnits.elementAt(Settings.selectedTorqueUnits),
+              onChanged: (String? unit) {
+                setState(() {
+                  Settings.selectedTorqueUnits =
+                      Settings.torqueUnits.indexOf(unit!);
+                  writeSettingsToPrefs(
+                      "${PreferenceManager.settingsPrefix}-${PreferenceManager.torqueUnitsSuffix}", Settings.selectedTorqueUnits);
+                });
+
+                return Settings.selectedTorqueUnits.toString();
+              },
+              title: Text(StringConsts.settings.torqueUnits)),
+          DropDownTile(
+              items: Settings.timeUnits,
+              value:
+                  Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
+              onChanged: (String? unit) {
+                setState(() {
+                  Settings.selectedTimeUnits = Settings.timeUnits.indexOf(unit!);
+                  writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.timeUnitsSuffix}", Settings.selectedTimeUnits);
+                });
+
+                return Settings.selectedTimeUnits.toString();
+              },
+              title: Text(StringConsts.settings.timeUnits)),
+          SwitchTile(
+            title: Text(StringConsts.settings.saveLoginDetails),
+            subtitle: Text(StringConsts.settings.saveLoginDetailsSub, style: Style.subtitle),
+            visible: !widget.login,
+            initValue: Settings.saveLoginDetails,
+            callback: ((bool value) {
+              setState(() {
+                Settings.saveLoginDetails = value;
+                writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}", Settings.saveLoginDetails);
+              });
+            }),
+          ),
+          // Dev Settings
+          Settings.devSettingsEnabled ? Row(children: const [
+            Expanded(child: Divider()),
+            Text("Dev Settings"),
+            Expanded(child: Divider()),
+          ]) : Container(),
+          Settings.devSettingsEnabled ? SwitchTile(
+              title: const Text("Emulate Connection to Actuator"),
+              subtitle: const Text("Unlocks all features of the app"),
+              initValue: Settings.emulateConnectedActuator,
+              callback: (bool value) {
+                setState(
+                  () {
+                    Settings.emulateConnectedActuator = value;
+                  },
+                );
+              }) : Container(),
+        ],
+      ),
+      floatingActionButton: GestureDetector(
+        onTapDown: (details) {
+          setState(() {
+            devSettingsCounter += 1;
+            if (devSettingsCounter >= 10) {
+              Settings.devSettingsEnabled = true;
+            }
+          });
+        },
+        child: Center(
+          child: Align(
+              alignment: FractionalOffset.bottomCenter,
+              child: Text(
+                  "${StringConsts.settings.appVersion} ${StringConsts.appVersion}")),
+        ),
+      ),
+    );
+  }
+}
+
+class ThemeNotification extends Notification {
+  updateTheme(BuildContext context) {
+    dispatch(context);
+  }
+}

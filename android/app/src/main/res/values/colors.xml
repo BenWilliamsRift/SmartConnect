@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#0049a0</color>
+    <color name="colorPrimaryDark">#00387b</color>
+    <color name="colorPrimaryLight">#0064f1</color>
+    <color name="colorAccent">#FFAC13</color>
+    <color name="yellow1">#fff77c</color>
+    <color name="yellow2">#fff227</color>
+    <color name="grey05">#e3e3e3</color>
+    <color name="orange4">#ffda82</color>
+    <color name="orange5">#ffbe23</color>
+    <color name="blue2">#6f7bec</color>
+    <color name="blue25">#2936b3</color>
+    <color name="light_green1">#ebebeb</color>
+    <color name="light_green2">#69a769</color>
+    <color name="green1">#004225</color>
+    <color name="green2">#00d900</color>
+    <color name="light_red1">#e39c9c</color>
+    <color name="light_red2">#ae6e6e</color>
+    <color name="red1">#ff0000</color>
+    <color name="red2">#d00404</color>
+    <color name="light_orange1">#dcbfa3</color>
+    <color name="light_orange2">#a78c72</color>
+    <color name="orange1">#ff8000</color>
+    <color name="orange2">#d26b07</color>
+    <color name="light">#e8e8e9</color>
+    <color name="text">#A6000000</color>
+
+    <color name="open">#3fc483</color>
+    <color name="close">#e44c45</color>
+    <color name="auto">#57c9f3</color>
+    <color name="manual">#faca76</color>
+    <color name="danger">#CA0B00</color>
+    <color name="disabled">#A6000000</color>
+
+    <color name="item_grey">#e7e7e7</color>
+    <color name="shadows">#33000000</color>
+    <color name="shadows2">#1A000000</color>
+</resources>
