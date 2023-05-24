@@ -135,6 +135,10 @@ class ActuatorsStrings {
     return "Do you want to move the closed angle, to maintain a working angle of: $value?";
   }
 
+  String moveOpenAngle(String value) {
+    return "Do you want to move the open angle, to maintain a working angle of: $value?";
+  }
+
   final String features = "Features";
   final String status = "Status";
   final String angle = "Angle";

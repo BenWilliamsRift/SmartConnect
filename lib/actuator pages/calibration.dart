@@ -26,12 +26,25 @@ class _CalibrationPageState extends State<CalibrationPage> {
     bluetoothMessageHandler.requestAutoManual();
     bluetoothMessageHandler.requestClosedAngleAddition();
     bluetoothMessageHandler.requestWorkingAngle();
-    Actuator.connectedActuator.settings.openAngle = Actuator.connectedActuator.settings.closedAngle + Actuator.connectedActuator.settings.workingAngle;
+    Actuator.connectedActuator.settings.openAngle =
+        Actuator.connectedActuator.settings.closedAngle +
+            Actuator.connectedActuator.settings.workingAngle;
   }
+
+  late TextEditingController openAngleController;
+  late TextEditingController closedAngleController;
+  late TextEditingController workingAngleController;
 
   @override
   void initState() {
     super.initState();
+
+    openAngleController = TextEditingController(
+        text: Actuator.connectedActuator.settings.getOpenAngle);
+    closedAngleController = TextEditingController(
+        text: Actuator.connectedActuator.settings.getClosedAngle);
+    workingAngleController = TextEditingController(
+        text: Actuator.connectedActuator.settings.getWorkingAngle);
 
     // initial requests
     requestAll();
@@ -40,31 +53,38 @@ class _CalibrationPageState extends State<CalibrationPage> {
   bool autoManualReleased = false;
   Color? autoManualColor;
 
-  int count = 0;
-
   @override
   Widget build(BuildContext context) {
     Style.update();
 
-    Future.delayed(const Duration(seconds: 1), () {if (mounted) {setState(() {
-      count++;
-    });}});
-
-    if (count == 5) {
-      bluetoothMessageHandler.getOpenAngle();
-      count = 0;
-    }
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.requestClosedAngleAddition();
+          bluetoothMessageHandler.requestWorkingAngle();
+          Actuator.connectedActuator.settings.openAngle =
+              Actuator.connectedActuator.settings.closedAngle +
+                  Actuator.connectedActuator.settings.workingAngle;
+          openAngleController.text =
+              Actuator.connectedActuator.settings.getOpenAngle;
+          closedAngleController.text =
+              Actuator.connectedActuator.settings.getClosedAngle;
+          workingAngleController.text =
+              Actuator.connectedActuator.settings.getWorkingAngle;
+        });
+      }
+    });
 
     return Scaffold(
       appBar: appBar(title: getTitle()),
       drawer: const NavDrawer(),
       body: SingleChildScrollView(
           child: Column(
-            children: [
-              Style.sizedHeight,
-              Column(children: [
-                Style.sizedHeight,
-                Row(children: [
+        children: [
+          Style.sizedHeight,
+          Column(children: [
+            Style.sizedHeight,
+            Row(children: [
                   Style.sizedWidth,
                   // cant be const otherwise they wont be rebuilt
                   const SizedBox(
@@ -168,66 +188,112 @@ class _CalibrationPageState extends State<CalibrationPage> {
                 style: Style.normalText,
                 StringConsts.actuators.calibrationOpenAngle),
             onSaved: (String? newValue) {
-              // confirmation message
-              confirmationMessage(
-                  context: context,
-                  text: StringConsts.actuators.moveClosedAngle(
-                      Actuator.connectedActuator.settings.getWorkingAngle),
-                  yesAction: () {
-                    // Move closed angle
-                  });
-
               // set open angle
               if (newValue != null) {
-                bluetoothMessageHandler.setOpenAngle(double.parse(newValue));
-                Actuator.connectedActuator.settings.openAngle =
-                    double.parse(newValue);
-              }
-            },
-            initialValue: Actuator.connectedActuator.settings.getOpenAngle,
-          ),
-              // closed angle
-              TextInputTile(
-                title: Text(
-                    style: Style.normalText,
-                    // closed angle
-                    StringConsts.actuators.calibrationCloseAngle,
-                  ),
-                  initialValue: Actuator.connectedActuator.settings.getClosedAngle,
-                onSaved: (String? newValue) {
-                  // set closed angle
-                  if (newValue != null) {
-                    bluetoothMessageHandler.setClosedAngleAddition(double.parse(newValue));
-                    Actuator.connectedActuator.settings.closedAngle = double.parse(newValue);
-                    Actuator.connectedActuator.settings.updateOpenAngle();
-                  }
-                },
-                ),
-              // working angle
-              TextInputTile(
-                  title: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.workingAngle),
-                  initialValue: Actuator.connectedActuator.settings.getWorkingAngle,
-                  onSaved: (String? newValue) {
-                    // set working angle
-                    if (newValue != null) {
-                      bluetoothMessageHandler.setWorkingAngle(double.parse(newValue));
-                      Actuator.connectedActuator.settings.workingAngle = double.parse(newValue);
-                      Actuator.connectedActuator.settings.updateOpenAngle();
-                    }
+                double openAngle = double.parse(newValue);
 
-                  }),
-              // torque band
-              TextTile(
-                  title: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.torqueBand),
-                  text: Text(
-                      style: Style.normalText,
-                      Actuator.connectedActuator.settings.torqueBand
-                          .toString())),
-            ],
+                Actuator.connectedActuator.settings.setOpenAngle(openAngle);
+                openAngleController.text =
+                    Actuator.connectedActuator.settings.getOpenAngle;
+
+                // confirmation message
+                confirmationMessage(
+                    context: context,
+                    text: StringConsts.actuators.moveClosedAngle(
+                        Actuator.connectedActuator.settings.getWorkingAngle),
+                    yesAction: () {
+                      // Move closed angle
+                      setState(() {
+                        Actuator.connectedActuator.settings.setClosedAngle(
+                            openAngle -
+                                Actuator
+                                    .connectedActuator.settings.workingAngle);
+                        closedAngleController.text =
+                            Actuator.connectedActuator.settings.getClosedAngle;
+                      });
+                    });
+              }
+
+              return Actuator.connectedActuator.settings.getOpenAngle;
+            },
+            controller: openAngleController,
+          ),
+          // closed angle
+          TextInputTile(
+              title: Text(
+                style: Style.normalText,
+                // closed angle
+                StringConsts.actuators.calibrationCloseAngle,
+              ),
+              initialValue: Actuator.connectedActuator.settings.getClosedAngle,
+              onSaved: (String? newValue) {
+                // set closed angle
+                if (newValue != null) {
+                  double closedAngle = double.parse(newValue);
+
+                  Actuator.connectedActuator.settings
+                      .setClosedAngle(closedAngle);
+                  closedAngleController.text = workingAngleController.text =
+                      Actuator.connectedActuator.settings.getClosedAngle;
+
+                  confirmationMessage(
+                      context: context,
+                      text: StringConsts.actuators.moveOpenAngle(
+                          Actuator.connectedActuator.settings.getWorkingAngle),
+                      yesAction: () {
+                        // Move open angle
+                        setState(() {
+                          Actuator.connectedActuator.settings.setOpenAngle(
+                              closedAngle +
+                                  Actuator
+                                      .connectedActuator.settings.workingAngle);
+                          openAngleController.text =
+                              Actuator.connectedActuator.settings.getOpenAngle;
+                        });
+                      });
+                }
+              },
+              controller: closedAngleController),
+          // working angle
+          TextInputTile(
+              title: Text(
+                  style: Style.normalText, StringConsts.actuators.workingAngle),
+              initialValue: Actuator.connectedActuator.settings.getWorkingAngle,
+              onSaved: (String? newValue) {
+                // set working angle
+                if (newValue != null) {
+                  double workingAngle = double.parse(newValue);
+
+                  Actuator.connectedActuator.settings
+                      .setWorkingAngle(workingAngle);
+                  workingAngleController.text =
+                      Actuator.connectedActuator.settings.getWorkingAngle;
+
+                  confirmationMessage(
+                      context: context,
+                      text: StringConsts.actuators.moveOpenAngle(
+                          Actuator.connectedActuator.settings.getWorkingAngle),
+                      yesAction: () {
+                        setState(() {
+                          Actuator.connectedActuator.settings.setOpenAngle(
+                              Actuator.connectedActuator.settings.closedAngle +
+                                  Actuator
+                                      .connectedActuator.settings.workingAngle);
+                          openAngleController.text =
+                              Actuator.connectedActuator.settings.getOpenAngle;
+                        });
+                      });
+                }
+              },
+              controller: workingAngleController),
+          // torque band
+          TextTile(
+              title: Text(
+                  style: Style.normalText, StringConsts.actuators.torqueBand),
+              text: Text(
+                  style: Style.normalText,
+                  Actuator.connectedActuator.settings.torqueBand.toString())),
+        ],
           )),
     );
   }

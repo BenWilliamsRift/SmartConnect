@@ -395,6 +395,7 @@ class TextInputTile extends StatefulWidget {
   final String? initialValue;
   final TextInputType keyboardType;
   final Function(String? newValue) onSaved;
+  final TextEditingController? controller;
 
   const TextInputTile(
       {Key? key,
@@ -402,7 +403,8 @@ class TextInputTile extends StatefulWidget {
       required this.onSaved,
       required this.title,
       this.keyboardType = TextInputType.number,
-      this.subtitle})
+      this.subtitle,
+      this.controller})
       : super(key: key);
 
   @override
@@ -421,7 +423,8 @@ class _TextInputTileState extends State<TextInputTile> {
   void initState() {
     super.initState();
 
-    controller = TextEditingController(text: widget.initialValue);
+    controller =
+        widget.controller ?? TextEditingController(text: widget.initialValue);
   }
 
   @override
@@ -1017,20 +1020,19 @@ void confirmationMessage(
   showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(content: Text(text), actions: [
+        return AlertDialog(title: Text(text), actions: [
           TextButton(
             onPressed: () {
-              yesAction();
               Navigator.of(context).pop();
             },
-            child: const Text("Yes"),
+            child: const Text("No"),
           ),
           TextButton(
             onPressed: () {
               yesAction();
               Navigator.of(context).pop();
             },
-            child: const Text("No"),
+            child: const Text("Yes"),
           ),
         ]);
       });
