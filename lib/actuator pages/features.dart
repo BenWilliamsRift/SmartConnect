@@ -1,18 +1,17 @@
 import 'package:flutter/foundation.dart';
-
-import '../actuator/actuator_settings.dart';
-import '../asset_manager.dart';
-import '../main.dart';
-import '../preference_manager.dart';
-import '../web_controller.dart';
 import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
+import '../actuator/actuator_settings.dart';
 import '../app_bar.dart';
+import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
-import 'list_tiles.dart';
+import '../main.dart';
 import '../nav_drawer.dart';
+import '../preference_manager.dart';
 import '../string_consts.dart';
+import '../web_controller.dart';
+import 'list_tiles.dart';
 
 class FeaturesPage extends StatefulWidget {
   const FeaturesPage({Key? key}) : super(key: key);
@@ -32,6 +31,9 @@ class _FeaturesPageState extends State<FeaturesPage> {
     super.initState();
 
     featurePasswordsIntoActuator(false);
+
+    showLoading = true;
+    updateFeatures();
   }
 
   List<SwitchTile> switches = [];
@@ -155,6 +157,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
     Style.update();
 
     // Must be kept in this order
+    // order is like this because the data that is received isn't structured so it is just assumed that all the right data is received and that the order of switches is the same
     switches = [
       SwitchTile(
         visible: true,

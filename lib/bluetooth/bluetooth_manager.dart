@@ -6,8 +6,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-
-import '../web_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,6 +14,7 @@ import '../asset_manager.dart';
 import '../main.dart';
 import '../preference_manager.dart';
 import '../string_consts.dart';
+import '../web_controller.dart';
 import 'bluetooth_message_handler.dart';
 
 class Device {
@@ -236,7 +235,7 @@ class BluetoothManager {
       }
     }
 
-    if (connectionStatus == failed || connectionStatus == connected) {
+    if (connectionStatus == connected) {
       BluetoothMessageHandler messageHandler = BluetoothMessageHandler();
       // messageHandler.requestAngle();
       String boardNumber = await getBoardNumber();
@@ -254,6 +253,7 @@ class BluetoothManager {
               orElse: () => "")
           .replaceAll("\n", "")
           .split('"')[6];
+
       String? type = Actuator.passwords
           .split("board_number")
           .firstWhere((line) => line.contains(boardNumber.toString()),
@@ -261,6 +261,7 @@ class BluetoothManager {
           .replaceAll("\n", "")
           .split('Type":"')[1]
           .split('","')[0];
+
       Actuator.connectedActuator.type = type;
 
       if (password != null) {
@@ -269,14 +270,10 @@ class BluetoothManager {
         showSnackBar(context, StringConsts.actuators.errorValidatingActuators,
             null, null);
       }
-    }
 
-    if (connectionStatus == connected) {
-      BluetoothMessageHandler bluetoothMessageHandler =
-          BluetoothMessageHandler();
       // routeToPage(context, const ControlPage());
       isActuatorConnected = true;
-      bluetoothMessageHandler.getInformation();
+      messageHandler.getInformation();
       String? response = await WebController().getFeaturePasswords();
 
       Actuator.connectedActuator.status = StringConsts.actuators.connected;
@@ -294,8 +291,9 @@ class BluetoothManager {
       }
 
       Future.delayed(const Duration(seconds: 1), () {
-        bluetoothMessageHandler.requestAutoManual();
+        messageHandler.requestAutoManual();
         WebController().getFeaturePasswords();
+        messageHandler.getInformation();
       });
     }
   }
@@ -320,7 +318,6 @@ class BluetoothManager {
       androidPlatform.invokeMethod("disconnect");
     }
   }
-
 
   // TODO test
   void writeBootloader(BuildContext context) async {

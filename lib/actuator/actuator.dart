@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../String_consts.dart';
+import '../bluetooth/bluetooth_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../date_time.dart';
-import 'actuator_settings.dart';
-import '../bluetooth/bluetooth_manager.dart';
 import '../main.dart';
-import '../String_consts.dart';
+import 'actuator_settings.dart';
 
 class Actuator {
   static String? connectingDeviceAddress = "";
@@ -88,12 +88,12 @@ class Actuator {
   bool connectedToBoard = false;
   bool bootloaderFlashing = false;
   bool writingToFlash = false;
+
   // We require response of m58 before sending multiple features
   bool featureReady = true;
   bool needFlash = false;
 
-  // todo remove
-  int? boardNumber = 20319;
+  int? boardNumber;
 
   late String? type;
 

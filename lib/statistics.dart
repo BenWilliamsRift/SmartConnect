@@ -1,18 +1,16 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+
+import 'actuator/actuator.dart';
+import 'actuator pages/list_tiles.dart';
+import 'app_bar.dart';
+import 'bluetooth/bluetooth_manager.dart';
 import 'bluetooth/bluetooth_message_handler.dart';
 import 'color_manager.dart';
 import 'main.dart';
-
-import 'actuator/actuator.dart';
-import 'bluetooth/bluetooth_manager.dart';
-import 'actuator pages/list_tiles.dart';
 import 'nav_drawer.dart';
 import 'string_consts.dart';
-import 'app_bar.dart';
-
-import 'package:flutter/material.dart';
-
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({Key? key}) : super(key: key);
@@ -73,7 +71,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
       stopwatch.start();
     }
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
+    Future.delayed(const Duration(seconds: 1), () {
       setState(() {
         bluetoothMessageHandler.requestAngle();
         bluetoothMessageHandler.requestTemperature();

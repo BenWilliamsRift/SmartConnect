@@ -1,3 +1,4 @@
+import 'actuator/actuator.dart';
 import 'settings.dart';
 
 class StringConsts {
@@ -77,6 +78,10 @@ class Bluetooth {
   final String unconnected = "Unconnected";
   final String disconnected = "Disconnected";
   final String notConnected = "Not connected";
+
+  String disconnect() {
+    return "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
+  }
 }
 
 class NetworkText {
@@ -174,6 +179,7 @@ class ActuatorsStrings {
   final String startInManualMode = "Start In Manual Mode";
   final String indicationMode = "Indication Mode";
   final String reverseActing = "Reverse Acting";
+
   String confirmLock(bool locked) {
     return "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
   }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +8,10 @@ import '../actuator/actuator.dart';
 import '../app_bar.dart';
 import '../bluetooth/bluetooth_manager.dart';
 import '../color_manager.dart';
-import 'list_tiles.dart';
 import '../main.dart';
 import '../nav_drawer.dart';
-import 'custom_search_bar.dart' as search;
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class ConnectToActuatorPage extends StatefulWidget {
   const ConnectToActuatorPage({Key? key}) : super(key: key);
@@ -70,7 +68,6 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
 
   bool aliasEditorEnabled = false;
   late FocusNode aliasFocusNode;
-  List<TextEditingController> aliasEditorControllers = [];
 
   void saveAlias(Device device, TextEditingController controller) {
     setState(() {
@@ -122,36 +119,6 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
       showSnackBar(context, StringConsts.bluetooth.disconnected, null, null);
     }
 
-    // print(unconnectedDevices.isNotEmpty ? unconnectedDevices.elementAt(0).name.split(" ") : null);
-
-    // Sort by connection strength
-    // TODO get rssi
-    switch (Actuator.connectionSortMode) {
-      case "Connection Strength":
-        connectedDevices.sort((a, b) => a.getRssi().compareTo(b.getRssi()));
-        connectingDevices.sort((a, b) => a.getRssi().compareTo(b.getRssi()));
-        unconnectedDevices.sort((a, b) => a.getRssi().compareTo(b.getRssi()));
-        break;
-      // board number up
-      case "Board No. \u2191":
-        connectedDevices.sort((a, b) => min(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        connectingDevices.sort((a, b) => min(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        unconnectedDevices.sort((a, b) => min(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        break;
-      // board number down
-      case "Board No. \u2193":
-        connectedDevices.sort((a, b) => max(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        connectingDevices.sort((a, b) => max(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        unconnectedDevices.sort((a, b) => max(int.parse(a.name.split(" ")[2]), int.parse(a.name.split(" ")[2])));
-        break;
-      // flash date up
-      case "Flash Date \u2191":
-        break;
-      //  flash date down
-      case "Flash Date \u2193":
-        break;
-    }
-
     devices.addAll(connectedDevices);
     devices.addAll(connectingDevices);
     devices.addAll(unconnectedDevices);
@@ -159,16 +126,6 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     List<Widget> widgetDevices = [];
 
     for (Device device in devices) {
-      if (aliasEditorControllers.length != devices.length) {
-        TextEditingController controller =
-            TextEditingController(text: device.alias);
-        aliasEditorControllers.add(controller);
-      }
-
-      TextEditingController controller =
-          aliasEditorControllers.elementAt(devices.indexOf(device));
-
-      controller.text = device.alias;
 
       widgetDevices.add(GestureDetector(
         onHorizontalDragStart: (details) {
@@ -230,13 +187,14 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
                       });
                       updateTimer?.cancel();
                     }
-                  });},
+                  });
+                },
                 onLongPress: () {
                   setState(() {
                     // TODO  Edit Alias
                   });
                 },
-               title: Text(controller.text),
+                title: Text(device.alias),
                 subtitle: Text(device.name),
                 trailing: (Actuator.connectedDeviceAddress == device.address)
                     ? IconButton(
@@ -350,15 +308,15 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
         },
         child: Column(
           children: [
-            Style.sizedHeight,
-            Style.sizedHeight,
-            Style.sizedHeight,
-            Row(children: [
-              Expanded(flex: 1, child: Style.sizedWidth),
-              const Expanded(flex: 20, child: search.SearchBar()),
-              Expanded(flex: 1, child: Style.sizedWidth),
-            ]),
-            Style.sizedHeight,
+            // Style.sizedHeight,
+            // Style.sizedHeight,
+            // Style.sizedHeight,
+            // Row(children: [
+            //   Expanded(flex: 1, child: Style.sizedWidth),
+            //   const Expanded(flex: 20, child: search.SearchBar()),
+            //   Expanded(flex: 1, child: Style.sizedWidth),
+            // ]),
+            // Style.sizedHeight,
             Style.sizedHeight,
             Row(children: [
               Expanded(flex: 1, child: Style.sizedWidth),

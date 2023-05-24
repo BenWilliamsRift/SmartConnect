@@ -1,8 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:math';
 
 import '../actuator/actuator.dart';
 import '../date_time.dart';
@@ -117,6 +118,8 @@ class BluetoothMessageHandler {
   static const String codeSetAnalogDeadbandForwards = "m124";
   static const String codeRequestAnalogDeadbandBackwards = "m125";
   static const String codeRequestAutoManual = "m128";
+  static const String codeResetLogData = "m154";
+  static const String codeRequestLoggingData = "m155";
   static const String codeVerify = "m156";
   static const String codeLock = "m169";
   static const String codeUnlock = "m170";
@@ -881,6 +884,15 @@ class BluetoothMessageHandler {
   }
 
   void setModulatingInversion(bool enabled) {
-    bluetoothManager.sendMessage(code: codeModulatingInversion, value: boolToString(enabled));
+    bluetoothManager.sendMessage(
+        code: codeModulatingInversion, value: boolToString(enabled));
+  }
+
+  void requestLoggingData() {
+    bluetoothManager.sendMessage(code: codeRequestLoggingData);
+  }
+
+  void resetLoggingData() {
+    bluetoothManager.sendMessage(code: codeResetLogData);
   }
 }
