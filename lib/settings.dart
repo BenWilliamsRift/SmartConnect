@@ -1,9 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'actuator pages/list_tiles.dart';
-import 'preference_manager.dart';
 import 'nav_drawer.dart';
+import 'preference_manager.dart';
 import 'string_consts.dart';
 
 class Settings {
@@ -63,25 +65,26 @@ class Settings {
 
   static int passwordMinLength = 6;
 
-  static double convertTemperatureUnits({required double temp, int source=celsius}) {
+  static int convertTemperatureUnits(
+      {required double temp, int source = celsius}) {
     assert(source == celsius || source == fahrenheit);
 
     if (source == celsius) {
       if (selectedTemperatureUnits == fahrenheit) {
-        return (temp * 9 / 5) + 32;
+        return ((temp * 9 / 5) + 32).round();
       }
 
-      return temp;
+      return temp.round();
     } else if (source == fahrenheit) {
       if (selectedTorqueUnits == celsius) {
-        return (temp - 32) * 5/9;
+        return ((temp - 32) * 5 / 9).round();
       }
 
-      return temp;
+      return temp.round();
     }
 
     // Should never get called
-    return temp;
+    return temp.round();
   }
 
   static String getTemperatureUnits() {
@@ -96,7 +99,13 @@ class Settings {
 
   // by default converts a number from newton meters into either foot pounds or inch pounds
   // but by changing the source the input can convert to any of the three from any of the three
+  // Source is the original format, wanted is the the wanted format
   static double convertTorqueUnits({required double torque, int source=newtonMeter, int wanted=-1}) {
+    double roundDouble(double value, int places) {
+      num mod = pow(10.0, places);
+      return ((value * mod).round().toDouble() / mod);
+    }
+
     assert(source == newtonMeter || source == footPound || source == inchPound);
 
     if (wanted == -1) {
@@ -106,41 +115,41 @@ class Settings {
     if (source == newtonMeter) {
       if (wanted == footPound) {
         // foot pound
-        return torque / 1.356;
+        return roundDouble(torque / 1.356, 2);
       } else if (wanted == inchPound) {
         // inch pound
-        return torque * 8.851;
+        return roundDouble(torque * 8.851, 2);
       }
 
       // newton meters
-      return torque;
+      return roundDouble(torque, 2);
     }
     else if (source == inchPound) {
       if (wanted == footPound) {
         // foot pound
-        return torque / 12;
+        return roundDouble(torque / 12, 2);
       } else if (wanted == newtonMeter) {
         // newton meters
-        return torque * 0.112984825;
+        return roundDouble(torque * 0.112984825, 2);
       }
 
       // inch pounds
-      return torque;
+      return roundDouble(torque, 2);
     }
     else if (source == footPound) {
       if (wanted == inchPound) {
         // inch pound
-        return torque * 12;
+        return roundDouble(torque * 12, 2);
       } else if (wanted == newtonMeter) {
         // newton meters
-        return torque * 1.3558179483;
+        return roundDouble(torque * 1.3558179483, 2);
       }
 
-      return torque;
+      return roundDouble(torque, 2);
     }
 
     // should never get returned here
-    return torque;
+    return roundDouble(torque, 2);
   }
 
   static String getTorqueUnits() {
@@ -228,7 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
           DropDownTile(
               items: Settings.torqueUnits,
               value:
-                  Settings.torqueUnits.elementAt(Settings.selectedTorqueUnits),
+              Settings.torqueUnits.elementAt(Settings.selectedTorqueUnits),
               onChanged: (String? unit) {
                 setState(() {
                   Settings.selectedTorqueUnits =
@@ -243,7 +252,7 @@ class _SettingsPageState extends State<SettingsPage> {
           DropDownTile(
               items: Settings.timeUnits,
               value:
-                  Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
+              Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
               onChanged: (String? unit) {
                 setState(() {
                   Settings.selectedTimeUnits = Settings.timeUnits.indexOf(unit!);
@@ -277,7 +286,7 @@ class _SettingsPageState extends State<SettingsPage> {
               initValue: Settings.emulateConnectedActuator,
               callback: (bool value) {
                 setState(
-                  () {
+                      () {
                     Settings.emulateConnectedActuator = value;
                   },
                 );
