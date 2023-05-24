@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:math';
 
-import '../bluetooth/bluetooth_message_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'bluetooth/bluetooth_manager.dart';
-import 'string_consts.dart';
+import '../bluetooth/bluetooth_message_handler.dart';
 import 'actuator/actuator.dart';
+import 'bluetooth/bluetooth_manager.dart';
 import 'color_manager.dart';
+import 'string_consts.dart';
 
 class AssetManager {
   static Image loading = const Image(
@@ -224,13 +224,13 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
 
   @override
   Widget build(BuildContext context) {
-
     Future.delayed(const Duration(seconds: 1), () {
       bluetoothMessageHandler.requestAngle();
       setState(() {});
     });
 
-    int actualAngle = Actuator.connectedActuator.settings.angle.truncate() % 360;
+    int actualAngle =
+        Actuator.connectedActuator.settings.angle.truncate() % 360;
 
     // reduce jumpiness in angle values
     previousAngles.add(actualAngle);
@@ -238,7 +238,7 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
       previousAngles.removeAt(0);
     }
 
-    int angle = averageAngle();
+    int angle = (averageAngle());
 
     angleRing =
         _CirclePainter(radius: radius, color: ColorManager.angleRingColor);
@@ -273,11 +273,12 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
             Center(
                 child: CustomPaint(
                     child: CustomPaint(
-                        size: Size(radius * 2, radius * 2), painter: angleRing))),
-            Center(
-                child: CustomPaint(
-                    child: CustomPaint(
-                        size: Size(radius * 2, radius * 2), painter: angleArc))),
+                        size: Size(radius * 2, radius * 2),
+                        painter: angleRing))),
+            // Center(
+            //     child: CustomPaint(
+            //         child: CustomPaint(
+            //             size: Size(radius * 2, radius * 2), painter: angleArc))),
             Center(
                 child: CustomPaint(
                     child: CustomPaint(

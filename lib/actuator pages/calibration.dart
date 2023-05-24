@@ -7,9 +7,9 @@ import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class CalibrationPage extends StatefulWidget {
   const CalibrationPage({Key? key}) : super(key: key);
@@ -35,20 +35,12 @@ class _CalibrationPageState extends State<CalibrationPage> {
 
     // initial requests
     requestAll();
-
-    openAngleController = TextEditingController(text: Actuator.connectedActuator.settings.getOpenAngle);
-    closedAngleController = TextEditingController(text: Actuator.connectedActuator.settings.getClosedAngle);
-    workingAngleController = TextEditingController(text: Actuator.connectedActuator.settings.getWorkingAngle);
   }
 
   bool autoManualReleased = false;
   Color? autoManualColor;
 
   int count = 0;
-
-  late TextEditingController openAngleController;
-  late TextEditingController closedAngleController;
-  late TextEditingController workingAngleController;
 
   @override
   Widget build(BuildContext context) {
@@ -173,20 +165,27 @@ class _CalibrationPageState extends State<CalibrationPage> {
               // open angle
               TextInputTile(
                 title: Text(
-                  style: Style.normalText,
-                  StringConsts.actuators.calibrationOpenAngle
-                ),
-                onSaved: (String? newValue) {
-                  // set open angle
-                  if (newValue != null) {
-                    bluetoothMessageHandler.setOpenAngle(double.parse(newValue));
-                    Actuator.connectedActuator.settings.openAngle = double.parse(newValue);
+                style: Style.normalText,
+                StringConsts.actuators.calibrationOpenAngle),
+            onSaved: (String? newValue) {
+              // confirmation message
+              confirmationMessage(
+                  context: context,
+                  text: StringConsts.actuators.moveClosedAngle(
+                      Actuator.connectedActuator.settings.getWorkingAngle),
+                  yesAction: () {
+                    // Move closed angle
+                  });
 
-                    openAngleController.text = Actuator.connectedActuator.settings.getOpenAngle;
-                  }
-                },
-                initialValue: Actuator.connectedActuator.settings.getOpenAngle,
-              ),
+              // set open angle
+              if (newValue != null) {
+                bluetoothMessageHandler.setOpenAngle(double.parse(newValue));
+                Actuator.connectedActuator.settings.openAngle =
+                    double.parse(newValue);
+              }
+            },
+            initialValue: Actuator.connectedActuator.settings.getOpenAngle,
+          ),
               // closed angle
               TextInputTile(
                 title: Text(
@@ -202,7 +201,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
                     Actuator.connectedActuator.settings.closedAngle = double.parse(newValue);
                     Actuator.connectedActuator.settings.updateOpenAngle();
                   }
-                  closedAngleController.text = Actuator.connectedActuator.settings.getClosedAngle;
                 },
                 ),
               // working angle
@@ -219,7 +217,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
                       Actuator.connectedActuator.settings.updateOpenAngle();
                     }
 
-                    workingAngleController.text = Actuator.connectedActuator.settings.getWorkingAngle;
                   }),
               // torque band
               TextTile(

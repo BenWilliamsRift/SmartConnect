@@ -117,7 +117,8 @@ class LoginText {
   final String failedToOpenRegisterPage = "Failed to open register page";
   final String copyRegisterUrl = "Copy link";
   final String confirmLogout = "Are you sure you want to log out";
-  final String twelveHourDelay = "It has been more than 12 hours since you last logged in, so you have been logged out.";
+  final String twelveHourDelay =
+      "It has been more than 12 hours since you last logged in, so you have been logged out.";
 }
 
 class ActuatorsStrings {
@@ -129,6 +130,10 @@ class ActuatorsStrings {
       "Error validating actuator, try logging ing again";
 
   final String noConnectedActuator = "No Connected Actuator";
+
+  String moveClosedAngle(String value) {
+    return "Do you want to move the closed angle, to maintain a working angle of: $value?";
+  }
 
   final String features = "Features";
   final String status = "Status";
@@ -151,7 +156,8 @@ class ActuatorsStrings {
 
   final String writeToFlash = "Save Settings";
   final String settingsSaved = "Settings Saved";
-  final String confirmWriteToFlash = "Are you sure you want to save these settings";
+  final String confirmWriteToFlash =
+      "Are you sure you want to save these settings";
   final String firmwareVersion = "Firmware Version";
   final String valveOrientation = "Valve Orientation";
   final String backlash = "Backlash";
@@ -167,6 +173,7 @@ class ActuatorsStrings {
   String confirmLock(bool locked) {
     return "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
   }
+
   final String lock = "Lock";
   final String unlock = "Unlock";
   final String failedToUpdateFeatures = "Failed to update features";
