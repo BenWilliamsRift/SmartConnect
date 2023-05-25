@@ -189,6 +189,14 @@ class ActuatorSettings {
       List.filled(ActuatorConstants.numberOfFeatures, "None");
   late String featuresPasswordDigits;
 
+  void setFeaturesDisabled(int index) {
+    featuresArray[index] = 0;
+  }
+
+  void setFeaturesEnabled(int index) {
+    featuresArray[index] = 1;
+  }
+
   late bool magnetTestMode;
 
   // Bootloader

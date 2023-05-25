@@ -122,8 +122,6 @@ class LoginText {
   final String failedToOpenRegisterPage = "Failed to open register page";
   final String copyRegisterUrl = "Copy link";
   final String confirmLogout = "Are you sure you want to log out";
-  final String twelveHourDelay =
-      "It has been more than 12 hours since you last logged in, so you have been logged out.";
 }
 
 class ActuatorsStrings {
@@ -139,6 +137,11 @@ class ActuatorsStrings {
   String moveClosedAngle(String value) {
     return "Do you want to move the closed angle, to maintain a working angle of: $value?";
   }
+
+  // TODO only use this while the old bootloader system is in place
+  // remove once the update process is streamlined
+  final String bootloaderDoYouKnowWhatYourDoing =
+      "Do you know what you are doing?";
 
   String moveOpenAngle(String value) {
     return "Do you want to move the open angle, to maintain a working angle of: $value?";
@@ -315,7 +318,7 @@ class SettingsStrings {
   final String twelveHourTime = "12 Hour time";
   final String saveLoginDetails = "Save login details";
   final String saveLoginDetailsSub =
-      "Lets you close the app and stay logged in for up to 12 hours";
+      "Lets you close the app and stay logged in";
   final String temperature = "Temperature";
   final String torqueUnits = "Torque Units";
   final String timeUnits = "Time units";

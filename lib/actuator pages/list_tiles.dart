@@ -1027,13 +1027,17 @@ class _AutoManualButtonState extends State<AutoManualButton> {
 void confirmationMessage(
     {required BuildContext context,
     required String text,
-    required Function yesAction}) {
+    required Function yesAction,
+    Function? noAction}) {
   showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(title: Text(text), actions: [
           TextButton(
             onPressed: () {
+              if (noAction != null) {
+                noAction();
+              }
               Navigator.of(context).pop();
             },
             child: const Text("No"),

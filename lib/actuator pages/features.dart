@@ -137,9 +137,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
     if (passwords == null) return;
 
     String boardNumber = Actuator.connectedActuator.boardNumber.toString();
-    if (kDebugMode) {
-      print(boardNumber);
-    }
     List<String> line = splitPasswords(passwords, boardNumber, 0, " ");
 
     if (line.length < ActuatorConstants.numberOfFeatures) return;
@@ -149,6 +146,10 @@ class _FeaturesPageState extends State<FeaturesPage> {
         // Set all Passwords
         Actuator.connectedActuator.settings
             .setFeaturePassword(i, line.elementAt(i + 1));
+
+        // lock features if they are not enabled on the website
+        // change features in the app if they are enabled
+        // save if the feature was turned off and keep it turned off even if they have the feature
       }
     } on Exception {
       // log error
@@ -164,29 +165,32 @@ class _FeaturesPageState extends State<FeaturesPage> {
   }
 
   void updatePasswords() {
+    // get features
+    bluetoothMessageHandler.requestFeatures();
+
     List<String> passwords =
-          Actuator.connectedActuator.settings.featuresPasswords;
-      for (int i = 0; i < ActuatorConstants.numberOfFeatures - 1; i++) {
-        String password = passwords.elementAt(i);
+        Actuator.connectedActuator.settings.featuresPasswords;
+    for (int i = 0; i < ActuatorConstants.numberOfFeatures - 1; i++) {
+      String password = passwords.elementAt(i);
+      // String password = Actuator.connectedActuator.settings.featuresPasswords[i];
 
-
-        SwitchTile featureSwitch = switches.elementAt(i);
-        bool didComplete = true;
-        if (!featureSwitch.initValue) {
-          switch (password.toLowerCase()) {
-            case "none":
-              // Hide feature
-              setFeature(i, false);
+      SwitchTile featureSwitch = switches.elementAt(i);
+      bool didComplete = true;
+      if (!featureSwitch.initValue) {
+        switch (password.toLowerCase()) {
+          case "none":
+          // Hide feature
+            setFeature(i, false);
             break;
           case "disable":
-              // Show feature but disable switch
-              setFeature(i, false);
+          // Show feature but disable switch
+            setFeature(i, false);
             break;
           default:
-              didComplete = false;
-          }
+            didComplete = false;
         }
-        if (!didComplete) {
+      }
+      if (!didComplete) {
         setFeature(i, true);
       }
       // if (password.toLowerCase() == "none" || password.toLowerCase() == "disable" && !featureSwitch.initValue) {
@@ -207,10 +211,11 @@ class _FeaturesPageState extends State<FeaturesPage> {
 
     // Must be kept in this order
     // order is like this because the data that is received isn't structured so it is just assumed that all the right data is received and that the order of switches is the same
+    // Hidden some features because it is never used
     switches = [
       SwitchTile(
         visible: true,
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         title:
             Text(style: Style.normalText, StringConsts.actuators.torqueLimit),
         initValue: Actuator.connectedActuator.torqueLimit ?? false,
@@ -227,7 +232,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
       ), // torque_limit_feature
       SwitchTile(
         visible: true,
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm60),
         initValue: Actuator.connectedActuator.isNm60 ?? false,
         callback: (bool value) {
@@ -243,7 +248,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
       ), // nm60_feature
       SwitchTile(
         visible: true,
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm80),
         initValue: Actuator.connectedActuator.isNm80 ?? false,
         callback: (bool value) {
@@ -259,7 +264,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
       ), // nm80_feature
       SwitchTile(
         visible: true,
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm100),
         initValue: Actuator.connectedActuator.isNm100 ?? false,
         callback: (bool value) {
@@ -274,6 +279,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
         },
       ), // nm100_feature
       SwitchTile(
+        visible: false,
         title: Text(
             style: Style.normalText, StringConsts.actuators.twoWireControl),
         touchInputDisabled: true,
@@ -294,7 +300,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.failsafe,
         ),
-        touchInputDisabled: true,
         initValue: Actuator.connectedActuator.failsafe ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.failsafe == null
@@ -312,7 +317,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.modulating,
         ),
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         initValue: Actuator.connectedActuator.modulating ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.modulating == null
@@ -330,7 +335,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.speedControl,
         ),
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         initValue: Actuator.connectedActuator.speedControl ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.speedControl == null
@@ -348,7 +353,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.multiTurn,
         ),
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         initValue: Actuator.connectedActuator.multiTurn ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.multiTurn == null
@@ -366,7 +371,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.offGridTimer,
         ),
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         initValue: Actuator.connectedActuator.offGridTimer ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.offGridTimer == null
@@ -384,7 +389,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
           style: Style.normalText,
           StringConsts.actuators.wiggle,
         ),
-        touchInputDisabled: true,
+        touchInputDisabled: false,
         initValue: Actuator.connectedActuator.wiggle ?? false,
         callback: (bool value) {
           Actuator.connectedActuator.wiggle == null
@@ -398,7 +403,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
         },
       ), // wiggle_feature
       SwitchTile(
-        visible: true,
+        visible: false,
         touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
@@ -417,7 +422,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
         },
       ), // control_systems_feature
       SwitchTile(
-        visible: true,
+        visible: false,
         touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
@@ -436,7 +441,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
         },
       ), // valve_profile_feature
       SwitchTile(
-        visible: true,
+        visible: false,
         touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
