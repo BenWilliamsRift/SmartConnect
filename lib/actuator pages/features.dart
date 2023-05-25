@@ -68,6 +68,53 @@ class _FeaturesPageState extends State<FeaturesPage> {
     });
   }
 
+  void setFeature(int index, bool value) {
+    switch (index) {
+      case 0:
+        Actuator.connectedActuator.torqueLimit = value;
+        break;
+      case 1:
+        Actuator.connectedActuator.isNm60 = value;
+        break;
+      case 2:
+        Actuator.connectedActuator.isNm80 = value;
+        break;
+      case 3:
+        Actuator.connectedActuator.isNm100 = value;
+        break;
+      case 4:
+        Actuator.connectedActuator.twoWireControl = value;
+        break;
+      case 5:
+        Actuator.connectedActuator.failsafe = value;
+        break;
+      case 6:
+        Actuator.connectedActuator.modulating = value;
+        break;
+      case 7:
+        Actuator.connectedActuator.speedControl = value;
+        break;
+      case 8:
+        Actuator.connectedActuator.multiTurn = value;
+        break;
+      case 9:
+        Actuator.connectedActuator.offGridTimer = value;
+        break;
+      case 10:
+        Actuator.connectedActuator.wiggle = value;
+        break;
+      case 11:
+        Actuator.connectedActuator.controlSystem = value;
+        break;
+      case 12:
+        Actuator.connectedActuator.valveProfile = value;
+        break;
+      case 13:
+        Actuator.connectedActuator.analogDeadband = value;
+        break;
+    }
+  }
+
   List<String> splitPasswords(
       String source, String boardNumber, int index, String separator) {
     List<String> passwords = source.split("\n");
@@ -129,19 +176,19 @@ class _FeaturesPageState extends State<FeaturesPage> {
           switch (password.toLowerCase()) {
             case "none":
               // Hide feature
-              featureSwitch.setValue!(false);
-              break;
-            case "disable":
+              setFeature(i, false);
+            break;
+          case "disable":
               // Show feature but disable switch
-              featureSwitch.setValue!(false);
-              break;
-            default:
+              setFeature(i, false);
+            break;
+          default:
               didComplete = false;
           }
         }
         if (!didComplete) {
-          featureSwitch.setValue!(true);
-        }
+        setFeature(i, true);
+      }
       // if (password.toLowerCase() == "none" || password.toLowerCase() == "disable" && !featureSwitch.initValue) {
       // //     uses a callback set for each switch
       //     featureSwitch.setValue!(false);
@@ -149,7 +196,9 @@ class _FeaturesPageState extends State<FeaturesPage> {
       //     featureSwitch.setValue!(true);
       //     // TODO Add different features
       //   }
-      }
+    }
+
+    setState(() {});
   }
 
   @override
@@ -172,8 +221,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.torqueLimit = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.torqueLimit = value;
+        setValue: () {
+          return Actuator.connectedActuator.torqueLimit;
         },
       ), // torque_limit_feature
       SwitchTile(
@@ -188,8 +237,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.isNm60 = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.isNm60 = value;
+        setValue: () {
+          return Actuator.connectedActuator.isNm60;
         },
       ), // nm60_feature
       SwitchTile(
@@ -204,8 +253,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.isNm80 = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.isNm80 = value;
+        setValue: () {
+          return Actuator.connectedActuator.isNm80;
         },
       ), // nm80_feature
       SwitchTile(
@@ -220,8 +269,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.isNm100 = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.isNm100 = value;
+        setValue: () {
+          return Actuator.connectedActuator.isNm100;
         },
       ), // nm100_feature
       SwitchTile(
@@ -236,8 +285,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.twoWireControl = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.twoWireControl = value;
+        setValue: () {
+          return Actuator.connectedActuator.twoWireControl;
         },
       ), // twowire_feature
       SwitchTile(
@@ -254,8 +303,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.failsafe = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.failsafe = value;
+        setValue: () {
+          return Actuator.connectedActuator.failsafe;
         },
       ), // failsafe_feature
       SwitchTile(
@@ -272,8 +321,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.modulating = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.modulating = value;
+        setValue: () {
+          return Actuator.connectedActuator.modulating;
         },
       ), // modulating_feature
       SwitchTile(
@@ -290,8 +339,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.speedControl = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.speedControl = value;
+        setValue: () {
+          return Actuator.connectedActuator.speedControl;
         },
       ), // speed_control_feature
       SwitchTile(
@@ -308,8 +357,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.multiTurn = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.multiTurn = value;
+        setValue: () {
+          return Actuator.connectedActuator.multiTurn;
         },
       ), // multi_turn_feature
       SwitchTile(
@@ -326,8 +375,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.offGridTimer = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.offGridTimer = value;
+        setValue: () {
+          return Actuator.connectedActuator.offGridTimer;
         },
       ), // off_grid_feature
       SwitchTile(
@@ -344,8 +393,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.wiggle = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.wiggle = value;
+        setValue: () {
+          return Actuator.connectedActuator.wiggle;
         },
       ), // wiggle_feature
       SwitchTile(
@@ -363,8 +412,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.controlSystem = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.controlSystem = value;
+        setValue: () {
+          return Actuator.connectedActuator.controlSystem;
         },
       ), // control_systems_feature
       SwitchTile(
@@ -382,8 +431,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.valveProfile = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.valveProfile = value;
+        setValue: () {
+          return Actuator.connectedActuator.valveProfile;
         },
       ), // valve_profile_feature
       SwitchTile(
@@ -401,8 +450,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   ? Actuator.connectedActuator.analogDeadband = value
                   : null;
         },
-        setValue: (bool value) {
-          Actuator.connectedActuator.analogDeadband = value;
+        setValue: () {
+          return Actuator.connectedActuator.analogDeadband;
         },
       ), // analog_deadband_feature
     ];

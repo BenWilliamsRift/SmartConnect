@@ -195,18 +195,12 @@ class BluetoothManager {
       else if (result == failed) {
         // throw  a Exception("Error connecting");
         connectionStatus = failed;
-        showSnackBar(
-            context,
-            "${StringConsts.bluetooth.failedConnection}$address",
-            null,
-            SnackBarAction(
-                label: StringConsts.bluetooth.retryConnection,
-                onPressed: () async {
-                  SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-                  // routeToPage(context, const FixConnectionsPage(), removeStack: false);
-                  result = await androidPlatform.invokeMethod("connect",
-                      {"address": address.toString(), "secure": "true"});
-                }));
+        showSnackBar(context,
+            "${StringConsts.bluetooth.failedConnection}$address", null, null);
+        Actuator.connectingDeviceAddress = null;
+        Actuator.connectedDeviceAddress = null;
+        connectingDeviceAddress = null;
+        connectedDeviceAddress = null;
       }
       // Successful connection
       else if (result == connected) {

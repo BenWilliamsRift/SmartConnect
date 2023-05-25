@@ -87,7 +87,7 @@ String getTitle() {
 class SwitchTile extends StatefulWidget {
   final bool initValue;
   final Function(bool value)? callback;
-  final Function(bool value)? setValue;
+  final Function()? setValue;
   final Text title;
   final Text? subtitle;
   final bool visible;
@@ -115,17 +115,28 @@ class _SwitchTileState extends State<SwitchTile> {
   late Text? subtitle;
   late bool visible;
   late bool touchInputDisabled;
+  Function()? setValue;
 
   bool waitingForResponse = false;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     value = widget.initValue;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     callback = widget.callback;
     title = widget.title;
     subtitle = widget.subtitle;
     visible = widget.visible;
     touchInputDisabled = widget.touchInputDisabled;
+    setValue = widget.setValue;
+
+    if (setValue != null) {
+      value = setValue!() ?? value;
+    }
 
     return visible
         ? Card(

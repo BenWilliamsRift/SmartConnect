@@ -56,7 +56,6 @@ class ActuatorSettings {
 
   // basic settings
 
-  late int boardNumber;
   late double firmwareVersion;
   late double valveOrientation;
   late int numberOfFullCycles;
