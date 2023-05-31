@@ -64,7 +64,7 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
         drawer: const NavDrawer(),
         body: Stack(
           children: [
-            showLoading ? AssetManager.loading : Container(),
+            showLoading ? Center(child: AssetManager.loading) : Container(),
             SingleChildScrollView(
                 child: Column(
               children: [
@@ -121,20 +121,30 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                           })),
                   Style.sizedWidth,
                 ]),
-                Row(children: [
-                  Style.sizedWidth,
-                  Expanded(
-                      child: Button(
-                          child: Text(StringConsts.actuators.uploadFirmware),
-                          onPressed: () {
-                            setState(() {
-                              // TODO how do i know when upload is done?
-                              bluetoothMessageHandler.updateFirmware(context);
-                              showLoading = true;
-                            });
-                          })),
-                  Style.sizedWidth,
-                ]),
+                Actuator.connectedActuator.inBootLoader
+                    ? Row(children: [
+                        Style.sizedWidth,
+                        Expanded(
+                            child: Button(
+                                child:
+                                    Text(StringConsts.actuators.uploadFirmware),
+                                onPressed: () {
+                                  setState(() {
+                                    bluetoothMessageHandler
+                                        .updateFirmware(context);
+                                    showLoading = true;
+                                    // TODO how do i know when upload is done?
+                                    Future.delayed(const Duration(seconds: 10),
+                                        () {
+                                      setState(() {
+                                        showLoading = false;
+                                      });
+                                    });
+                                  });
+                                })),
+                        Style.sizedWidth,
+                      ])
+                    : Container(),
                 Text(
                     textAlign: TextAlign.center,
                     Actuator.connectedActuator.inBootLoader

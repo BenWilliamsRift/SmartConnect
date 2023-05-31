@@ -174,21 +174,18 @@ class _FeaturesPageState extends State<FeaturesPage> {
       String password = passwords.elementAt(i);
       // String password = Actuator.connectedActuator.settings.featuresPasswords[i];
 
-      SwitchTile featureSwitch = switches.elementAt(i);
       bool didComplete = true;
-      if (!featureSwitch.initValue) {
-        switch (password.toLowerCase()) {
-          case "none":
+      switch (password.toLowerCase()) {
+        case "none":
           // Hide feature
-            setFeature(i, false);
-            break;
-          case "disable":
+          setFeature(i, false);
+          break;
+        case "disable":
           // Show feature but disable switch
-            setFeature(i, false);
-            break;
-          default:
-            didComplete = false;
-        }
+          setFeature(i, false);
+          break;
+        default:
+          didComplete = false;
       }
       if (!didComplete) {
         setFeature(i, true);
