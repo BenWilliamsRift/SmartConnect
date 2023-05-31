@@ -191,23 +191,23 @@ class Actuator {
 
   // temporary values
   String? status;
-  bool? twoWireControl;
+  bool twoWireControl = false;
   bool inBootLoader = false;
-  bool? failsafe;
-  bool? modulating;
-  bool? speedControl;
-  bool? multiTurn;
-  bool? offGridTimer;
-  bool? wiggle;
+  bool failsafe = false;
+  bool modulating = false;
+  bool speedControl = false;
+  bool multiTurn = false;
+  bool offGridTimer = false;
+  bool wiggle = false;
   bool isLocked = false;
 
-  bool? torqueLimit;
-  bool? isNm60;
-  bool? isNm80;
-  bool? isNm100;
-  bool? controlSystem;
-  bool? valveProfile;
-  bool? analogDeadband;
+  bool torqueLimit = false;
+  bool isNm60 = false;
+  bool isNm80 = false;
+  bool isNm100 = false;
+  bool controlSystem = false;
+  bool valveProfile = false;
+  bool analogDeadband = false;
 
   late Delay failsafeDelay = Delay();
 

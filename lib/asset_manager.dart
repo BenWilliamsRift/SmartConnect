@@ -19,16 +19,15 @@ class AssetManager {
   static Image actuatorImage = const Image(
       image: AssetImage("assets/angle_ring.png"),
       filterQuality: FilterQuality.high);
-  static Image logo = const Image(
-    image: AssetImage("assets/logo.png"),
-    width: 40,
-    height: 40
-  );
-  static String hexFileName = "pfire_actuator_hex.txt";
+  static Image logo =
+      const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
+  static String hexFileName = "actuator_hex.txt";
+  static Image locked = const Image(
+      image: AssetImage("assets/locked.png"), width: 40, height: 40);
 
   // Load files
   static Future<String> loadAsset(String assetName) async {
-   return await rootBundle.loadString(assetName);
+    return await rootBundle.loadString(assetName);
   }
 }
 

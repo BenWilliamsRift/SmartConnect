@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../actuator/actuator.dart';
+import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
 import '../date_time.dart';
@@ -92,6 +93,7 @@ class SwitchTile extends StatefulWidget {
   final Text? subtitle;
   final bool visible;
   final bool touchInputDisabled;
+  final bool isLocked;
 
   const SwitchTile(
       {Key? key,
@@ -101,7 +103,8 @@ class SwitchTile extends StatefulWidget {
       required this.title,
       this.subtitle,
       this.visible = true,
-      this.touchInputDisabled = false})
+      this.touchInputDisabled = false,
+      this.isLocked = false})
       : super(key: key);
 
   @override
@@ -117,7 +120,7 @@ class _SwitchTileState extends State<SwitchTile> {
   late bool touchInputDisabled;
   Function()? setValue;
 
-  bool waitingForResponse = false;
+  bool isLocked = false;
 
   @override
   void initState() {
@@ -133,6 +136,11 @@ class _SwitchTileState extends State<SwitchTile> {
     visible = widget.visible;
     touchInputDisabled = widget.touchInputDisabled;
     setValue = widget.setValue;
+    isLocked = widget.isLocked;
+
+    if (isLocked) {
+      touchInputDisabled = true;
+    }
 
     if (setValue != null) {
       value = setValue!() ?? value;
@@ -144,34 +152,32 @@ class _SwitchTileState extends State<SwitchTile> {
             child: ListTile(
               title: title,
               subtitle: subtitle,
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  waitingForResponse
-                      ? const CircularProgressIndicator()
-                      : Container(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    child: Switch(
-                      value: value,
-                      onChanged: (bool value) {
-                        if (touchInputDisabled) {
-                          setState(() {});
-                          return;
-                        } else {
-                          setState(() {
-                            this.value = value;
-                            // TODO waitingForResponse = true;
-                            // run a custom callback if needed
-                            if (callback != null) {
-                              callback?.call(value);
-                            }
-                          });
-                        }
-                      },
-                    ),
-                  ),
-                ],
+              trailing: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                child: isLocked
+                    ? GestureDetector(
+                        onTap: () {
+                          // TODO open ad for features
+                          // Show text saying that they need to buy these features to have them active
+                        },
+                        child: AssetManager.locked)
+                    : Switch(
+                        value: value,
+                        onChanged: (bool value) {
+                          if (touchInputDisabled) {
+                            setState(() {});
+                            return;
+                          } else {
+                            setState(() {
+                              this.value = value;
+                              // run a custom callback if needed
+                              if (callback != null) {
+                                callback?.call(value);
+                              }
+                            });
+                          }
+                        },
+                      ),
               ),
             ))
         : Container();

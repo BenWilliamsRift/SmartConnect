@@ -214,246 +214,197 @@ class _FeaturesPageState extends State<FeaturesPage> {
     // Hidden some features because it is never used
     switches = [
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.torqueLimit,
         visible: true,
-        touchInputDisabled: false,
         title:
             Text(style: Style.normalText, StringConsts.actuators.torqueLimit),
-        initValue: Actuator.connectedActuator.torqueLimit ?? false,
+        initValue: Actuator.connectedActuator.torqueLimit,
         callback: (bool value) {
-          Actuator.connectedActuator.torqueLimit == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.torqueLimit ?? false
-                  ? Actuator.connectedActuator.torqueLimit = value
-                  : null;
+          Actuator.connectedActuator.torqueLimit = value;
         },
         setValue: () {
           return Actuator.connectedActuator.torqueLimit;
         },
       ), // torque_limit_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.isNm60,
         visible: true,
-        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm60),
-        initValue: Actuator.connectedActuator.isNm60 ?? false,
+        initValue: Actuator.connectedActuator.isNm60,
         callback: (bool value) {
-          Actuator.connectedActuator.isNm60 == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.isNm60 ?? false
-                  ? Actuator.connectedActuator.isNm60 = value
-                  : null;
+          Actuator.connectedActuator.isNm60 = value;
         },
         setValue: () {
           return Actuator.connectedActuator.isNm60;
         },
       ), // nm60_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.isNm80,
         visible: true,
-        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm80),
-        initValue: Actuator.connectedActuator.isNm80 ?? false,
+        initValue: Actuator.connectedActuator.isNm80,
         callback: (bool value) {
-          Actuator.connectedActuator.isNm80 == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.isNm80 ?? false
-                  ? Actuator.connectedActuator.isNm80 = value
-                  : null;
+          Actuator.connectedActuator.isNm80 = value;
         },
         setValue: () {
           return Actuator.connectedActuator.isNm80;
         },
       ), // nm80_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.isNm100,
         visible: true,
-        touchInputDisabled: false,
         title: Text(style: Style.normalText, StringConsts.actuators.nm100),
-        initValue: Actuator.connectedActuator.isNm100 ?? false,
+        initValue: Actuator.connectedActuator.isNm100,
         callback: (bool value) {
-          Actuator.connectedActuator.isNm100 == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.isNm100 ?? false
-                  ? Actuator.connectedActuator.isNm100 = value
-                  : null;
+          Actuator.connectedActuator.isNm100 = value;
         },
         setValue: () {
           return Actuator.connectedActuator.isNm100;
         },
       ), // nm100_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.twoWireControl,
         visible: false,
         title: Text(
             style: Style.normalText, StringConsts.actuators.twoWireControl),
-        touchInputDisabled: true,
-        initValue: Actuator.connectedActuator.twoWireControl ?? false,
+        initValue: Actuator.connectedActuator.twoWireControl,
         callback: (bool value) {
-          Actuator.connectedActuator.twoWireControl == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.twoWireControl ?? false
-                  ? Actuator.connectedActuator.twoWireControl = value
-                  : null;
+          Actuator.connectedActuator.twoWireControl = value;
         },
         setValue: () {
           return Actuator.connectedActuator.twoWireControl;
         },
       ), // twowire_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.failsafe,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.failsafe,
         ),
-        initValue: Actuator.connectedActuator.failsafe ?? false,
+        initValue: Actuator.connectedActuator.failsafe,
         callback: (bool value) {
-          Actuator.connectedActuator.failsafe == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.failsafe ?? false
-                  ? Actuator.connectedActuator.failsafe = value
-                  : null;
+          Actuator.connectedActuator.failsafe = value;
         },
         setValue: () {
           return Actuator.connectedActuator.failsafe;
         },
       ), // failsafe_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.modulating,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.modulating,
         ),
-        touchInputDisabled: false,
-        initValue: Actuator.connectedActuator.modulating ?? false,
+        initValue: Actuator.connectedActuator.modulating,
         callback: (bool value) {
-          Actuator.connectedActuator.modulating == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.modulating ?? false
-                  ? Actuator.connectedActuator.modulating = value
-                  : null;
+          Actuator.connectedActuator.modulating = value;
         },
         setValue: () {
           return Actuator.connectedActuator.modulating;
         },
       ), // modulating_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.speedControl,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.speedControl,
         ),
-        touchInputDisabled: false,
-        initValue: Actuator.connectedActuator.speedControl ?? false,
+        initValue: Actuator.connectedActuator.speedControl,
         callback: (bool value) {
-          Actuator.connectedActuator.speedControl == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.speedControl ?? false
-                  ? Actuator.connectedActuator.speedControl = value
-                  : null;
+          Actuator.connectedActuator.speedControl = value;
         },
         setValue: () {
           return Actuator.connectedActuator.speedControl;
         },
       ), // speed_control_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.multiTurn,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.multiTurn,
         ),
-        touchInputDisabled: false,
-        initValue: Actuator.connectedActuator.multiTurn ?? false,
+        initValue: Actuator.connectedActuator.multiTurn,
         callback: (bool value) {
-          Actuator.connectedActuator.multiTurn == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.multiTurn ?? false
-                  ? Actuator.connectedActuator.multiTurn = value
-                  : null;
+          Actuator.connectedActuator.multiTurn = value;
         },
         setValue: () {
           return Actuator.connectedActuator.multiTurn;
         },
       ), // multi_turn_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.offGridTimer,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.offGridTimer,
         ),
-        touchInputDisabled: false,
-        initValue: Actuator.connectedActuator.offGridTimer ?? false,
+        initValue: Actuator.connectedActuator.offGridTimer,
         callback: (bool value) {
-          Actuator.connectedActuator.offGridTimer == null
-              ? Actuator.connectedActuator.offGridTimer
-              : Actuator.connectedActuator.offGridTimer ?? false
-                  ? Actuator.connectedActuator.offGridTimer = value
-                  : null;
+          Actuator.connectedActuator.offGridTimer = value;
         },
         setValue: () {
           return Actuator.connectedActuator.offGridTimer;
         },
       ), // off_grid_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.wiggle,
+        visible: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.wiggle,
         ),
-        touchInputDisabled: false,
-        initValue: Actuator.connectedActuator.wiggle ?? false,
+        initValue: Actuator.connectedActuator.wiggle,
         callback: (bool value) {
-          Actuator.connectedActuator.wiggle == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.wiggle ?? false
-                  ? Actuator.connectedActuator.wiggle = value
-                  : null;
+          Actuator.connectedActuator.wiggle = value;
         },
         setValue: () {
           return Actuator.connectedActuator.wiggle;
         },
       ), // wiggle_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.controlSystem,
         visible: false,
-        touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.controlSystem,
         ),
-        initValue: Actuator.connectedActuator.controlSystem ?? false,
+        initValue: Actuator.connectedActuator.controlSystem,
         callback: (bool value) {
-          Actuator.connectedActuator.controlSystem == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.controlSystem ?? false
-                  ? Actuator.connectedActuator.controlSystem = value
-                  : null;
+          Actuator.connectedActuator.controlSystem = value;
         },
         setValue: () {
           return Actuator.connectedActuator.controlSystem;
         },
       ), // control_systems_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.valveProfile,
         visible: false,
-        touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.valveProfile,
         ),
-        initValue: Actuator.connectedActuator.valveProfile ?? false,
+        initValue: Actuator.connectedActuator.valveProfile,
         callback: (bool value) {
-          Actuator.connectedActuator.valveProfile == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.valveProfile ?? false
-                  ? Actuator.connectedActuator.valveProfile = value
-                  : null;
+          Actuator.connectedActuator.valveProfile = value;
         },
         setValue: () {
           return Actuator.connectedActuator.valveProfile;
         },
       ), // valve_profile_feature
       SwitchTile(
+        isLocked: !Actuator.connectedActuator.analogDeadband,
         visible: false,
-        touchInputDisabled: true,
         title: Text(
           style: Style.normalText,
           StringConsts.actuators.analogDeadband,
         ),
-        initValue: Actuator.connectedActuator.analogDeadband ?? false,
+        initValue: Actuator.connectedActuator.analogDeadband,
         callback: (bool value) {
-          Actuator.connectedActuator.analogDeadband == null
-              ? StringConsts.bluetooth.notConnected
-              : Actuator.connectedActuator.analogDeadband ?? false
-                  ? Actuator.connectedActuator.analogDeadband = value
-                  : null;
+          Actuator.connectedActuator.analogDeadband = value;
         },
         setValue: () {
           return Actuator.connectedActuator.analogDeadband;
