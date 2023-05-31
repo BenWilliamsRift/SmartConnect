@@ -1,7 +1,9 @@
 import 'dart:core';
 
-import '../settings.dart';
+import 'package:actuatorapp2/bluetooth/bluetooth_message_handler.dart';
+
 import '../date_time.dart';
+import '../settings.dart';
 
 class ActuatorConstants {
   static int numberOfFeatures = 14;
@@ -54,7 +56,6 @@ class ActuatorSettings {
 
   // basic settings
 
-  late int boardNumber;
   late double firmwareVersion;
   late double valveOrientation;
   late int numberOfFullCycles;
@@ -71,8 +72,10 @@ class ActuatorSettings {
   late int indicationMode;
   late int torqueProfile;
   int maximumDuty = 0;
+
   // ignore: non_constant_identifier_names
   late double PIDP;
+
   // ignore: non_constant_identifier_names
   late double PIDI;
   late bool startInManualMode;
@@ -81,29 +84,52 @@ class ActuatorSettings {
   late bool buttonsEnabled;
   late bool locked;
 
-  // calibration Settings
+  BluetoothMessageHandler messageHandler = BluetoothMessageHandler();
 
+  // calibration Settings
   double closedAngle = 0;
+
   String get getClosedAngle => "${closedAngle.truncateToDouble()}$angleSymbol";
+
+  void setClosedAngle(double angle) {
+    closedAngle = angle;
+    messageHandler.setClosedAngleAddition(angle);
+  }
+
   double openAngle = 0;
+
   String get getOpenAngle => "${openAngle.truncateToDouble()}$angleSymbol";
 
-  void updateOpenAngle() {
-    openAngle = closedAngle + workingAngle;
+  void setOpenAngle(double angle) {
+    openAngle = angle;
+    messageHandler.setOpenAngle(angle);
   }
 
   double workingAngle = 0.0;
-  String get getWorkingAngle => "${workingAngle.truncateToDouble()}$angleSymbol";
+
+  String get getWorkingAngle =>
+      "${workingAngle.truncateToDouble()}$angleSymbol";
+
+  void setWorkingAngle(double angle) {
+    workingAngle = angle;
+    messageHandler.setWorkingAngle(angle);
+  }
+
   double calibratedClosedAngle = 0.0;
   double torqueBand = 0;
-  String get getTorqueBand => "${Settings.convertTorqueUnits(torque: torqueBand)}${Settings.getTorqueUnits()}";
+
+  String get getTorqueBand =>
+      "${Settings.convertTorqueUnits(torque: torqueBand)}${Settings.getTorqueUnits()}";
 
   // torque limit
-
   double torqueLimitNm = 0.0;
+
   void setTorqueLimitNm(String? value) {
     if (value != null) {
-      torqueLimitNm = Settings.convertTorqueUnits(torque: double.parse(value), source: Settings.selectedTorqueUnits, wanted: Settings.newtonMeter);
+      torqueLimitNm = Settings.convertTorqueUnits(
+          torque: double.parse(value),
+          source: Settings.selectedTorqueUnits,
+          wanted: Settings.newtonMeter);
     }
   }
   double torqueLimitBackoffAngle = 0.0;
@@ -162,6 +188,14 @@ class ActuatorSettings {
   List<String> featuresPasswords =
       List.filled(ActuatorConstants.numberOfFeatures, "None");
   late String featuresPasswordDigits;
+
+  void setFeaturesDisabled(int index) {
+    featuresArray[index] = 0;
+  }
+
+  void setFeaturesEnabled(int index) {
+    featuresArray[index] = 1;
+  }
 
   late bool magnetTestMode;
 

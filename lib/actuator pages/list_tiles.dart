@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../actuator/actuator.dart';
+import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
 import '../date_time.dart';
@@ -87,11 +88,12 @@ String getTitle() {
 class SwitchTile extends StatefulWidget {
   final bool initValue;
   final Function(bool value)? callback;
-  final Function(bool value)? setValue;
+  final Function()? setValue;
   final Text title;
   final Text? subtitle;
   final bool visible;
   final bool touchInputDisabled;
+  final bool isLocked;
 
   const SwitchTile(
       {Key? key,
@@ -100,10 +102,10 @@ class SwitchTile extends StatefulWidget {
       this.setValue,
       required this.title,
       this.subtitle,
-      this.visible=true,
-      this.touchInputDisabled=false
-      })
-      : super(key: key) ;
+      this.visible = true,
+      this.touchInputDisabled = false,
+      this.isLocked = false})
+      : super(key: key);
 
   @override
   State<SwitchTile> createState() => _SwitchTileState();
@@ -116,51 +118,69 @@ class _SwitchTileState extends State<SwitchTile> {
   late Text? subtitle;
   late bool visible;
   late bool touchInputDisabled;
+  Function()? setValue;
 
-  bool waitingForResponse = false;
+  bool isLocked = false;
+
+  @override
+  void initState() {
+    super.initState();
+    value = widget.initValue;
+  }
 
   @override
   Widget build(BuildContext context) {
-    value = widget.initValue;
     callback = widget.callback;
     title = widget.title;
     subtitle = widget.subtitle;
     visible = widget.visible;
     touchInputDisabled = widget.touchInputDisabled;
+    setValue = widget.setValue;
+    isLocked = widget.isLocked;
 
-    return visible ? Card(
-        margin: EdgeInsets.all(Style.padding),
-        child: ListTile(
-          title: title,
-          subtitle: subtitle,
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              waitingForResponse ? const CircularProgressIndicator() : Container(),
-              Padding(
+    if (isLocked) {
+      touchInputDisabled = true;
+    }
+
+    if (setValue != null) {
+      value = setValue!() ?? value;
+    }
+
+    return visible
+        ? Card(
+            margin: EdgeInsets.all(Style.padding),
+            child: ListTile(
+              title: title,
+              subtitle: subtitle,
+              trailing: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                child: Switch(
-                  value: value,
-                  onChanged: (bool value) {
-                    if (touchInputDisabled) {
-                      setState(() {});
-                      return;
-                    } else {
-                      setState(() {
-                        this.value = value;
-                        // TODO waitingForResponse = true;
-                        // run a custom callback if needed
-                        if (callback != null) {
-                          callback?.call(value);
-                        }
-                      });
-                    }
-                  },
-                ),
+                child: isLocked
+                    ? GestureDetector(
+                        onTap: () {
+                          // TODO open ad for features
+                          // Show text saying that they need to buy these features to have them active
+                        },
+                        child: AssetManager.locked)
+                    : Switch(
+                        value: value,
+                        onChanged: (bool value) {
+                          if (touchInputDisabled) {
+                            setState(() {});
+                            return;
+                          } else {
+                            setState(() {
+                              this.value = value;
+                              // run a custom callback if needed
+                              if (callback != null) {
+                                callback?.call(value);
+                              }
+                            });
+                          }
+                        },
+                      ),
               ),
-            ],
-          ),
-        )) : Container();
+            ))
+        : Container();
   }
 }
 
@@ -172,7 +192,13 @@ class TextTile extends StatefulWidget {
   final Function()? update;
 
   const TextTile(
-      {Key? key, required this.text, required this.title, this.subtitle, this.compact=false, this.update}) : super(key: key);
+      {Key? key,
+      required this.text,
+      required this.title,
+      this.subtitle,
+      this.compact = false,
+      this.update})
+      : super(key: key);
 
   @override
   State<TextTile> createState() => _TextTileState();
@@ -198,7 +224,6 @@ class _TextTileState extends State<TextTile> {
         update.call();
       });
     }
-
   }
 
   @override
@@ -216,9 +241,17 @@ class _TextTileState extends State<TextTile> {
     subtitle = widget.subtitle;
     compact = widget.compact;
 
-    return !compact ? Card(
-        margin: EdgeInsets.all(Style.padding),
-        child: ListTile(title: title, subtitle: subtitle, trailing: text)) : SizedBox(height: 30, child: ListTile(title: title, trailing: text, visualDensity: VisualDensity.compact, dense: true));
+    return !compact
+        ? Card(
+            margin: EdgeInsets.all(Style.padding),
+            child: ListTile(title: title, subtitle: subtitle, trailing: text))
+        : SizedBox(
+            height: 30,
+            child: ListTile(
+                title: title,
+                trailing: text,
+                visualDensity: VisualDensity.compact,
+                dense: true));
   }
 }
 
@@ -368,10 +401,7 @@ class _IconButtonTileState extends State<IconButtonTile> {
           onReleased: onReleased,
           backgroundColor: backgroundColor,
           buttonEnabled: false,
-          child: IconButton(
-            onPressed: () {},
-            icon: icon
-          ),
+          child: IconButton(onPressed: () {}, icon: icon),
         ));
   }
 }
@@ -382,6 +412,7 @@ class TextInputTile extends StatefulWidget {
   final String? initialValue;
   final TextInputType keyboardType;
   final Function(String? newValue) onSaved;
+  final TextEditingController? controller;
 
   const TextInputTile(
       {Key? key,
@@ -389,7 +420,8 @@ class TextInputTile extends StatefulWidget {
       required this.onSaved,
       required this.title,
       this.keyboardType = TextInputType.number,
-      this.subtitle})
+      this.subtitle,
+      this.controller})
       : super(key: key);
 
   @override
@@ -408,7 +440,8 @@ class _TextInputTileState extends State<TextInputTile> {
   void initState() {
     super.initState();
 
-    controller = TextEditingController(text: widget.initialValue);
+    controller =
+        widget.controller ?? TextEditingController(text: widget.initialValue);
   }
 
   @override
@@ -426,14 +459,14 @@ class _TextInputTileState extends State<TextInputTile> {
               width: 100,
               child: Card(
                 margin: EdgeInsets.all(Style.padding),
-                child: TextFormField(
-                    textInputAction: TextInputAction.none,
+                child: TextField(
                     textAlign: TextAlign.center,
                     style: Style.normalText,
-                    initialValue: controller.text,
+                    controller: controller,
                     keyboardType: keyboardType,
                     decoration: const InputDecoration(border: InputBorder.none),
-                    onSaved: (String? value) {
+                    onChanged: (value) {},
+                    onSubmitted: (String? value) {
                       setState(() {
                         controller.text = value ?? controller.text;
                         onSaved.call(value);
@@ -452,7 +485,15 @@ class TimePickerRot extends StatefulWidget {
   final int sensitivity;
   final String text;
 
-  const TimePickerRot({Key? key, required this.value, required this.mini, required this.maxi, required this.text, required this.sensitivity, required this.callback}) : super(key: key);
+  const TimePickerRot(
+      {Key? key,
+      required this.value,
+      required this.mini,
+      required this.maxi,
+      required this.text,
+      required this.sensitivity,
+      required this.callback})
+      : super(key: key);
 
   @override
   State<TimePickerRot> createState() => _TimePickerRotState();
@@ -473,7 +514,7 @@ class _TimePickerRotState extends State<TimePickerRot> {
 
   late int sensitivity;
 
- @override
+  @override
   void initState() {
     super.initState();
 
@@ -484,14 +525,14 @@ class _TimePickerRotState extends State<TimePickerRot> {
     numMax = widget.maxi;
     sensitivity = widget.sensitivity;
     controller = TextEditingController(text: value.toString());
- }
+  }
 
- @override
- void dispose() {
-   super.dispose();
+  @override
+  void dispose() {
+    super.dispose();
 
-   controller.dispose();
- }
+    controller.dispose();
+  }
 
   int loopNum(int num) {
     if (num < numMin) {
@@ -515,79 +556,77 @@ class _TimePickerRotState extends State<TimePickerRot> {
     SizedBox sizedBox = const SizedBox(height: 10);
 
     return GestureDetector(
-        onVerticalDragStart: (details) {
+      onVerticalDragStart: (details) {
+        prevPos = details.localPosition.dy;
+      },
+      onVerticalDragUpdate: (details) {
+        if (details.localPosition.dy > prevPos + sensitivity) {
+          value -= 1;
+          if (value < numMin) {
+            value = numMax - 1;
+          }
+          value = max(value, numMin);
           prevPos = details.localPosition.dy;
-        },
-        onVerticalDragUpdate: (details) {
-          if (details.localPosition.dy > prevPos + sensitivity) {
-            value -= 1;
-            if (value < numMin) {
-              value = numMax - 1;
-            }
-            value = max(value, numMin);
-            prevPos = details.localPosition.dy;
+        }
+        if (details.localPosition.dy < prevPos - sensitivity) {
+          value += 1;
+          if (value >= numMax) {
+            value = numMin;
           }
-          if (details.localPosition.dy < prevPos - sensitivity) {
-            value += 1;
-            if (value >= numMax) {
-              value = numMin;
-            }
-            value = min(value, numMax - 1);
-            prevPos = details.localPosition.dy;
-          }
-          parseNum(value);
-        },
-        child: Container(
-          decoration: const BoxDecoration(color: Colors.transparent),
-          child: Column(children: [
-            sizedBox,
-            Text(text, textAlign: TextAlign.center),
-            sizedBox,
-            ElevatedButton(
-              onPressed: () {
-                parseNum(loopNum(value - 1));
-              },
-              child: Text(loopNum(value - 1).toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: ColorManager.timePickerRotTextColor)),
-            ),
-            sizedBox,
-            SizedBox(
-              width: 20,
-              child: TextFormField(
-                controller: controller,
+          value = min(value, numMax - 1);
+          prevPos = details.localPosition.dy;
+        }
+        parseNum(value);
+      },
+      child: Container(
+        decoration: const BoxDecoration(color: Colors.transparent),
+        child: Column(children: [
+          sizedBox,
+          Text(text, textAlign: TextAlign.center),
+          sizedBox,
+          ElevatedButton(
+            onPressed: () {
+              parseNum(loopNum(value - 1));
+            },
+            child: Text(loopNum(value - 1).toString(),
                 textAlign: TextAlign.center,
-                textInputAction: TextInputAction.next,
-                enableInteractiveSelection: false,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(2)
-                ],
-                keyboardType: TextInputType.number,
-                onChanged: (newValue) {
-                  parseNum(int.parse(newValue));
-                  controller.selection = TextSelection.fromPosition(
-                      TextPosition(offset: controller.text.length));
-                },
-                onSaved: (newValue) {
-                  parseNum(int.parse(newValue ?? value.toString()));
-                },
-              ),
-            ),
-            sizedBox,
-            ElevatedButton(
-              onPressed: () {
-                parseNum(loopNum(value + 1));
+                style: TextStyle(color: ColorManager.timePickerRotTextColor)),
+          ),
+          sizedBox,
+          SizedBox(
+            width: 20,
+            child: TextFormField(
+              controller: controller,
+              textAlign: TextAlign.center,
+              textInputAction: TextInputAction.next,
+              enableInteractiveSelection: false,
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+                LengthLimitingTextInputFormatter(2)
+              ],
+              keyboardType: TextInputType.number,
+              onChanged: (newValue) {
+                parseNum(int.parse(newValue));
+                controller.selection = TextSelection.fromPosition(
+                    TextPosition(offset: controller.text.length));
               },
-              child: Text(loopNum(value + 1).toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: ColorManager.timePickerRotTextColor)),
+              onSaved: (newValue) {
+                parseNum(int.parse(newValue ?? value.toString()));
+              },
             ),
-          ]),
-        ),
-      );
+          ),
+          sizedBox,
+          ElevatedButton(
+            onPressed: () {
+              parseNum(loopNum(value + 1));
+            },
+            child: Text(loopNum(value + 1).toString(),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: ColorManager.timePickerRotTextColor)),
+          ),
+        ]),
+      ),
+    );
   }
 }
 
@@ -673,12 +712,60 @@ class _TimePickerState extends State<TimePicker> {
     sensitivity = widget.sensitivity ?? Settings.scrollSensitivity;
   }
 
-  late TimePickerRot monthRot = TimePickerRot(value: time.months, mini: monthsMin, maxi: monthsMax, text: StringConsts.months, callback: (int num) {time.months = num;}, sensitivity: sensitivity);
-  late TimePickerRot weekRot = TimePickerRot(value: time.weeks, mini: weeksMin, maxi: weeksMax, text: StringConsts.weeks, callback: (int num) {time.weeks = num;}, sensitivity: sensitivity);
-  late TimePickerRot dayRot = TimePickerRot(value: time.days, mini: daysMin, maxi: daysMax, text: StringConsts.days, callback: (int num) {time.days = num;}, sensitivity: sensitivity);
-  late TimePickerRot hourRot = TimePickerRot(value: time.hours, mini: hourMin, maxi: hourMax, text: StringConsts.hours, callback: (int num) {time.hours = num;}, sensitivity: sensitivity);
-  late TimePickerRot minuteRot = TimePickerRot(value: time.minutes, mini: minuteMin, maxi: minuteMax, text: StringConsts.minutes, callback: (int num) {time.minutes = num;}, sensitivity: sensitivity);
-  late TimePickerRot secondRot = TimePickerRot(value: time.seconds, mini: secondMin, maxi: secondMax, text: StringConsts.seconds, callback: (int num) {time.seconds = num;}, sensitivity: sensitivity);
+  late TimePickerRot monthRot = TimePickerRot(
+      value: time.months,
+      mini: monthsMin,
+      maxi: monthsMax,
+      text: StringConsts.months,
+      callback: (int num) {
+        time.months = num;
+      },
+      sensitivity: sensitivity);
+  late TimePickerRot weekRot = TimePickerRot(
+      value: time.weeks,
+      mini: weeksMin,
+      maxi: weeksMax,
+      text: StringConsts.weeks,
+      callback: (int num) {
+        time.weeks = num;
+      },
+      sensitivity: sensitivity);
+  late TimePickerRot dayRot = TimePickerRot(
+      value: time.days,
+      mini: daysMin,
+      maxi: daysMax,
+      text: StringConsts.days,
+      callback: (int num) {
+        time.days = num;
+      },
+      sensitivity: sensitivity);
+  late TimePickerRot hourRot = TimePickerRot(
+      value: time.hours,
+      mini: hourMin,
+      maxi: hourMax,
+      text: StringConsts.hours,
+      callback: (int num) {
+        time.hours = num;
+      },
+      sensitivity: sensitivity);
+  late TimePickerRot minuteRot = TimePickerRot(
+      value: time.minutes,
+      mini: minuteMin,
+      maxi: minuteMax,
+      text: StringConsts.minutes,
+      callback: (int num) {
+        time.minutes = num;
+      },
+      sensitivity: sensitivity);
+  late TimePickerRot secondRot = TimePickerRot(
+      value: time.seconds,
+      mini: secondMin,
+      maxi: secondMax,
+      text: StringConsts.seconds,
+      callback: (int num) {
+        time.seconds = num;
+      },
+      sensitivity: sensitivity);
 
   @override
   Widget build(BuildContext context) {
@@ -692,37 +779,23 @@ class _TimePickerState extends State<TimePicker> {
             children: [
               Row(children: [
                 Expanded(flex: 2, child: sizedBox),
-
                 monthRot,
-
                 Expanded(flex: 2, child: sizedBox),
-
                 weekRot,
-
                 Expanded(flex: 2, child: sizedBox),
-
                 dayRot,
-
                 Expanded(flex: 2, child: sizedBox),
               ]),
-
               sizedBox,
               sizedBox,
               sizedBox,
-
               Row(children: [
                 Expanded(flex: 2, child: sizedBox),
-
                 hourRot,
-
                 Expanded(flex: 2, child: sizedBox),
-
                 minuteRot,
-
                 Expanded(flex: 2, child: sizedBox),
-
                 secondRot,
-
                 Expanded(flex: 2, child: sizedBox),
               ]),
             ],
@@ -752,7 +825,13 @@ class TimePickerTile extends StatefulWidget {
   final Delay time;
   final Function(Delay) callback;
 
-  const TimePickerTile({Key? key, required this.title, required this.timeText, required this.time, required this.callback}) : super(key: key);
+  const TimePickerTile(
+      {Key? key,
+      required this.title,
+      required this.timeText,
+      required this.time,
+      required this.callback})
+      : super(key: key);
 
   @override
   State<TimePickerTile> createState() => _TimePickerTileState();
@@ -788,17 +867,14 @@ class _TimePickerTileState extends State<TimePickerTile> {
     callback = widget.callback;
 
     return Card(
-      margin: EdgeInsets.all(Style.padding),
-      child: ListTile(
-        title: title,
-        trailing: Button(
-          onPressed: () {
-            _showTimePicker();
-          },
-          child: timeText
-        )
-      )
-    );
+        margin: EdgeInsets.all(Style.padding),
+        child: ListTile(
+            title: title,
+            trailing: Button(
+                onPressed: () {
+                  _showTimePicker();
+                },
+                child: timeText)));
   }
 }
 
@@ -810,7 +886,15 @@ class HoldButton extends StatefulWidget {
   final Color? backgroundColor;
   final bool buttonEnabled;
 
-  const HoldButton({Key? key, required this.onPressed, required this.onReleased, required this.child, required this.backgroundColor, this.buttonEnabled=true, this.onDoubleTap}) : super(key: key);
+  const HoldButton(
+      {Key? key,
+      required this.onPressed,
+      required this.onReleased,
+      required this.child,
+      required this.backgroundColor,
+      this.buttonEnabled = true,
+      this.onDoubleTap})
+      : super(key: key);
 
   @override
   State<HoldButton> createState() => _HoldButtonState();
@@ -837,30 +921,25 @@ class _HoldButtonState extends State<HoldButton> {
 
     if (buttonEnabled) {
       child = Button(
-        onPressed: () {},
-        backgroundColor: backgroundColor,
-        child: child
-      );
+          onPressed: () {}, backgroundColor: backgroundColor, child: child);
     }
 
     return GestureDetector(
-      onTapDown: (details) {
-        onPressed();
-      },
-      onDoubleTap: () {
-        onDoubleTap!();
-      },
-      onTapUp: (details) {
-        onTapUpCalled = true;
-        onReleased();
-      },
-      onLongPressUp: () {
-        if (onTapUpCalled) return;
-        onReleased();
-      },
-
-      child: child
-    );
+        onTapDown: (details) {
+          onPressed();
+        },
+        onDoubleTap: () {
+          onDoubleTap!();
+        },
+        onTapUp: (details) {
+          onTapUpCalled = true;
+          onReleased();
+        },
+        onLongPressUp: () {
+          if (onTapUpCalled) return;
+          onReleased();
+        },
+        child: child);
   }
 }
 
@@ -884,8 +963,8 @@ class _AutoManualButtonState extends State<AutoManualButton> {
   @override
   void initState() {
     super.initState();
-     animationDuration = slowDuration;
-     bluetoothMessageHandler.requestAutoManual();
+    animationDuration = slowDuration;
+    bluetoothMessageHandler.requestAutoManual();
   }
 
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
@@ -895,7 +974,7 @@ class _AutoManualButtonState extends State<AutoManualButton> {
     width = (MediaQuery.of(context).size.width - Style.padding) / 3;
   }
 
-    void _cancel() {
+  void _cancel() {
     // Cancel request if auto manual hasn't been activated
     bluetoothMessageHandler.stopActuator();
     bluetoothMessageHandler.requestAutoManual();
@@ -917,7 +996,11 @@ class _AutoManualButtonState extends State<AutoManualButton> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 1), () {setState(() {bluetoothMessageHandler.requestAutoManual();});});
+    Future.delayed(const Duration(seconds: 1), () {
+      setState(() {
+        bluetoothMessageHandler.requestAutoManual();
+      });
+    });
 
     return GestureDetector(
       onLongPress: () {
@@ -925,25 +1008,53 @@ class _AutoManualButtonState extends State<AutoManualButton> {
           bluetoothMessageHandler.setAutoManual();
         });
       },
-      onTapUp: (details) =>_cancel(),
-      onLongPressUp: () =>_cancel(),
+      onTapUp: (details) => _cancel(),
+      onLongPressUp: () => _cancel(),
       child: Button(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (Actuator.connectedActuator.settings.autoManual == 1) {
-              return ColorManager.companyYellow;
-            } else {
-              return ColorManager.blue25;
-            }
-          })
-        ),
+            backgroundColor: MaterialStateProperty.resolveWith((states) {
+          if (Actuator.connectedActuator.settings.autoManual == 1) {
+            return ColorManager.companyYellow;
+          } else {
+            return ColorManager.blue25;
+          }
+        })),
         onPressed: () {},
-        child:  Center(
+        child: Center(
             child: Text(
-                style: Style.normalText.copyWith(color: Colors.white),
-                StringConsts.actuators.autoOrManual,
-            )),
+          style: Style.normalText.copyWith(color: Colors.white),
+          StringConsts.actuators.autoOrManual,
+        )),
       ),
     );
   }
+}
+
+void confirmationMessage(
+    {required BuildContext context,
+    required String text,
+    required Function yesAction,
+    Function? noAction}) {
+  showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(title: Text(text), actions: [
+          TextButton(
+            onPressed: () {
+              if (noAction != null) {
+                noAction();
+              }
+              Navigator.of(context).pop();
+            },
+            child: const Text("No"),
+          ),
+          TextButton(
+            onPressed: () {
+              yesAction();
+              Navigator.of(context).pop();
+            },
+            child: const Text("Yes"),
+          ),
+        ]);
+      });
 }

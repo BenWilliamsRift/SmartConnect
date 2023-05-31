@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -53,13 +51,6 @@ void showAlert(
       });
 }
 
-double constrain(double? num, double? mini, double? maxi) {
-  if (num == null || mini == null || maxi == null) {
-    return 0;
-  }
-  return max(mini, min(num, maxi));
-}
-
 void main() {
   runApp(const MainApp());
 }
@@ -83,6 +74,7 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     PreferenceManager.loadSettingsPrefs();
 
+    // Only allow the app to be in portrait up position
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp
     ]);
@@ -96,6 +88,7 @@ class _MainAppState extends State<MainApp> {
             return true;
           },
       child: NotificationListener<ThemeNotification>(
+        // Change the theme
         onNotification: (notification) {
           setState(() {});
           return true;

@@ -1,50 +1,57 @@
 // ignore_for_file: non_constant_identifier_names
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+
 import '../actuator/actuator.dart';
+import '../actuator/actuator_settings.dart';
 import '../date_time.dart';
 import 'bluetooth_manager.dart';
 
 class BluetoothMessageHandler {
   // non m- requests
-  static const String codeRequestAngle = "a";  // Angle
+  static const String codeRequestAngle = "a"; // Angle
   static const String codeRequestLEDS = "l"; // LEDS is TODO
   static const String codeRequestTemperature = "w"; // Temperature
 
   // bootloader requests
+  static const String codeEnterBootloader = "m200";
   static const String codeExitBootloader = "%";
   static const String codeGetBootloaderStatus = "@";
   static const String codeSendManualFirmwareEnter = "!";
 
   // m- commands - in order
   static const String codeRequestFirmwareVersion = "m4";
-  static const String codeOpenActuator = "m5"; // Open the actuator until there is a stop command, limited to the open angle
-  static const String codeStopActuator = "m6"; // Stop the actuator for normal opening and closing.
-  static const String codeCloseActuator = "m7"; // Close the actuator until there is a stop command, limited to the close angle
-  static const String codeSetAutoManual = "m9"; // Once this is sent, wait 4 seconds then send the stop command.
+  static const String codeOpenActuator =
+      "m5"; // Open the actuator until there is a stop command, limited to the open angle
+  static const String codeStopActuator =
+      "m6"; // Stop the actuator for normal opening and closing.
+  static const String codeCloseActuator =
+      "m7"; // Close the actuator until there is a stop command, limited to the close angle
+  static const String codeSetAutoManual =
+      "m9"; // Once this is sent, wait 4 seconds then send the stop command.
   static const String codeRequestWorkingTime = "m10";
   static const String codeWriteToFlash = "m11";
-  static const String codeSetWorkingTime = "m12"; // Working time is TODO
-  static const String codeSetMaximumDuty = "m14"; // Maximum duty is TODO
-  static const String codeSetTorqueLimit = "m15"; // Torque limit is TODO
-  static const String codeSetValveOrientation = "m16"; // valve orientation is TODO
+  static const String codeSetWorkingTime = "m12";
+  static const String codeSetMaximumDuty = "m14";
+  static const String codeSetTorqueLimit = "m15";
+  static const String codeSetValveOrientation = "m16";
   static const String codeRequestMaximumDuty = "m20";
   static const String codeRequestTorqueLimit = "m21";
   static const String codeRequestValveOrientation = "m22";
   static const String codeRequestNumberOfFullCycles = "m23";
   static const String codeRequestWorkingAngle = "m26";
-  static const String codeSetWorkingAngle = "m27"; // Working angle is TODO
+  static const String codeSetWorkingAngle = "m27";
   static const String codeRequestFailsafeMode = "m28";
-  static const String codeSetFailsafeMode = "m29"; // Fail safe mode is TODO
+  static const String codeSetFailsafeMode = "m29";
   static const String codeRequestFailsafeAngle = "m30";
-  static const String codeSetFailsafeAngle = "m31"; // Fail safe angle is TODO
+  static const String codeSetFailsafeAngle = "m31";
   static const String codeRequestAnalogSignalMode = "m32";
-  static const String codeSetAnalogSignalMode = "m33"; // Analog signal mode is TODO
+  static const String codeSetAnalogSignalMode = "m33";
   static const String codeRequestReverseActing = "m34";
-  static const String codeSetReverseActing = "m35"; // reverse acting  is TODO
+  static const String codeSetReverseActing = "m35";
   static const String codeRequestNumberOfStarts = "m36";
   static const String codeRequestIndicationMode = "m38";
   static const String codeSetIndicationMode = "m39";
@@ -117,11 +124,12 @@ class BluetoothMessageHandler {
   static const String codeSetAnalogDeadbandForwards = "m124";
   static const String codeRequestAnalogDeadbandBackwards = "m125";
   static const String codeRequestAutoManual = "m128";
+  static const String codeResetLogData = "m154";
+  static const String codeRequestLoggingData = "m155";
   static const String codeVerify = "m156";
   static const String codeLock = "m169";
   static const String codeUnlock = "m170";
   static const String codeRequestLocked = "m171";
-  static const String codeEnterBootloader = "m200";
   static const String codeSetFailsafeDelay = "m202";
   static const String codeRequestFailsafeDelay = "m203";
   static const String codeModulatingInversion = "m1222";
@@ -252,7 +260,20 @@ class BluetoothMessageHandler {
           Actuator.connectedActuator.settings.lossOfSignalAngle =
               double.parse(message.split(",")[1]);
           break;
-        case "57": // not defined : 497
+        case "57":
+          List<String> parts = message.substring(1).split(",");
+          if (parts.length < 3) {
+            return;
+          }
+
+          int index = int.parse(parts[1]);
+          int value = int.parse(parts[2]);
+
+          if (value == 0) {
+            Actuator.connectedActuator.settings.setFeaturesDisabled(index);
+          } else if (value == 1) {
+            Actuator.connectedActuator.settings.setFeaturesEnabled(index);
+          }
           break;
         case codeRequestFeaturePasswordDigits: // 58
           // feature password digits
@@ -634,11 +655,15 @@ class BluetoothMessageHandler {
   }
 
   void setLossOfSignalAngle(double lossOfSignalAngle) {
-    bluetoothManager.sendMessage(code: codeSetLossOfSignalAngle, value: lossOfSignalAngle.toString());
+    bluetoothManager.sendMessage(
+        code: codeSetLossOfSignalAngle, value: lossOfSignalAngle.toString());
   }
 
-  void requestFeatures(int feature) {
-    bluetoothManager.sendMessage(code: codeRequestFeatures, value: feature.toString());
+  void requestFeatures() {
+    for (int i = 0; i < ActuatorConstants.numberOfFeatures; i++) {
+      bluetoothManager.sendMessage(
+          code: codeRequestFeatures, value: i.toString());
+    }
   }
 
   void requestFeaturePasswordDigits() {
@@ -881,6 +906,15 @@ class BluetoothMessageHandler {
   }
 
   void setModulatingInversion(bool enabled) {
-    bluetoothManager.sendMessage(code: codeModulatingInversion, value: boolToString(enabled));
+    bluetoothManager.sendMessage(
+        code: codeModulatingInversion, value: boolToString(enabled));
+  }
+
+  void requestLoggingData() {
+    bluetoothManager.sendMessage(code: codeRequestLoggingData);
+  }
+
+  void resetLoggingData() {
+    bluetoothManager.sendMessage(code: codeResetLogData);
   }
 }

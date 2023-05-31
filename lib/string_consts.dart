@@ -1,3 +1,4 @@
+import 'actuator/actuator.dart';
 import 'settings.dart';
 
 class StringConsts {
@@ -77,6 +78,10 @@ class Bluetooth {
   final String unconnected = "Unconnected";
   final String disconnected = "Disconnected";
   final String notConnected = "Not connected";
+
+  String disconnect() {
+    return "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
+  }
 }
 
 class NetworkText {
@@ -117,7 +122,6 @@ class LoginText {
   final String failedToOpenRegisterPage = "Failed to open register page";
   final String copyRegisterUrl = "Copy link";
   final String confirmLogout = "Are you sure you want to log out";
-  final String twelveHourDelay = "It has been more than 12 hours since you last logged in, so you have been logged out.";
 }
 
 class ActuatorsStrings {
@@ -129,6 +133,19 @@ class ActuatorsStrings {
       "Error validating actuator, try logging ing again";
 
   final String noConnectedActuator = "No Connected Actuator";
+
+  String moveClosedAngle(String value) {
+    return "Do you want to move the closed angle, to maintain a working angle of: $value?";
+  }
+
+  // TODO only use this while the old bootloader system is in place
+  // remove once the update process is streamlined
+  final String bootloaderDoYouKnowWhatYourDoing =
+      "Do you know what you are doing?";
+
+  String moveOpenAngle(String value) {
+    return "Do you want to move the open angle, to maintain a working angle of: $value?";
+  }
 
   final String features = "Features";
   final String status = "Status";
@@ -151,7 +168,8 @@ class ActuatorsStrings {
 
   final String writeToFlash = "Save Settings";
   final String settingsSaved = "Settings Saved";
-  final String confirmWriteToFlash = "Are you sure you want to save these settings";
+  final String confirmWriteToFlash =
+      "Are you sure you want to save these settings";
   final String firmwareVersion = "Firmware Version";
   final String valveOrientation = "Valve Orientation";
   final String backlash = "Backlash";
@@ -164,9 +182,11 @@ class ActuatorsStrings {
   final String startInManualMode = "Start In Manual Mode";
   final String indicationMode = "Indication Mode";
   final String reverseActing = "Reverse Acting";
+
   String confirmLock(bool locked) {
     return "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
   }
+
   final String lock = "Lock";
   final String unlock = "Unlock";
   final String failedToUpdateFeatures = "Failed to update features";
@@ -298,7 +318,7 @@ class SettingsStrings {
   final String twelveHourTime = "12 Hour time";
   final String saveLoginDetails = "Save login details";
   final String saveLoginDetailsSub =
-      "Lets you close the app and stay logged in for up to 12 hours";
+      "Lets you close the app and stay logged in";
   final String temperature = "Temperature";
   final String torqueUnits = "Torque Units";
   final String timeUnits = "Time units";

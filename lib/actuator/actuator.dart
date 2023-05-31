@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../String_consts.dart';
+import '../bluetooth/bluetooth_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../date_time.dart';
-import 'actuator_settings.dart';
-import '../bluetooth/bluetooth_manager.dart';
 import '../main.dart';
-import '../String_consts.dart';
+import 'actuator_settings.dart';
 
 class Actuator {
   static String? connectingDeviceAddress = "";
@@ -88,12 +88,12 @@ class Actuator {
   bool connectedToBoard = false;
   bool bootloaderFlashing = false;
   bool writingToFlash = false;
+
   // We require response of m58 before sending multiple features
   bool featureReady = true;
   bool needFlash = false;
 
-  // todo remove
-  int? boardNumber = 20319;
+  int? boardNumber;
 
   late String? type;
 
@@ -191,23 +191,23 @@ class Actuator {
 
   // temporary values
   String? status;
-  bool? twoWireControl;
+  bool twoWireControl = false;
   bool inBootLoader = false;
-  bool? failsafe;
-  bool? modulating;
-  bool? speedControl;
-  bool? multiTurn;
-  bool? offGridTimer;
-  bool? wiggle;
+  bool failsafe = false;
+  bool modulating = false;
+  bool speedControl = false;
+  bool multiTurn = false;
+  bool offGridTimer = false;
+  bool wiggle = false;
   bool isLocked = false;
 
-  bool? torqueLimit;
-  bool? isNm60;
-  bool? isNm80;
-  bool? isNm100;
-  bool? controlSystem;
-  bool? valveProfile;
-  bool? analogDeadband;
+  bool torqueLimit = false;
+  bool isNm60 = false;
+  bool isNm80 = false;
+  bool isNm100 = false;
+  bool controlSystem = false;
+  bool valveProfile = false;
+  bool analogDeadband = false;
 
   late Delay failsafeDelay = Delay();
 

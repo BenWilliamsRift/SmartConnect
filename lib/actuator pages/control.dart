@@ -5,9 +5,9 @@ import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({Key? key}) : super(key: key);
@@ -38,13 +38,19 @@ class _ControlPageState extends State<ControlPage> {
   Widget build(BuildContext context) {
     Style.update();
 
-      Future.delayed(const Duration(seconds: 1), () {if (mounted) {setState(() {});}});
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.requestBatteryVoltage();
+        });
+      }
+    });
 
     return Scaffold(
-      appBar: appBar(title: getTitle()),
-      drawer: const NavDrawer(),
-      body: SingleChildScrollView(
-          child: Column(
+        appBar: appBar(title: getTitle()),
+        drawer: const NavDrawer(),
+        body: SingleChildScrollView(
+            child: Column(
           children: [
             Style.sizedHeight,
             Row(children: [

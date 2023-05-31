@@ -65,8 +65,6 @@ class ColorManager {
 
   static get danger => const Color.fromARGB(255, 202, 11, 0);
 
-  static get disabled => const Color.fromARGB(255, 0, 0, 0);
-
   static get itemGrey => const Color.fromARGB(255, 255, 255, 255);
 
   static get shadows => const Color.fromARGB(255, 0, 0, 0);
@@ -160,8 +158,7 @@ class ColorManager {
 
   static get divider => Settings.isDarkMode ? Colors.white54 : Colors.black26;
 
-  static get angleRingColor =>
-      Settings.isDarkMode ? Colors.white : darkBlue;
+  static get angleRingColor => Settings.isDarkMode ? Colors.white : darkBlue;
 
   static get angleLineColor => companyYellow;
 
@@ -169,5 +166,9 @@ class ColorManager {
       ? const Color.fromARGB(255, 48, 48, 48)
       : const Color.fromARGB(255, 250, 250, 250);
 
-  static get disabledRing => Settings.isDarkMode ? Colors.grey.withOpacity(0.7) : Colors.black.withOpacity(0.7);
+  static get disabledRing => Settings.isDarkMode
+      ? Colors.grey.withOpacity(0.7)
+      : Colors.black.withOpacity(0.7);
+
+  static get disabled => const Color.fromARGB(255, 125, 25, 25);
 }

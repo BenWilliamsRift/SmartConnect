@@ -363,6 +363,5 @@ public class Actuator {
 
     public static void updateBoardNumber(String name) {
         boardNumber = Integer.parseInt(name.split(" ")[2]);
-        Log.i("BoardNumber", String.valueOf(boardNumber));
     }
 }
