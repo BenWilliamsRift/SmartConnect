@@ -19,71 +19,6 @@ class EmailDev {
   static List<String> recipients = ["ben@rifttechnology.com"];
 }
 
-class GeneralEnquiryPage extends StatefulWidget {
-  const GeneralEnquiryPage(
-      {Key? key, required this.summaryController, required this.bodyController})
-      : super(key: key);
-
-  final TextEditingController summaryController;
-  final TextEditingController bodyController;
-
-  @override
-  State<GeneralEnquiryPage> createState() => _GeneralEnquiryPageState();
-}
-
-class _GeneralEnquiryPageState extends State<GeneralEnquiryPage> {
-  SizedBox sizedBox = const SizedBox(height: 30);
-
-  late final TextEditingController summaryController;
-  late final TextEditingController bodyController;
-
-  @override
-  void initState() {
-    super.initState();
-    summaryController = widget.summaryController;
-    bodyController = widget.bodyController;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-        child: Scrollbar(
-      child: SingleChildScrollView(
-          child: Column(children: [
-        TextFormField(
-          controller: summaryController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            filled: true,
-            hintText: StringConsts.contact.generalEnquirySummaryHint,
-            label: Text(StringConsts.contact.generalEnquirySummaryLabel),
-            helperText: StringConsts.contact.generalEnquirySummaryHelp,
-          ),
-          textCapitalization: TextCapitalization.sentences,
-          maxLines: 3,
-          autocorrect: true,
-        ),
-        sizedBox,
-        TextFormField(
-          controller: bodyController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            filled: true,
-            alignLabelWithHint: true,
-            hintText: StringConsts.contact.generalEnquiryHint,
-            label: Text(StringConsts.contact.generalEnquiryLabel),
-            helperText: StringConsts.contact.generalEnquiryHelp,
-          ),
-          maxLines: null,
-          enableInteractiveSelection: true,
-          textCapitalization: TextCapitalization.sentences,
-          autocorrect: true,
-        ),
-      ])),
-    ));
-  }
-}
-
 class ReportABugPage extends StatefulWidget {
   const ReportABugPage(
       {Key? key, required this.summaryController, required this.bodyController})
@@ -223,71 +158,6 @@ class _ReportABugPageState extends State<ReportABugPage> {
   }
 }
 
-class SalesPage extends StatefulWidget {
-  const SalesPage(
-      {Key? key, required this.summaryController, required this.bodyController})
-      : super(key: key);
-
-  final TextEditingController summaryController;
-  final TextEditingController bodyController;
-
-  @override
-  State<SalesPage> createState() => _SalesPageState();
-}
-
-class _SalesPageState extends State<SalesPage> {
-  SizedBox sizedBox = const SizedBox(height: 30);
-
-  late TextEditingController summaryController;
-  late TextEditingController bodyController;
-
-  @override
-  void initState() {
-    super.initState();
-    summaryController = widget.summaryController;
-    bodyController = widget.bodyController;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-        child: Scrollbar(
-      child: SingleChildScrollView(
-          child: Column(children: [
-        TextFormField(
-          controller: summaryController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            filled: true,
-            hintText: StringConsts.contact.salesSummaryHint,
-            label: Text(StringConsts.contact.salesSummaryLabel),
-            helperText: StringConsts.contact.salesSummaryHelp,
-          ),
-          textCapitalization: TextCapitalization.sentences,
-          maxLines: 3,
-          autocorrect: true,
-        ),
-        sizedBox,
-        TextFormField(
-          controller: bodyController,
-          decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            filled: true,
-            alignLabelWithHint: true,
-            hintText: StringConsts.contact.salesHint,
-            label: Text(StringConsts.contact.salesLabel),
-            helperText: StringConsts.contact.salesHelp,
-          ),
-          maxLines: null,
-          enableInteractiveSelection: true,
-          textCapitalization: TextCapitalization.sentences,
-          autocorrect: true,
-        ),
-      ])),
-    ));
-  }
-}
-
 class ContactUsPage extends StatefulWidget {
   const ContactUsPage({Key? key}) : super(key: key);
 
@@ -300,19 +170,6 @@ class _ContactUsPageState extends State<ContactUsPage> {
 
   TextEditingController summaryController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
-
-  Widget getPage() {
-    if (enquiryType == StringConsts.contact.bugReport) {
-      return ReportABugPage(
-          summaryController: summaryController, bodyController: bodyController);
-    } else if (enquiryType == StringConsts.contact.salesEnquiry) {
-      return SalesPage(
-          summaryController: summaryController, bodyController: bodyController);
-    }
-
-    return GeneralEnquiryPage(
-        summaryController: summaryController, bodyController: bodyController);
-  }
 
   void sendEnquiry() async {
     String body = bodyController.text;
@@ -349,37 +206,9 @@ class _ContactUsPageState extends State<ContactUsPage> {
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
-          child: Column(children: [
-            sizedBox,
-
-            // ask for type
-            Center(
-              child: DropdownButton<String>(
-                  value: enquiryType,
-                  items: StringConsts.contact.types
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      summaryController.text = "";
-                      bodyController.text = "";
-                      enquiryType = value ?? enquiryType;
-                    });
-                  }),
-            ),
-
-            sizedBox,
-
-            Divider(color: ColorManager.divider),
-
-            sizedBox,
-
-            getPage(),
-          ]),
+          child: ReportABugPage(
+              summaryController: summaryController,
+              bodyController: bodyController),
         ),
         floatingActionButton: Visibility(
           visible: showFab,
@@ -411,6 +240,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   }
 }
 
+// not used
 class FAQPage extends StatefulWidget {
   const FAQPage({Key? key}) : super(key: key);
 

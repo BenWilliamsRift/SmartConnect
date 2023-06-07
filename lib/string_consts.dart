@@ -18,7 +18,7 @@ class StringConsts {
   static const String logOut = "Log out";
   static const String connectToActuator = "Connect to Actuator";
   static const String appSettings = "App Settings";
-  static const String contactUs = "Contact Us";
+  static const String contactUs = "Report a Bug";
   static const String faq = "FAQ";
   static const String torqueLimit = "Torque Limit";
 
