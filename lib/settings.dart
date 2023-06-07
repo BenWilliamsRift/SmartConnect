@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:actuatorapp2/web_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -198,6 +199,8 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  bool advancedSettingsOpen = false;
+
   @override
   Widget build(BuildContext context) {
     ThemeNotification themeNotifier = ThemeNotification();
@@ -264,27 +267,63 @@ class _SettingsPageState extends State<SettingsPage> {
               title: Text(StringConsts.settings.timeUnits)),
           SwitchTile(
             title: Text(StringConsts.settings.saveLoginDetails),
-            subtitle: Text(StringConsts.settings.saveLoginDetailsSub, style: Style.subtitle),
+            subtitle: Text(StringConsts.settings.saveLoginDetailsSub,
+                style: Style.subtitle),
             visible: !widget.login,
             initValue: Settings.saveLoginDetails,
             callback: ((bool value) {
               setState(() {
                 Settings.saveLoginDetails = value;
-                writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}", Settings.saveLoginDetails);
+                writeSettingsToPrefs(
+                    "${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}",
+                    Settings.saveLoginDetails);
               });
             }),
           ),
+          // Advanced settings
+          GestureDetector(
+              onTap: () {
+                // open advanced settings
+                setState(() {
+                  advancedSettingsOpen = !advancedSettingsOpen;
+                });
+              },
+              child: Row(children: [
+                const Expanded(child: Divider(indent: 1, endIndent: 1)),
+                Center(
+                    child: Expanded(
+                        child: Text(StringConsts.settings.advancedSettings))),
+                Center(
+                    child: Expanded(
+                        child: Icon(advancedSettingsOpen
+                            ? Icons.arrow_drop_up_sharp
+                            : Icons.arrow_drop_down_sharp))),
+                const Expanded(child: Divider(indent: 1, endIndent: 1)),
+              ])),
+          advancedSettingsOpen
+              ? TextInputTile(
+                  onSaved: (String? newValue) {
+                    setState(() {
+                      WebController().checkAccessCodeRequest(newValue ?? "");
+                    });
+                  },
+                  title: Text(StringConsts.settings.accessCodes),
+                )
+              : Container(),
           // Dev Settings
-          Settings.devSettingsEnabled ? Row(children: const [
-            Expanded(child: Divider()),
-            Text("Dev Settings"),
-            Expanded(child: Divider()),
-          ]) : Container(),
-          Settings.devSettingsEnabled ? SwitchTile(
-              title: const Text("Emulate Connection to Actuator"),
-              subtitle: const Text("Unlocks all features of the app"),
-              initValue: Settings.emulateConnectedActuator,
-              callback: (bool value) {
+          Settings.devSettingsEnabled
+              ? const Row(children: [
+                  Expanded(child: Divider()),
+                  Text("Dev Settings"),
+                  Expanded(child: Divider()),
+                ])
+              : Container(),
+          Settings.devSettingsEnabled
+              ? SwitchTile(
+                  title: const Text("Emulate Connection to Actuator"),
+                  subtitle: const Text("Unlocks all features of the app"),
+                  initValue: Settings.emulateConnectedActuator,
+                  callback: (bool value) {
                 setState(
                       () {
                     Settings.emulateConnectedActuator = value;

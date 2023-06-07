@@ -312,6 +312,9 @@ class Values {
 class SettingsStrings {
   final String title = "Settings";
 
+  final String advancedSettings = "Advanced Settings";
+  final String accessCodes = "Access Codes";
+
   final String specialBorders = "Special borders";
   final String visualDensity = "Visual density";
   final String isDarkMode = "Dark mode";
