@@ -183,6 +183,7 @@ public class MainActivity extends FlutterActivity {
                             }
 
                             if (call.method.equals("write")) {
+                                Log.i("Bytes", Objects.requireNonNull(call.argument("bytes")).getClass().getName());
                                 bluetoothController.write(call.argument("bytes"));
                             }
 

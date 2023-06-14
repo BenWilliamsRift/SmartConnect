@@ -77,15 +77,18 @@ class BluetoothManager {
       bluetoothResponse.setMethodCallHandler((call) async {
         switch (call.method) {
           case "bluetoothCommandResponse":
-            await BluetoothMessageHandler().processResponse(call.arguments.split("\n"));
+            await BluetoothMessageHandler()
+                .processResponse(call.arguments.split("\n"));
             break;
         }
       });
     }
   }
 
-  BluetoothManager() {
-    initBluetoothResponse();
+  BluetoothManager({bool test = false}) {
+    if (!test) {
+      initBluetoothResponse();
+    }
 
     if (devicesCopy.isNotEmpty) {
       devices = devicesCopy[0] as List<Device>;
@@ -359,20 +362,19 @@ class BluetoothManager {
     sleep(const Duration(milliseconds: 100));
 
     String fileData = await AssetManager.getActuatorHex();
-    Uint8List data = Uint8List(40000);
-    for (int i = 0; i < fileData.length / ~2; i += 2) {
+    List<int> data = [];
+    for (int i = 0; i < fileData.length; i += 2) {
       // get every 2 characters
       String hex = fileData[i] + fileData[i + 1];
 
       // convert to bytes
-      int byte = hexStringToByteArray(hex);
+      int byte = hexStringToInt(hex);
 
       // add to list
       data.add(byte);
     }
-    print(data);
     // write list
-    write(data);
+    write(Uint8List.fromList(data));
 
     // if (Actuator.connectedActuator.settings.parityEnabled) {
     //   sendMessage(code: "!");
@@ -402,7 +404,7 @@ class BluetoothManager {
 //   return bytes;
 // }
 
-  int hexStringToByteArray(String s) {
+  int hexStringToInt(String s) {
     return (int.parse(s[0], radix: 16) << 4) + int.parse(s[1], radix: 16);
   }
 
