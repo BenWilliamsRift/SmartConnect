@@ -102,6 +102,7 @@ class BluetoothManager {
 
   String getName() {
     // TODO getName
+
     return "";
   }
 
