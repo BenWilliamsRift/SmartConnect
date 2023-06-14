@@ -1,7 +1,6 @@
 package com.example.actuatorapp2;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,13 +11,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
-
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -188,6 +180,10 @@ public class MainActivity extends FlutterActivity {
                                 } else {
                                     bluetoothController.send(call.argument("code") + "," + Objects.requireNonNull(call.argument("param")));
                                 }
+                            }
+
+                            if (call.method.equals("write")) {
+                                bluetoothController.write(call.argument("bytes"));
                             }
 
                             if (call.method.equals("isConnected")) {

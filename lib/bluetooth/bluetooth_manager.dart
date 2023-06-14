@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -314,53 +313,102 @@ class BluetoothManager {
   }
 
   // TODO test
+  // void writeBootloader(BuildContext context) async {
+  //   // Start transfer key
+  //   // send 35 to the actuator
+  //   // 35 is the ASCII code for #
+  //   sendMessage(code: '#');
+  //
+  //   Uint8List hash = Uint8List(1);
+  //   hash[0] = 35; // 35 is # as an int
+  //   write(hash);
+  //
+  //   sleep(const Duration(milliseconds: 100));
+  //
+  //   Uint8List hexBufferData = Uint8List(40000);
+  //   int offset = 0;
+  //   try {
+  //      ByteData fileData = await DefaultAssetBundle.of(context).load(AssetManager.hexFileName);
+  //      Uint8List fileBytes = fileData.buffer.asUint8List();
+  //       int chunkSize = 40000;
+  //       int length = fileBytes.length;
+  //       while (offset < length) {
+  //         int end = offset + chunkSize < length ? offset + chunkSize : length;
+  //         // hexBufferData.setRange(0, end - offset, fileBytes.sublist(offset, end));
+  //         Uint8List array = hexStringToByteArray(utf8.decode(fileBytes.sublist(offset, end).sublist(0, end - offset)));
+  //         write(array);
+  //
+  //         if (Actuator.connectedActuator.settings.parityEnabled) {
+  //           sendMessage(code: "!");
+  //           sendMessage(code: (getParity(end - offset) ? 1 : 0).toString());
+  //       }
+  //       offset += chunkSize;
+  //     }
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print('Error: $e');
+  //     }
+  //   }
+  // }
   void writeBootloader(BuildContext context) async {
     // Start transfer key
-    // send 35 to the actuator
-    // 35 is the ASCII code for #
-    sendMessage(code: '#');
+    Uint8List hash = Uint8List(1);
+    hash[0] = 35;
+    write(hash);
 
     sleep(const Duration(milliseconds: 100));
 
-    Uint8List hexBufferData = Uint8List(40000);
-    int offset = 0;
-    try {
-       ByteData fileData = await DefaultAssetBundle.of(context).load(AssetManager.hexFileName);
-       Uint8List fileBytes = fileData.buffer.asUint8List();
-        int length = fileBytes.length;
-        int chunkSize = 40000;
-        while (offset < length) {
-          int end = offset + chunkSize < length ? offset + chunkSize : length;
-          hexBufferData.setRange(0, end - offset, fileBytes.sublist(offset, end));
-          List<int> array = hexStringToByteArray(utf8.decode(hexBufferData.sublist(0, end - offset)));
-          sendMessage(code: String.fromCharCodes(array));
+    String fileData = await AssetManager.getActuatorHex();
+    Uint8List data = Uint8List(40000);
+    for (int i = 0; i < fileData.length / ~2; i += 2) {
+      // get every 2 characters
+      String hex = fileData[i] + fileData[i + 1];
 
-          if (Actuator.connectedActuator.settings.parityEnabled) {
-            sendMessage(code: "!");
-            sendMessage(code: (getParity(end - offset) ? 1 : 0).toString());
-        }
-        offset += chunkSize;
-      }
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error: $e');
-      }
+      // convert to bytes
+      int byte = hexStringToByteArray(hex);
+
+      // add to list
+      data.add(byte);
     }
+    print(data);
+    // write list
+    write(data);
+
+    // if (Actuator.connectedActuator.settings.parityEnabled) {
+    //   sendMessage(code: "!");
+    //   sendMessage(code: (getParity(0) ? 1 : 0).toString());
+    // //parity?
+    //
+    // //sleep(Duration(milliseconds: 10));
+    // }
   }
 
-  List<int> hexStringToByteArray(String hexString) {
-    List<int> bytes = [];
-    for (int i = 0; i < hexString.length; i += 2) {
-      String hex = hexString.substring(i, i + 2);
-      int byte = int.parse(hex, radix: 16);
-      bytes.add(byte);
-    }
-  return bytes;
-}
+  void write(Uint8List bytes) {
+    print(bytes);
+    androidPlatform.invokeMethod("write", {"bytes": bytes});
+  }
 
-  bool getParity(int n){
+//   Uint8List hexStringToByteArray(String hexString) {
+//     hexString.replaceAll("//s", "");
+//     int len = hexString.length;
+//     Uint8List bytes = Uint8List(len);
+//     print(hexString);
+//     for (int i = 0; i < len; i += 2) {
+//       String hex = hexString.substring(i, i + 2);
+//       print(hex);
+//       int byte = int.parse(hex, radix: 16);
+//       bytes.add(byte);
+//     }
+//   return bytes;
+// }
+
+  int hexStringToByteArray(String s) {
+    return (int.parse(s[0], radix: 16) << 4) + int.parse(s[1], radix: 16);
+  }
+
+  bool getParity(int n) {
     bool parity = false;
-    while(n != 0) {
+    while (n != 0) {
       parity = !parity;
       n = n & (n - 1);
     }

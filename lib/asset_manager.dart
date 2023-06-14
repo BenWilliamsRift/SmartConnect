@@ -20,14 +20,18 @@ class AssetManager {
       image: AssetImage("assets/angle_ring.png"),
       filterQuality: FilterQuality.high);
   static Image logo =
-      const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
-  static String hexFileName = "actuator_hex.txt";
+  const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
+  static String hexFileName = "assets/actuator_hexs/actuator_hex.txt";
   static Image locked = const Image(
       image: AssetImage("assets/locked.png"), width: 40, height: 40);
 
   // Load files
   static Future<String> loadAsset(String assetName) async {
     return await rootBundle.loadString(assetName);
+  }
+
+  static Future<String> getActuatorHex() async {
+    return await rootBundle.loadString(AssetManager.hexFileName);
   }
 }
 

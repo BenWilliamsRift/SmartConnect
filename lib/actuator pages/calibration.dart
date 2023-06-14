@@ -34,6 +34,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
   late TextEditingController openAngleController;
   late TextEditingController closedAngleController;
   late TextEditingController workingAngleController;
+  late TextEditingController angleController;
 
   @override
   void initState() {
@@ -45,6 +46,8 @@ class _CalibrationPageState extends State<CalibrationPage> {
         text: Actuator.connectedActuator.settings.getClosedAngle);
     workingAngleController = TextEditingController(
         text: Actuator.connectedActuator.settings.getWorkingAngle);
+    angleController = TextEditingController(
+        text: Actuator.connectedActuator.settings.getAngle);
 
     // initial requests
     requestAll();
@@ -60,6 +63,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
+          bluetoothMessageHandler.requestAngle();
           bluetoothMessageHandler.requestClosedAngleAddition();
           bluetoothMessageHandler.requestWorkingAngle();
           Actuator.connectedActuator.settings.openAngle =
@@ -85,106 +89,105 @@ class _CalibrationPageState extends State<CalibrationPage> {
           Column(children: [
             Style.sizedHeight,
             Row(children: [
-                  Style.sizedWidth,
-                  // cant be const otherwise they wont be rebuilt
-                  const SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: ActuatorConnectedIndicator())
-                ]),
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ActuatorIndicator(radius: 120),
-                  ],
-                )
-              ]),
-              Style.sizedHeight,
-              Row(children: [
-                Style.sizedWidth,
-                Expanded(
-                    child: IconButtonTile(
-                        icon: Icon(Icons.rotate_left_outlined,
-                            color: ColorManager.actuatorIcon),
-                        backgroundColor: ColorManager.rotateLeftOutlinedButton,
-                        onPressed: () {
-                          setState(() {
-                            bluetoothMessageHandler.calibrateOpenActuator();
-                            });
-                        },
-                        onReleased: () {
-                          setState(() {
-                            bluetoothMessageHandler.calibrateStopActuator();
-                          });
-                        })),
-                Style.sizedWidth,
-                Expanded(
-                    child: IconButtonTile(
-                  icon: Icon(Icons.rotate_right_outlined,
-                      color: ColorManager.actuatorIcon),
-                  backgroundColor: ColorManager.rotateRightOutlinedButton,
-                  onPressed: () {
-                    setState(() {
-                      bluetoothMessageHandler.calibrateCloseActuator();
-                    });
-                  },
-                  onReleased: () {
-                    setState(() {
-                      bluetoothMessageHandler.calibrateStopActuator();
-                    });
-                  },
-                )),
-                Style.sizedWidth,
-                const Expanded(child: AutoManualButton())
-              ]),
               Style.sizedWidth,
-              Row(children: [
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
-                    bluetoothMessageHandler.setClosedAngleAddition(Actuator.connectedActuator.settings.angle);
-                  },
-                  child: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.setCloseHere),
-                )),
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
-                    Actuator.writeToFlash(context, bluetoothMessageHandler);
-                  },
-                  child: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.writeToFlash),
-                )),
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
-                    bluetoothMessageHandler.setOpenAngle(Actuator.connectedActuator.settings.angle);
-                  },
-                  child: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.setOpenHere),
-                )),
-                Style.sizedWidth,
-              ]),
-              // angle
-              TextTile(
-                title: Text(
-                    style: Style.normalText, StringConsts.actuators.rawAngle),
-                text: Text(
-                    style: Style.normalText,
-                    Actuator.connectedActuator.settings.getRawAngle),
-                update: () {
-                  bluetoothMessageHandler.requestAngle();
-                },
-              ),
-              // open angle
-              TextInputTile(
-                title: Text(
+              // cant be const otherwise they wont be rebuilt
+              const SizedBox(
+                  width: 30, height: 30, child: ActuatorConnectedIndicator())
+            ]),
+            const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ActuatorIndicator(radius: 120),
+              ],
+            )
+          ]),
+          Style.sizedHeight,
+          Row(children: [
+            Style.sizedWidth,
+            Expanded(
+                child: IconButtonTile(
+                    icon: Icon(Icons.rotate_left_outlined,
+                        color: ColorManager.actuatorIcon),
+                    backgroundColor: ColorManager.rotateLeftOutlinedButton,
+                    onPressed: () {
+                      setState(() {
+                        bluetoothMessageHandler.calibrateOpenActuator();
+                      });
+                    },
+                    onReleased: () {
+                      setState(() {
+                        bluetoothMessageHandler.calibrateStopActuator();
+                      });
+                    })),
+            Style.sizedWidth,
+            Expanded(
+                child: IconButtonTile(
+              icon: Icon(Icons.rotate_right_outlined,
+                  color: ColorManager.actuatorIcon),
+              backgroundColor: ColorManager.rotateRightOutlinedButton,
+              onPressed: () {
+                setState(() {
+                  bluetoothMessageHandler.calibrateCloseActuator();
+                });
+              },
+              onReleased: () {
+                setState(() {
+                  bluetoothMessageHandler.calibrateStopActuator();
+                });
+              },
+            )),
+            Style.sizedWidth,
+            const Expanded(child: AutoManualButton())
+          ]),
+          Style.sizedWidth,
+          Row(children: [
+            Style.sizedWidth,
+            Expanded(
+                child: Button(
+              onPressed: () {
+                bluetoothMessageHandler.setClosedAngleAddition(
+                    Actuator.connectedActuator.settings.angle);
+              },
+              child: Text(
+                  style: Style.normalText, StringConsts.actuators.setCloseHere),
+            )),
+            Style.sizedWidth,
+            Expanded(
+                child: Button(
+              onPressed: () {
+                Actuator.writeToFlash(context, bluetoothMessageHandler);
+              },
+              child: Text(
+                  style: Style.normalText, StringConsts.actuators.writeToFlash),
+            )),
+            Style.sizedWidth,
+            Expanded(
+                child: Button(
+              onPressed: () {
+                bluetoothMessageHandler
+                    .setOpenAngle(Actuator.connectedActuator.settings.angle);
+              },
+              child: Text(
+                  style: Style.normalText, StringConsts.actuators.setOpenHere),
+            )),
+            Style.sizedWidth,
+          ]),
+          // angle
+          TextInputTile(
+            title:
+                Text(style: Style.normalText, StringConsts.actuators.rawAngle),
+            onSaved: (String? newValue) {
+              setState(() {
+                // set angle
+                bluetoothMessageHandler.setAngle(double.parse(newValue ??
+                    Actuator.connectedActuator.settings.angle.toString()));
+              });
+            },
+            controller: angleController,
+          ),
+          // open angle
+          TextInputTile(
+            title: Text(
                 style: Style.normalText,
                 StringConsts.actuators.calibrationOpenAngle),
             onSaved: (String? newValue) {
@@ -294,7 +297,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
                   style: Style.normalText,
                   Actuator.connectedActuator.settings.torqueBand.toString())),
         ],
-          )),
+      )),
     );
   }
 }

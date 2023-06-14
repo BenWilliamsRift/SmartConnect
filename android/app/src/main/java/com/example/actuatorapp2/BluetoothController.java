@@ -18,7 +18,6 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 
@@ -27,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -314,7 +314,7 @@ public class BluetoothController {
         String[] PERMISSIONS;
         int PERMISSION_ALL = 1;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PERMISSIONS = new String[] {
+            PERMISSIONS = new String[]{
                     Manifest.permission.BLUETOOTH_ADMIN,
                     Manifest.permission.BLUETOOTH_CONNECT,
                     Manifest.permission.BLUETOOTH_SCAN,
@@ -325,7 +325,7 @@ public class BluetoothController {
                 ActivityCompat.requestPermissions(mainActivity.getActivity(), PERMISSIONS, PERMISSION_ALL);
             }
         } else {
-            PERMISSIONS = new String[] {
+            PERMISSIONS = new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.BLUETOOTH,
@@ -381,6 +381,23 @@ public class BluetoothController {
     @SuppressLint("MissingPermission")
     List<HashMap<String, String>> getDevices() {
         List<HashMap<String, String>> tempDevices = new ArrayList<>();
+
+        // get bonded devices
+        Set<BluetoothDevice> bondedDevices = getBondedDevices();
+
+        for (BluetoothDevice device : bondedDevices) {
+            HashMap<String, String> deviceInfo = new HashMap<>();
+
+            deviceInfo.put("name", device.getName());
+            System.out.println(device.getName());
+            deviceInfo.put("address", device.getAddress());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                deviceInfo.put("alias", device.getAlias());
+            } else {
+                deviceInfo.put("alias", device.getName());
+            }
+            deviceInfo.put("rssi", "0");
+        }
 
         // add device information to a hashmap to be sent to the flutter engine
         for (BLDevice BLDevice : devicesRssi) {
@@ -475,6 +492,16 @@ public class BluetoothController {
             }
         });
         timeoutThread.start();
+    }
+
+    public Set<BluetoothDevice> getBondedDevices() {
+        if (ActivityCompat.checkSelfPermission(mainActivity.getApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            Set<BluetoothDevice> devices = bluetoothAdapter.getBondedDevices();
+            System.out.println(devices);
+            return devices;
+        }
+
+        return Collections.emptySet();
     }
 
     private boolean getParity(int n) {

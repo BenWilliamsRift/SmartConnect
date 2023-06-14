@@ -26,7 +26,7 @@ class WebController {
 
   Future<String> checkAccessCodeRequest(String password) async {
     var response =
-        await http.post(featurePasswordsUrl, body: {"password": password});
+        await http.post(setGroupingUrl, body: {"password": password});
 
     return response.body;
   }

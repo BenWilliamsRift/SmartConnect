@@ -9,9 +9,9 @@ import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class BasicSettingsPage extends StatefulWidget {
   const BasicSettingsPage({Key? key}) : super(key: key);

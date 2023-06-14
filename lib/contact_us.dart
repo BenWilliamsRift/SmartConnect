@@ -17,6 +17,8 @@ class Reports {
 
 class EmailDev {
   static List<String> recipients = ["ben@rifttechnology.com"];
+
+  static void send(String type, String summary, String report) {}
 }
 
 class ReportABugPage extends StatefulWidget {
@@ -166,7 +168,7 @@ class ContactUsPage extends StatefulWidget {
 }
 
 class _ContactUsPageState extends State<ContactUsPage> {
-  String enquiryType = StringConsts.contact.generalEnquiry;
+  String enquiryType = StringConsts.contact.bugReport;
 
   TextEditingController summaryController = TextEditingController();
   TextEditingController bodyController = TextEditingController();
@@ -190,17 +192,9 @@ class _ContactUsPageState extends State<ContactUsPage> {
 
   @override
   Widget build(BuildContext context) {
-    SizedBox sizedBox = const SizedBox(height: 10);
     final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
 
     return Scaffold(
-      // , actions: [IconButton(
-      //       onPressed: () {
-      //         routeToPage(context, const FAQPage());
-      //       },
-      //       icon: const Icon(Icons.help),
-      //       tooltip: StringConsts.contact.faq,
-      //     )]
         appBar: appBar(title: StringConsts.contactUs),
         drawer: const NavDrawer(),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -237,25 +231,5 @@ class _ContactUsPageState extends State<ContactUsPage> {
             ],
           ),
         ));
-  }
-}
-
-// not used
-class FAQPage extends StatefulWidget {
-  const FAQPage({Key? key}) : super(key: key);
-
-  @override
-  State<FAQPage> createState() => _FAQPageState();
-}
-
-class _FAQPageState extends State<FAQPage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: appBar(title: StringConsts.faq),
-        drawer: const NavDrawer(),
-        body: ListView.builder(itemBuilder: (context, index) {
-          return ListTile(title: Text("Item $index"));
-        }));
   }
 }

@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
@@ -134,23 +135,6 @@ class BluetoothMessageHandler {
   static const String codeRequestFailsafeDelay = "m203";
   static const String codeModulatingInversion = "m1222";
   static const String codeRequestModulatingInversion = "m1223";
-
-  void getOpenAngle() {
-    requestClosedAngleAddition();
-    requestWorkingAngle();
-    requestReverseActing();
-
-    bool reverseActing = Actuator.connectedActuator.settings.reverseActing;
-    Future.delayed(const Duration(seconds: 1), () {
-     if (reverseActing) {
-      double workingAngle = Actuator.connectedActuator.settings.workingAngle;
-      double closedAddition = Actuator.connectedActuator.settings.calibratedClosedAngle;
-      Actuator.connectedActuator.settings.openAngle = closedAddition + workingAngle;
-     }
-    });
-
-    Actuator.connectedActuator.settings.openAngle = Actuator.connectedActuator.settings.closedAngle + Actuator.connectedActuator.settings.workingAngle;
-  }
 
   double roundDouble(double value, int places) {
     num mod = pow(10.0, places);
@@ -411,6 +395,29 @@ class BluetoothMessageHandler {
 
   static String boolToString(bool value) {
     return value ? "1" : "0";
+  }
+
+  void setAngle(double angle) {}
+
+  void getOpenAngle() {
+    requestClosedAngleAddition();
+    requestWorkingAngle();
+    requestReverseActing();
+
+    bool reverseActing = Actuator.connectedActuator.settings.reverseActing;
+    Future.delayed(const Duration(seconds: 1), () {
+      if (reverseActing) {
+        double workingAngle = Actuator.connectedActuator.settings.workingAngle;
+        double closedAddition =
+            Actuator.connectedActuator.settings.calibratedClosedAngle;
+        Actuator.connectedActuator.settings.openAngle =
+            closedAddition + workingAngle;
+      }
+    });
+
+    Actuator.connectedActuator.settings.openAngle =
+        Actuator.connectedActuator.settings.closedAngle +
+            Actuator.connectedActuator.settings.workingAngle;
   }
 
   void writeToFlash() {
