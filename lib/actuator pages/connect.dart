@@ -33,6 +33,9 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     super.initState();
     getPermissions();
 
+    // get paired devices
+    // bluetoothManager.getPairedDevices();
+
     aliasFocusNode = FocusNode();
   }
 

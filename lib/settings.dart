@@ -179,8 +179,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late final SharedPreferences prefs;
 
-  int devSettingsCounter = 0;
-
   @override
   void initState() {
     super.initState();
@@ -201,6 +199,21 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool advancedSettingsOpen = false;
 
+  void checkAccessCode(String key) {
+    switch (key.toLowerCase()) {
+      case "dev settings":
+        Settings.devSettingsEnabled = !Settings.devSettingsEnabled;
+        break;
+
+      default:
+        WebController().checkAccessCodeRequest(key ?? "").then((value) {
+          print("Value: $value");
+          return value;
+        });
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeNotification themeNotifier = ThemeNotification();
@@ -213,21 +226,11 @@ class _SettingsPageState extends State<SettingsPage> {
         children: [
           Align(
             alignment: Alignment.bottomCenter,
-            child: GestureDetector(
-              onTapDown: (details) {
-                setState(() {
-                  devSettingsCounter += 1;
-                  if (devSettingsCounter >= 10) {
-                    Settings.devSettingsEnabled = true;
-                  }
-                });
-              },
-              child: Center(
-                child: Align(
-                    alignment: FractionalOffset.bottomCenter,
-                    child: Text(
-                        "${StringConsts.settings.appVersion} ${StringConsts.appVersion}")),
-              ),
+            child: Center(
+              child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Text(
+                      "${StringConsts.settings.appVersion} ${StringConsts.appVersion}")),
             ),
           ),
           ListView(
@@ -330,12 +333,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ? TextInputTile(
                       onSaved: (String? newValue) {
                         setState(() {
-                          WebController()
-                              .checkAccessCodeRequest(newValue ?? "")
-                              .then((value) {
-                            print("Value: $value");
-                            return value;
-                          });
+                          checkAccessCode(newValue ?? "");
                         });
                       },
                       keyboardType: TextInputType.text,

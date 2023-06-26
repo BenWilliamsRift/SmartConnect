@@ -106,6 +106,28 @@ class BluetoothManager {
     return "";
   }
 
+  void getPairedDevices() {
+    androidPlatform.invokeMethod("getBonded").then((temp) {
+      for (LinkedHashMap device in temp) {
+        print(device["name"]?.startsWith("RIFT") ?? false);
+        if (!deviceAddresses.contains(device["address"])) {
+          if (device["name"]?.startsWith("RIFT") ?? false) {
+            if (kDebugMode) {
+              print(device["rssi"].toString());
+            }
+            devices.add(Device(
+                device["name"].toString(),
+                device["address"].toString(),
+                device["alias"].toString(),
+                device["rssi"].toString(),
+                this));
+            deviceAddresses.add(device["address"].toString());
+          }
+        }
+      }
+    });
+  }
+
   static bool isActuatorConnected = false;
 
   Future<bool> isConnected() async {
@@ -354,11 +376,15 @@ class BluetoothManager {
   //     }
   //   }
   // }
-  void writeBootloader(BuildContext context) async {
+  void writeBootloader() async {
+    Stopwatch stopwatch = Stopwatch()..start();
     // Start transfer key
     Uint8List hash = Uint8List(1);
     hash[0] = 35;
     write(hash);
+
+    // set writing to flash - test
+    Actuator.connectedActuator.writingToFlash = true;
 
     sleep(const Duration(milliseconds: 100));
 
@@ -374,8 +400,11 @@ class BluetoothManager {
       // add to list
       data.add(byte);
     }
+
     // write list
     write(Uint8List.fromList(data));
+
+    print(stopwatch.elapsed);
 
     // if (Actuator.connectedActuator.settings.parityEnabled) {
     //   sendMessage(code: "!");
@@ -387,7 +416,6 @@ class BluetoothManager {
   }
 
   void write(Uint8List bytes) {
-    print(bytes);
     androidPlatform.invokeMethod("write", {"bytes": bytes});
   }
 

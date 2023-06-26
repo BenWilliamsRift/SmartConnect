@@ -130,12 +130,12 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                     Text(StringConsts.actuators.uploadFirmware),
                                 onPressed: () {
                                   setState(() {
-                                    bluetoothMessageHandler
-                                        .updateFirmware(context);
+                                    bluetoothMessageHandler.updateFirmware();
                                     showLoading = true;
                                     // TODO how do i know when upload is done?
-                                    Future.delayed(const Duration(seconds: 10),
-                                        () {
+                                    Future.delayed(
+                                        bluetoothMessageHandler
+                                            .getEstimatedTimeForFirmware(), () {
                                       setState(() {
                                         showLoading = false;
                                       });

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
 import '../actuator/actuator_settings.dart';
@@ -455,6 +454,19 @@ class BluetoothMessageHandler {
     requestFeaturePasswordDigits();
   }
 
+  Duration getEstimatedTimeForFirmware() {
+    return const Duration(seconds: 10);
+
+    // 3Mbits per second // bluetooth 2.0 + EDR
+    // 375,000 bytes per second
+    // the file contains 165160 characters
+    // which is 82,580 number of bytes
+    // so it should take less than a second
+    // using 721Kbits per second, the slowest data rate // bluetooth 1.2
+    // 90,125 bytes per second
+    // it should take around a second to transfer
+  }
+
   void requestAngle() {
     bluetoothManager.sendMessage(code: codeRequestAngle);
   }
@@ -896,12 +908,14 @@ class BluetoothMessageHandler {
     }
   }
 
-  void updateFirmware(BuildContext context) {
-    bluetoothManager.writeBootloader(context);
+  void updateFirmware() {
+    bluetoothManager.writeBootloader();
   }
 
   void setFailsafeDelay(Delay time) {
-    bluetoothManager.sendMessage(code: codeSetFailsafeDelay, value: (time.totalSeconds.floor()).toString());
+    bluetoothManager.sendMessage(
+        code: codeSetFailsafeDelay,
+        value: (time.totalSeconds.floor()).toString());
   }
 
   void requestFailsafeDelay() {

@@ -2,8 +2,8 @@ import 'package:actuatorapp2/bluetooth/bluetooth_manager.dart';
 import 'package:test/test.dart';
 
 void main() {
+  BluetoothManager bluetoothManager = BluetoothManager(test: true);
   group("Converting Hex to Int", () {
-    BluetoothManager bluetoothManager = BluetoothManager(test: true);
     test("Hex: 20", () {
       int num = bluetoothManager.hexStringToInt("20");
       expect(num, 32);
