@@ -390,6 +390,7 @@ class BluetoothManager {
 
     String fileData = await AssetManager.getActuatorHex();
     List<int> data = [];
+    fileData = fileData.trim();
     for (int i = 0; i < fileData.length; i += 2) {
       // get every 2 characters
       String hex = fileData[i] + fileData[i + 1];
