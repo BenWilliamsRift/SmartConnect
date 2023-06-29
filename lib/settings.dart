@@ -206,7 +206,7 @@ class _SettingsPageState extends State<SettingsPage> {
         break;
 
       default:
-        WebController().checkAccessCodeRequest(key ?? "").then((value) {
+        WebController().checkAccessCodeRequest(key).then((value) {
           print("Value: $value");
           return value;
         });

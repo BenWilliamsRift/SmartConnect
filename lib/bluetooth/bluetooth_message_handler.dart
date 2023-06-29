@@ -890,10 +890,12 @@ class BluetoothMessageHandler {
   }
 
   void lock() {
+    Actuator.connectedActuator.isLocked = true;
     bluetoothManager.sendMessage(code: codeLock);
   }
 
   void unlock() {
+    Actuator.connectedActuator.isLocked = false;
     bluetoothManager.sendMessage(code: codeUnlock);
   }
 

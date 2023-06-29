@@ -280,24 +280,29 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                                                 ),
                                                 TextButton(
                                                   onPressed: (() {
-                                                    Navigator.of(context).pop();
-                                                    if (Actuator
-                                                            .connectedActuator
-                                                            .isLocked &&
-                                                        lockTextController.text
-                                                                .toUpperCase() ==
-                                                            "UNLOCK") {
-                                                      bluetoothMessageHandler
-                                                          .unlock();
-                                                    } else if (!Actuator
-                                                            .connectedActuator
-                                                            .isLocked &&
-                                                        lockTextController.text
-                                                                .toUpperCase() ==
-                                                            "LOCK") {
-                                                      bluetoothMessageHandler
-                                                          .lock();
-                                                    }
+                                                    setState(() {
+                                                      Navigator.of(context)
+                                                          .pop();
+                                                      if (Actuator
+                                                              .connectedActuator
+                                                              .isLocked &&
+                                                          lockTextController
+                                                                  .text
+                                                                  .toUpperCase() ==
+                                                              "UNLOCK") {
+                                                        bluetoothMessageHandler
+                                                            .unlock();
+                                                      } else if (!Actuator
+                                                              .connectedActuator
+                                                              .isLocked &&
+                                                          lockTextController
+                                                                  .text
+                                                                  .toUpperCase() ==
+                                                              "LOCK") {
+                                                        bluetoothMessageHandler
+                                                            .lock();
+                                                      }
+                                                    });
                                                   }),
                                                   child: const Text(
                                                       StringConsts.confirm),
