@@ -132,7 +132,6 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                   setState(() {
                                     bluetoothMessageHandler.updateFirmware();
                                     showLoading = true;
-                                    // TODO how do i know when upload is done?
                                     Future.delayed(
                                         bluetoothMessageHandler
                                             .getEstimatedTimeForFirmware(), () {

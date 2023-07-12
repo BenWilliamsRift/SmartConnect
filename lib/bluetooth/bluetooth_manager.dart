@@ -153,7 +153,12 @@ class BluetoothManager {
           if (kDebugMode) {
             print(device["rssi"].toString());
           }
-          devices.add(Device(device["name"].toString(), device["address"].toString(), device["alias"].toString(), device["rssi"].toString(), this));
+          devices.add(Device(
+              device["name"].toString(),
+              device["address"].toString(),
+              device["alias"].toString(),
+              device["rssi"].toString(),
+              this));
           deviceAddresses.add(device["address"].toString());
         }
       }
@@ -310,6 +315,7 @@ class BluetoothManager {
       }
 
       Future.delayed(const Duration(seconds: 1), () {
+        messageHandler.getBootloaderStatus();
         messageHandler.requestAutoManual();
         WebController().getFeaturePasswords();
         messageHandler.getInformation();
@@ -338,46 +344,7 @@ class BluetoothManager {
     }
   }
 
-  // TODO test
-  // void writeBootloader(BuildContext context) async {
-  //   // Start transfer key
-  //   // send 35 to the actuator
-  //   // 35 is the ASCII code for #
-  //   sendMessage(code: '#');
-  //
-  //   Uint8List hash = Uint8List(1);
-  //   hash[0] = 35; // 35 is # as an int
-  //   write(hash);
-  //
-  //   sleep(const Duration(milliseconds: 100));
-  //
-  //   Uint8List hexBufferData = Uint8List(40000);
-  //   int offset = 0;
-  //   try {
-  //      ByteData fileData = await DefaultAssetBundle.of(context).load(AssetManager.hexFileName);
-  //      Uint8List fileBytes = fileData.buffer.asUint8List();
-  //       int chunkSize = 40000;
-  //       int length = fileBytes.length;
-  //       while (offset < length) {
-  //         int end = offset + chunkSize < length ? offset + chunkSize : length;
-  //         // hexBufferData.setRange(0, end - offset, fileBytes.sublist(offset, end));
-  //         Uint8List array = hexStringToByteArray(utf8.decode(fileBytes.sublist(offset, end).sublist(0, end - offset)));
-  //         write(array);
-  //
-  //         if (Actuator.connectedActuator.settings.parityEnabled) {
-  //           sendMessage(code: "!");
-  //           sendMessage(code: (getParity(end - offset) ? 1 : 0).toString());
-  //       }
-  //       offset += chunkSize;
-  //     }
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print('Error: $e');
-  //     }
-  //   }
-  // }
   void writeBootloader() async {
-    Stopwatch stopwatch = Stopwatch()..start();
     // Start transfer key
     Uint8List hash = Uint8List(1);
     hash[0] = 35;
@@ -405,34 +372,18 @@ class BluetoothManager {
     // write list
     write(Uint8List.fromList(data));
 
-    print(stopwatch.elapsed);
+    if (Actuator.connectedActuator.settings.parityEnabled) {
+      sendMessage(code: "!");
+      sendMessage(code: (getParity(0) ? 1 : 0).toString());
+      //parity?
 
-    // if (Actuator.connectedActuator.settings.parityEnabled) {
-    //   sendMessage(code: "!");
-    //   sendMessage(code: (getParity(0) ? 1 : 0).toString());
-    // //parity?
-    //
-    // //sleep(Duration(milliseconds: 10));
-    // }
+      //sleep(Duration(milliseconds: 10));
+    }
   }
 
   void write(Uint8List bytes) {
     androidPlatform.invokeMethod("write", {"bytes": bytes});
   }
-
-//   Uint8List hexStringToByteArray(String hexString) {
-//     hexString.replaceAll("//s", "");
-//     int len = hexString.length;
-//     Uint8List bytes = Uint8List(len);
-//     print(hexString);
-//     for (int i = 0; i < len; i += 2) {
-//       String hex = hexString.substring(i, i + 2);
-//       print(hex);
-//       int byte = int.parse(hex, radix: 16);
-//       bytes.add(byte);
-//     }
-//   return bytes;
-// }
 
   int hexStringToInt(String s) {
     return (int.parse(s[0], radix: 16) << 4) + int.parse(s[1], radix: 16);
@@ -454,7 +405,8 @@ class BluetoothManager {
   void sendMessage({required String code, String? value}) async {
     if (!Actuator.connectedActuator.writingToFlash) {
       if (value != null) {
-        androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code, "param": value});
+        androidPlatform.invokeMethod(
+            "sendBluetoothMessage", {"code": code, "param": value});
       } else {
         androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code});
       }

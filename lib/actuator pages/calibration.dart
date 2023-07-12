@@ -31,23 +31,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
             Actuator.connectedActuator.settings.workingAngle;
   }
 
-  late TextEditingController openAngleController;
-  late TextEditingController closedAngleController;
-  late TextEditingController workingAngleController;
-  late TextEditingController angleController;
-
   @override
   void initState() {
     super.initState();
-
-    openAngleController = TextEditingController(
-        text: Actuator.connectedActuator.settings.getOpenAngle);
-    closedAngleController = TextEditingController(
-        text: Actuator.connectedActuator.settings.getClosedAngle);
-    workingAngleController = TextEditingController(
-        text: Actuator.connectedActuator.settings.getWorkingAngle);
-    angleController = TextEditingController(
-        text: Actuator.connectedActuator.settings.getAngle);
 
     // initial requests
     requestAll();
@@ -69,12 +55,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
           Actuator.connectedActuator.settings.openAngle =
               Actuator.connectedActuator.settings.closedAngle +
                   Actuator.connectedActuator.settings.workingAngle;
-          openAngleController.text =
-              Actuator.connectedActuator.settings.getOpenAngle;
-          closedAngleController.text =
-              Actuator.connectedActuator.settings.getClosedAngle;
-          workingAngleController.text =
-              Actuator.connectedActuator.settings.getWorkingAngle;
         });
       }
     });
@@ -105,36 +85,50 @@ class _CalibrationPageState extends State<CalibrationPage> {
           Row(children: [
             Style.sizedWidth,
             Expanded(
-                child: IconButtonTile(
-                    icon: Icon(Icons.rotate_left_outlined,
-                        color: ColorManager.actuatorIcon),
-                    backgroundColor: ColorManager.rotateLeftOutlinedButton,
-                    onPressed: () {
-                      setState(() {
-                        bluetoothMessageHandler.calibrateOpenActuator();
-                      });
-                    },
-                    onReleased: () {
-                      setState(() {
-                        bluetoothMessageHandler.calibrateStopActuator();
-                      });
-                    })),
+                child: GestureDetector(
+              onDoubleTap: () {
+                setState(() {
+                  bluetoothMessageHandler.doubleTapOpenActuator();
+                });
+              },
+              child: IconButtonTile(
+                  icon: Icon(Icons.rotate_left_outlined,
+                      color: ColorManager.actuatorIcon),
+                  backgroundColor: ColorManager.rotateLeftOutlinedButton,
+                  onPressed: () {
+                    setState(() {
+                      bluetoothMessageHandler.calibrateOpenActuator();
+                    });
+                  },
+                  onReleased: () {
+                    setState(() {
+                      bluetoothMessageHandler.calibrateStopActuator();
+                    });
+                  }),
+            )),
             Style.sizedWidth,
             Expanded(
-                child: IconButtonTile(
-              icon: Icon(Icons.rotate_right_outlined,
-                  color: ColorManager.actuatorIcon),
-              backgroundColor: ColorManager.rotateRightOutlinedButton,
-              onPressed: () {
+                child: GestureDetector(
+              onDoubleTap: () {
                 setState(() {
-                  bluetoothMessageHandler.calibrateCloseActuator();
+                  bluetoothMessageHandler.doubleTapCloseActuator();
                 });
               },
-              onReleased: () {
-                setState(() {
-                  bluetoothMessageHandler.calibrateStopActuator();
-                });
-              },
+              child: IconButtonTile(
+                icon: Icon(Icons.rotate_right_outlined,
+                    color: ColorManager.actuatorIcon),
+                backgroundColor: ColorManager.rotateRightOutlinedButton,
+                onPressed: () {
+                  setState(() {
+                    bluetoothMessageHandler.calibrateCloseActuator();
+                  });
+                },
+                onReleased: () {
+                  setState(() {
+                    bluetoothMessageHandler.calibrateStopActuator();
+                  });
+                },
+              ),
             )),
             Style.sizedWidth,
             const Expanded(child: AutoManualButton())
@@ -176,6 +170,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
           TextInputTile(
             title:
                 Text(style: Style.normalText, StringConsts.actuators.rawAngle),
+            initialValue: Actuator.connectedActuator.settings.getAngle,
             onSaved: (String? newValue) {
               setState(() {
                 // set angle
@@ -183,21 +178,19 @@ class _CalibrationPageState extends State<CalibrationPage> {
                     Actuator.connectedActuator.settings.angle.toString()));
               });
             },
-            controller: angleController,
           ),
           // open angle
           TextInputTile(
             title: Text(
                 style: Style.normalText,
                 StringConsts.actuators.calibrationOpenAngle),
+            initialValue: Actuator.connectedActuator.settings.getOpenAngle,
             onSaved: (String? newValue) {
               // set open angle
               if (newValue != null) {
                 double openAngle = double.parse(newValue);
 
                 Actuator.connectedActuator.settings.setOpenAngle(openAngle);
-                openAngleController.text =
-                    Actuator.connectedActuator.settings.getOpenAngle;
 
                 // confirmation message
                 confirmationMessage(
@@ -211,15 +204,12 @@ class _CalibrationPageState extends State<CalibrationPage> {
                             openAngle -
                                 Actuator
                                     .connectedActuator.settings.workingAngle);
-                        closedAngleController.text =
-                            Actuator.connectedActuator.settings.getClosedAngle;
                       });
                     });
               }
 
               return Actuator.connectedActuator.settings.getOpenAngle;
             },
-            controller: openAngleController,
           ),
           // closed angle
           TextInputTile(
@@ -236,59 +226,51 @@ class _CalibrationPageState extends State<CalibrationPage> {
 
                   Actuator.connectedActuator.settings
                       .setClosedAngle(closedAngle);
-                  closedAngleController.text = workingAngleController.text =
-                      Actuator.connectedActuator.settings.getClosedAngle;
 
                   confirmationMessage(
                       context: context,
                       text: StringConsts.actuators.moveOpenAngle(
                           Actuator.connectedActuator.settings.getWorkingAngle),
                       yesAction: () {
-                        // Move open angle
-                        setState(() {
-                          Actuator.connectedActuator.settings.setOpenAngle(
-                              closedAngle +
-                                  Actuator
-                                      .connectedActuator.settings.workingAngle);
-                          openAngleController.text =
-                              Actuator.connectedActuator.settings.getOpenAngle;
-                        });
+                      // Move open angle
+                      setState(() {
+                        Actuator.connectedActuator.settings.setOpenAngle(
+                            closedAngle +
+                                Actuator
+                                    .connectedActuator.settings.workingAngle);
                       });
-                }
-              },
-              controller: closedAngleController),
+                    });
+              }
+            },
+          ),
           // working angle
           TextInputTile(
-              title: Text(
-                  style: Style.normalText, StringConsts.actuators.workingAngle),
-              initialValue: Actuator.connectedActuator.settings.getWorkingAngle,
-              onSaved: (String? newValue) {
-                // set working angle
-                if (newValue != null) {
-                  double workingAngle = double.parse(newValue);
+            title: Text(
+                style: Style.normalText, StringConsts.actuators.workingAngle),
+            initialValue: Actuator.connectedActuator.settings.getWorkingAngle,
+            onSaved: (String? newValue) {
+              // set working angle
+              if (newValue != null) {
+                double workingAngle = double.parse(newValue);
 
-                  Actuator.connectedActuator.settings
+                Actuator.connectedActuator.settings
                       .setWorkingAngle(workingAngle);
-                  workingAngleController.text =
-                      Actuator.connectedActuator.settings.getWorkingAngle;
 
                   confirmationMessage(
                       context: context,
                       text: StringConsts.actuators.moveOpenAngle(
                           Actuator.connectedActuator.settings.getWorkingAngle),
-                      yesAction: () {
-                        setState(() {
-                          Actuator.connectedActuator.settings.setOpenAngle(
-                              Actuator.connectedActuator.settings.closedAngle +
-                                  Actuator
-                                      .connectedActuator.settings.workingAngle);
-                          openAngleController.text =
-                              Actuator.connectedActuator.settings.getOpenAngle;
-                        });
+                    yesAction: () {
+                      setState(() {
+                        Actuator.connectedActuator.settings.setOpenAngle(
+                            Actuator.connectedActuator.settings.closedAngle +
+                                Actuator
+                                    .connectedActuator.settings.workingAngle);
                       });
-                }
-              },
-              controller: workingAngleController),
+                    });
+              }
+            },
+          ),
           // torque band
           TextTile(
               title: Text(

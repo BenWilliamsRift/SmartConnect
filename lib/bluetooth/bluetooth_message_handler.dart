@@ -455,7 +455,8 @@ class BluetoothMessageHandler {
   }
 
   Duration getEstimatedTimeForFirmware() {
-    return const Duration(seconds: 10);
+    // failed the last page
+    return const Duration(minutes: 1, seconds: 30);
 
     // 3Mbits per second // bluetooth 2.0 + EDR
     // 375,000 bytes per second

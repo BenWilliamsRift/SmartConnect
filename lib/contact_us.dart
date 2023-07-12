@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_email_sender/flutter_email_sender.dart';
 
 import 'app_bar.dart';
-import 'color_manager.dart';
 import 'nav_drawer.dart';
 import 'string_consts.dart';
 
@@ -192,44 +191,23 @@ class _ContactUsPageState extends State<ContactUsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
-
     return Scaffold(
         appBar: appBar(title: StringConsts.contactUs),
         drawer: const NavDrawer(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: ReportABugPage(
               summaryController: summaryController,
               bodyController: bodyController),
         ),
-        floatingActionButton: Visibility(
-          visible: showFab,
-          child: Row(
-            children: [
-              const Expanded(flex: 1, child: SizedBox(width: 50)),
-              Expanded(
-                flex: 2,
-                child: ListTile(
-                    onTap: () {
-                      setState(() {
-                        sendEnquiry();
-                      });
-                    },
-                    leading: const Icon(Icons.send),
-                    title: Text(StringConsts.contact.send),
-                    tileColor: ColorManager.tileColor,
-                    shape: RoundedRectangleBorder(
-                        side: const BorderSide(
-                            width: 2, color: Colors.transparent),
-                        borderRadius: BorderRadius.circular(50))
-                    // tileColor: Colors.lightBlue,
-                    ),
-              ),
-              const Expanded(flex: 1, child: SizedBox(width: 50)),
-            ],
-          ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            setState(() {
+              sendEnquiry();
+            });
+          },
+          tooltip: StringConsts.contact.send,
+          child: const Icon(Icons.send),
         ));
   }
 }
