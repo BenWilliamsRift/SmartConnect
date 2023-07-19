@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
@@ -25,13 +26,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
@@ -60,7 +62,7 @@ public class BluetoothController {
     static final int STATE_LISTEN = 1;
     static final int STATE_CONNECTING = 2;
     static final int STATE_CONNECTED = 3;
-    static final int STATE_RECONNECTING = 4;
+    //    static final int STATE_RECONNECTING = 4;
     static final int STATE_EXCEPTION = 5;
     // Name for the SDP record when creating server socket
     private static final String NAME_SECURE = "BluetoothChatSecure";
@@ -70,51 +72,19 @@ public class BluetoothController {
             UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final UUID UUID_INSECURE =
             UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
-    private static final String[] notRequests = new String[]{
-            "m5",
-            "m6",
-            "m7",
-            "m44",
-            "m45",
-            "m48",
-            "a",
-            "l",
-            "w",
-            "m11",
-            "m111",
-            "m9",
-            "m40",
-            "m46",
-            "m47",
-            "m200",
-            "@",
-            "~",
-            "#",
-            "%",
-            "!",
-    };
-    private static final String[] areRequests = new String[]{
-            "m57" // Feature request
-    };
-    private static final Set<String> notRequestsSet = new HashSet<>(Arrays.asList(notRequests));
-    private static final Set<String> areRequestsSet = new HashSet<>(Arrays.asList(areRequests));
     public static String DEVICE_NAME = "device_name";
     private static MainActivity mainActivity;
-    final String HEXF_FILE_NAME = "actuatorHexs.txt";
     final int timeOutDuration = 15000;
     public Runnable runnable;
     BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-    @SuppressLint("HandlerLeak")
-    private final Handler handler = new Handler() {
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case MESSAGE_STATE_CHANGE:
                     switch (msg.arg1) {
                         case STATE_CONNECTED:
-                            String mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-
                             keepAliveSignal();
                             break;
                         case STATE_CONNECTING:
@@ -124,40 +94,14 @@ public class BluetoothController {
                     }
                     break;
                 case MESSAGE_WRITE:
+                case MESSAGE_DEVICE_NAME:
                     break;
-
                 // Receive message from actuator
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
 
                     flutterChannel.invokeMethod("bluetoothCommandResponse", processReadMessage(readMessage));
-
-                    break;
-                case MESSAGE_DEVICE_NAME:
-                    // save the connected device's name
-                    String mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
-                    // final ArrayList<Actuator> singleActuator =  new ArrayList<>();
-                    // singleActuator.add(actuator);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-//                                BluetoothMessageHandler.requestFeatures(singleActuator);
-                        }
-                    }, 250);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-//                                BluetoothMessageHandler.requestFeatures(singleActuator);
-                        }
-                    }, 750);
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-//                                mActuatorSingleton.onActuatorConnected(actuator);
-                        }
-                    }, 1250);
-
                     break;
                 case MESSAGE_LOST_CONNECTION:
                     disconnect(); // Lost connection, remove our actuator from the disconnected list and make sure we've stopped all threads.
@@ -176,7 +120,6 @@ public class BluetoothController {
     }
 
     long timeOutSystemTime = 0;
-    Actuator actuator;
     List<BluetoothDevice> devices = new ArrayList<>();
     List<BLDevice> devicesRssi = new ArrayList<>();
     Thread timeoutThread;
@@ -185,14 +128,11 @@ public class BluetoothController {
     private int CONNECTION_STATUS;
     private int state = STATE_NONE;
     private long flashingBoard = 0; // Used to prevent bluetooth request being sent while board is in a critical mode
-    private long flashTimeoutMs = 2000;
     private AcceptThread secureAcceptThread;
     private AcceptThread inSecureAcceptThread;
     private ConnectThread connectThread;
     private ConnectedThread connectedThread;
     MethodChannel flutterChannel = null;
-    private boolean receivedReverseActing;
-    private boolean receivedClosedAngle;
     static private BluetoothDevice connectedDevice;
 
     BluetoothController(MainActivity mainActivity) {
@@ -209,17 +149,6 @@ public class BluetoothController {
         return mainActivity.actuatorPassword;
     }
 //    public CallbackInterface m155Callback, m1551Callback, m1552Callback;
-
-    private static byte[] hexStringToByteArray(String s) {
-        s = s.replaceAll("\\s", "");
-        int len = s.length();
-        byte[] data = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
-        }
-
-        return data;
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static void updateConnectionStatus(int status) {
@@ -286,20 +215,20 @@ public class BluetoothController {
     }
 
     // Three dots allow one, or many or an array of strings to be passed
-    boolean hasPermissions(Context context, String... permissions) {
+    boolean doesNotHavePermission(Context context, String... permissions) {
         if (context != null && permissions != null) {
             for (String permission : permissions) {
                 if (ActivityCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
-                    return false;
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     @SuppressLint("MissingPermission")
     @RequiresApi(api = Build.VERSION_CODES.M)
-    public boolean startScan(MainActivity mainActivity) {
+    public void startScan(MainActivity mainActivity) {
         // Clear devices to prevent duplicate devices for another scan
         devices.clear();
 
@@ -308,7 +237,7 @@ public class BluetoothController {
 
         if (!mainActivity.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH)) {
             Log.i("BlueController", "Bluetooth not supported");
-            return false;
+            return;
         }
 
         String[] PERMISSIONS;
@@ -321,9 +250,6 @@ public class BluetoothController {
                     Manifest.permission.ACCESS_COARSE_LOCATION,
                     Manifest.permission.ACCESS_FINE_LOCATION
             };
-            if (!hasPermissions(mainActivity.getApplicationContext(), PERMISSIONS)) {
-                ActivityCompat.requestPermissions(mainActivity.getActivity(), PERMISSIONS, PERMISSION_ALL);
-            }
         } else {
             PERMISSIONS = new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -332,9 +258,9 @@ public class BluetoothController {
                     Manifest.permission.BLUETOOTH_ADMIN,
             };
 
-            if (!hasPermissions(mainActivity.getApplicationContext(), PERMISSIONS)) {
-                ActivityCompat.requestPermissions(mainActivity.getActivity(), PERMISSIONS, PERMISSION_ALL);
-            }
+        }
+        if (doesNotHavePermission(mainActivity.getApplicationContext(), PERMISSIONS)) {
+            ActivityCompat.requestPermissions(mainActivity.getActivity(), PERMISSIONS, PERMISSION_ALL);
         }
 
 
@@ -374,30 +300,16 @@ public class BluetoothController {
         mainActivity.registerReceiver(scanReceiver, intentFilter);
 
         // start the discovery service
-        return bluetoothAdapter.startDiscovery();
+        bluetoothAdapter.startDiscovery();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @SuppressLint("MissingPermission")
     List<HashMap<String, String>> getDevices() {
+
+        // List<HashMap<String, String>> tempDevices = new ArrayList<>(getBondedDevices());
+
         List<HashMap<String, String>> tempDevices = new ArrayList<>();
-
-        // get bonded devices
-        Set<BluetoothDevice> bondedDevices = getBondedDevices();
-
-        for (BluetoothDevice device : bondedDevices) {
-            HashMap<String, String> deviceInfo = new HashMap<>();
-
-            deviceInfo.put("name", device.getName());
-            System.out.println(device.getName());
-            deviceInfo.put("address", device.getAddress());
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                deviceInfo.put("alias", device.getAlias());
-            } else {
-                deviceInfo.put("alias", device.getName());
-            }
-            deviceInfo.put("rssi", "0");
-        }
 
         // add device information to a hashmap to be sent to the flutter engine
         for (BLDevice BLDevice : devicesRssi) {
@@ -437,8 +349,16 @@ public class BluetoothController {
         return state == STATE_CONNECTING;
     }
 
+    private ScheduledExecutorService executorService;
+    private ScheduledFuture<?> timeoutFuture;
+
+
     @SuppressLint("MissingPermission")
     public void connectToDevice(BluetoothDevice device, boolean secure) throws IOException {
+
+        if (device == null) {
+            return;
+        }
 
         if (!bluetoothAdapter.isEnabled()) {
             bluetoothAdapter.enable();
@@ -473,44 +393,51 @@ public class BluetoothController {
         timeoutThread = null;
         // x3 to the duration if the user has to pair to the device
         final int timeOutLength = (device.getBondState() == BluetoothDevice.BOND_BONDED) ? timeOutDuration : timeOutDuration * 3;
-        timeOutSystemTime = System.currentTimeMillis() + timeOutLength; // time we should time out
-        timeoutThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (state == STATE_CONNECTING) {
-                    try {
-                        if (timeOutSystemTime < System.currentTimeMillis()) {
-                            connectThread.cancel();
-                            connectionTimedOut();
-                            return;
-                        }
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+        timeOutSystemTime = System.currentTimeMillis() + timeOutLength;
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        timeoutFuture = executorService.scheduleAtFixedRate(() -> {
+            if (timeOutSystemTime < System.currentTimeMillis()) {
+                connectThread.cancel();
+                connectionTimedOut();
+                cancelTimeoutThread();
             }
-        });
-        timeoutThread.start();
+        }, 0, 1, TimeUnit.SECONDS);
+
     }
 
-    public Set<BluetoothDevice> getBondedDevices() {
-        if (ActivityCompat.checkSelfPermission(mainActivity.getApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Set<BluetoothDevice> devices = bluetoothAdapter.getBondedDevices();
-            System.out.println(devices);
-            return devices;
+    private void cancelTimeoutThread() {
+        if (timeoutFuture != null && !timeoutFuture.isCancelled()) {
+            timeoutFuture.cancel(true);
         }
-
-        return Collections.emptySet();
+        if (executorService != null) {
+            executorService.shutdown();
+        }
     }
 
-    private boolean getParity(int n) {
-        boolean parity = false;
-        while (n != 0) {
-            parity = !parity;
-            n = n & (n - 1);
+
+    @SuppressLint("MissingPermission")
+    public List<HashMap<String, String>> getBondedDevices() {
+        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices();
+
+        Log.i("bonded", String.valueOf(bondedDevices.size()));
+
+        List<HashMap<String, String>> devices = new ArrayList<>();
+
+        for (BluetoothDevice device : bondedDevices) {
+            HashMap<String, String> deviceInfo = new HashMap<>();
+
+            deviceInfo.put("name", device.getName());
+            deviceInfo.put("address", device.getAddress());
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                deviceInfo.put("alias", device.getAlias());
+            } else {
+                deviceInfo.put("alias", device.getName());
+            }
+            deviceInfo.put("rssi", "0");
+
+            devices.add(deviceInfo);
         }
-        return parity;
+        return devices;
     }
 
     public void keepAlive() {
@@ -545,31 +472,13 @@ public class BluetoothController {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             connectedDevice.setAlias(alias);
-        } else {
-            // write name to file??
-            // Tel user they can only do that on newer devices
         }
-    }
-
-    private boolean isNumeric(String s) {
-        return s != null && s.matches("[-+]?\\d*\\.?\\d+");
-    }
-
-    void loggingFunc(String[] loggingInfo) {
-        Actuator.setLoggingPassword(loggingInfo[1]);
-        Actuator.setNumberOfFullCycles(Integer.parseInt(loggingInfo[2]));
-        Actuator.setNumberOfStarts(Integer.parseInt(loggingInfo[3]));
-        Actuator.setPeakCurrent(Double.parseDouble(loggingInfo[4]));
-        Actuator.setPeakTemperature(Double.parseDouble(loggingInfo[5]));
-        Actuator.setVoltageAllTimeLow(Double.parseDouble(loggingInfo[6]));
-        Actuator.setPowerOns(Integer.parseInt(loggingInfo[7]));
-        Actuator.setLastCycleEnergy(Double.parseDouble(loggingInfo[8]));
-        Actuator.setLastChargeTime(Integer.parseInt(loggingInfo[9]));
     }
 
     public void disconnect() {
         stop();
         runnable = null;
+        cancelTimeoutThread();
     }
 
     public synchronized void stop() {
@@ -597,7 +506,7 @@ public class BluetoothController {
     }
 
     @SuppressLint("MissingPermission")
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device, final String socketType) {
+    public synchronized void connected(BluetoothSocket socket, BluetoothDevice device) {
         // Cancel the thread that completed the connection
         if (connectThread != null) {
             connectThread.cancel();
@@ -611,7 +520,7 @@ public class BluetoothController {
         }
 
         // Cancel the accept thread because we only want to connect to one device
-        connectedThread = new ConnectedThread(socket, socketType);
+        connectedThread = new ConnectedThread(socket);
         connectedThread.start();
 
         // Send the name of the connected device back to the UI activity
@@ -634,9 +543,7 @@ public class BluetoothController {
 
         // Prevent interrupts to actuators while in critical state
 
-        if (isMessageRequest(message))
-            new BluetoothAwait(message);
-
+        long flashTimeoutMs = 2000;
         if (SystemClock.elapsedRealtime() - flashingBoard < flashTimeoutMs) {
             return;
         } else if (message.compareTo("m111\n") == 0 || message.compareTo("m11\n") == 0) {
@@ -653,45 +560,6 @@ public class BluetoothController {
             // Probably a broken pipe, we've lost connection with the device, remove it from the list and disconnect threads
             disconnect();
         }
-    }
-
-    void writeBootloader(Actuator actuator, MainActivity activity) {
-        // Start transfer key
-        SystemClock.sleep(100);
-
-        byte[] hexBuffer = new byte[40000];
-        try {
-            InputStream inputStream = activity.getAssets().open(HEXF_FILE_NAME);
-            int value;
-            while ((value = inputStream.read(hexBuffer, 0, 40000)) != -1) {
-                byte[] array = hexStringToByteArray(new String(hexBuffer).substring(0, value));
-
-                if (Actuator.parity) {
-                    send("!");
-                    send(String.valueOf(((getParity(value) ? 1 : 0))));
-                }
-
-            }
-        } catch (Exception e) {
-            Log.e("error", e.getMessage());
-        }
-    }
-
-    // Determine if a message being sent is a getter or a setter
-    private boolean isMessageRequest(String Message) {
-        Message = Message.replaceAll("\\n", "");
-        char c = Message.charAt(0);
-
-        // Some requests have commas, and some non-requests don't have commas. Filter these ones out through the sets.
-        if (notRequestsSet.contains(Message))
-            return false;
-        else if (c == 'm') {
-            if (Message.contains(",")) {
-                String[] split = Message.split(",");
-                return areRequestsSet.contains(split[0]);
-            }
-        }
-        return true;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -771,7 +639,7 @@ public class BluetoothController {
                         case STATE_LISTEN:
                         case STATE_CONNECTING:
                             // Situation normal. Start the connected thread
-                            connected(socket, socket.getRemoteDevice(), socketType);
+                            connected(socket, socket.getRemoteDevice());
                             break;
                         case STATE_NONE:
                         case STATE_CONNECTED:
@@ -831,29 +699,11 @@ public class BluetoothController {
 
             bluetoothAdapter.cancelDiscovery();
 
+            Log.i("Device Address", device.getAddress());
+
             // Make a connection to the BluetoothSocket
             try {
                 socket.connect();
-
-                actuator = new Actuator(device, mainActivity);
-
-                // start the keep alive
-                runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            verifyActuator();
-                        } catch (Exception e) {
-                            Log.e("KeepAlive", e.getMessage());
-                        } finally {
-                            if (runnable == this) {
-                                handler.postDelayed(this, 1000);
-                            }
-                        }
-                    }
-                };
-
-                runnable.run();
 
                 Log.e("ConnectThread", "-- attempting start --");
                 BluetoothController.updateConnectionStatus(BluetoothController.CONNECTING);
@@ -863,6 +713,7 @@ public class BluetoothController {
                 e.printStackTrace();
                 try {
                     Log.e("ConnectThread", "-- attempting close --");
+                    e.printStackTrace();
                     socket.close();
                 } catch (IOException e2) {
                     Log.e("ConnectThread", "-- close failed --");
@@ -887,11 +738,12 @@ public class BluetoothController {
             }
 
             // Start the connected thread
-            connected(socket, device, socketType);
+            connected(socket, device);
         }
 
         public void cancel() {
             try {
+
                 socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -904,7 +756,7 @@ public class BluetoothController {
         private final InputStream inStream;
         private final OutputStream outStream;
 
-        ConnectedThread(BluetoothSocket s, String socketType) {
+        ConnectedThread(BluetoothSocket s) {
             socket = s;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -946,8 +798,7 @@ public class BluetoothController {
                         // Read from inputStream
                         bytes = inStream.read(buffer[buffer_to_use]);
 
-                        handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer[buffer_to_use])
-                                .sendToTarget();
+                        handler.obtainMessage(MESSAGE_READ, bytes, -1, buffer[buffer_to_use]).sendToTarget();
                         buffer_to_use++;
                         if (buffer_to_use >= num_buffers) {
                             buffer_to_use = 0;
@@ -973,14 +824,13 @@ public class BluetoothController {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                handler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
+                handler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer).sendToTarget();
             } catch (IOException e) {
                 Log.e("ConnectedThread:Write", "Exception writing", e);
 
                 Message msg = handler.obtainMessage(MESSAGE_LOST_CONNECTION);
                 // device connection was lost
-                // send to flutter engine
+
                 handler.sendMessage(msg);
 
                 setState(STATE_EXCEPTION);
@@ -989,6 +839,8 @@ public class BluetoothController {
 
         public void cancel() {
             try {
+                inStream.close();
+                outStream.close();
                 socket.close();
             } catch (IOException e) {
                 Log.e("ConnectedThread:Close", "close() of connect socket failed", e);
