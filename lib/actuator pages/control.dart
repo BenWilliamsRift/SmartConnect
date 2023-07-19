@@ -167,8 +167,8 @@ class _ControlPageState extends State<ControlPage> {
                     style: Style.normalText,
                     Actuator.connectedActuator.settings.getAngle),
                 update: () {
-                  bluetoothMessageHandler.requestAngle();
-                },
+                  // bluetoothMessageHandler.requestAngle();
+              },
             ),
             // Temperature
             TextTile(

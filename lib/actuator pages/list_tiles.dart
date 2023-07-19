@@ -431,7 +431,7 @@ class TextInputTile extends StatefulWidget {
 class _TextInputTileState extends State<TextInputTile> {
   late Text title;
   late Text? subtitle;
-  // late String initialValue;
+  late String initialValue;
   late Function(String? newValue) onSaved;
   late TextEditingController controller;
   late TextInputType keyboardType;
@@ -450,6 +450,11 @@ class _TextInputTileState extends State<TextInputTile> {
     title = widget.title;
     subtitle = widget.subtitle;
     keyboardType = widget.keyboardType;
+
+    if (widget.initialValue != null) {
+      initialValue = widget.initialValue!;
+      controller.text = initialValue;
+    }
 
     return Card(
       child: ListTile(

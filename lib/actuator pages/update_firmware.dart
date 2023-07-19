@@ -55,6 +55,7 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
       if (mounted) {
         setState(() {
           bluetoothMessageHandler.getBootloaderStatus();
+          bluetoothMessageHandler.requestFirmwareVersion();
         });
       }
     });
@@ -80,7 +81,10 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                     text: Text(
                         style: Style.normalText,
                         Actuator.connectedActuator.settings.firmwareVersion
-                            .toString())),
+                            .toString()),
+                    update: () {
+                      bluetoothMessageHandler.requestFirmwareVersion();
+                    }),
                 Row(children: [
                   Style.sizedWidth,
                   Expanded(
@@ -94,29 +98,32 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                 print(Actuator.connectedActuator.inBootLoader);
                               }
 
-                              if (hasShownAlert) {
-                                if (Actuator.connectedActuator.inBootLoader) {
-                                  bluetoothMessageHandler.exitBootloader();
-                                  Actuator.connectedActuator.inBootLoader =
-                                      false;
-                                } else {
-                                  bluetoothMessageHandler.enterBootloader();
-                                  Actuator.connectedActuator.inBootLoader =
-                                      true;
-                                }
-                              } else {
-                                hasShownAlert = true;
-                                confirmationMessage(
-                                    context: context,
-                                    text: StringConsts.actuators
-                                        .bootloaderDoYouKnowWhatYourDoing,
-                                    yesAction: () {
-                                      // let the user continue
-                                    },
-                                    noAction: () {
+                              // if (hasShownAlert) {
+                              //   if (Actuator.connectedActuator.inBootLoader) {
+                              //     bluetoothMessageHandler.exitBootloader();
+                              //     Actuator.connectedActuator.inBootLoader =
+                              //         false;
+                              //   } else {
+                              //     bluetoothMessageHandler.enterBootloader();
+                              //     Actuator.connectedActuator.inBootLoader =
+                              //         true;
+                              //   }
+                              // } else {
+                              hasShownAlert = true;
+                              confirmationMessage(
+                                  context: context,
+                                  text: StringConsts.actuators
+                                      .bootloaderDoYouKnowWhatYourDoing,
+                                  yesAction: () {
+                                    // let the user continue
+                                    bluetoothMessageHandler.enterBootloader();
+                                    Actuator.connectedActuator.inBootLoader =
+                                        true;
+                                  },
+                                  noAction: () {
                                       Navigator.pop(context);
                                     });
-                              }
+                              // }
                             });
                           })),
                   Style.sizedWidth,
@@ -130,15 +137,19 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                     Text(StringConsts.actuators.uploadFirmware),
                                 onPressed: () {
                                   setState(() {
-                                    bluetoothMessageHandler.updateFirmware();
-                                    showLoading = true;
-                                    Future.delayed(
-                                        bluetoothMessageHandler
-                                            .getEstimatedTimeForFirmware(), () {
-                                      setState(() {
-                                        showLoading = false;
+                                    if (!showLoading) {
+                                      bluetoothMessageHandler.updateFirmware();
+
+                                      showLoading = true;
+                                      Future.delayed(
+                                          bluetoothMessageHandler
+                                              .getEstimatedTimeForFirmware(),
+                                          () {
+                                        setState(() {
+                                          showLoading = false;
+                                        });
                                       });
-                                    });
+                                    }
                                   });
                                 })),
                         Style.sizedWidth,

@@ -15,6 +15,7 @@ class Reports {
 }
 
 class EmailDev {
+  // todo add support email
   static List<String> recipients = ["ben@rifttechnology.com"];
 
   static void send(String type, String summary, String report) {}

@@ -40,9 +40,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   String get getBoardNumber => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.boardNumber.toString() : StringConsts.bluetooth.notConnected;
-  String get getFirmware => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.firmwareVersion.toString() : StringConsts.bluetooth.notConnected;
-  String get getType => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.type == null ? StringConsts.bluetooth.notConnected : Actuator.connectedActuator.type ?? StringConsts.loading : StringConsts.bluetooth.notConnected;
-  String get getAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getAngle : StringConsts.bluetooth.notConnected;
+  String get getFirmware => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.firmwareVersion.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getType => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.type == ""
+          ? StringConsts.loading
+          : Actuator.connectedActuator.type
+      : StringConsts.bluetooth.notConnected;
+
+  String get getAngle => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.getAngle
+      : StringConsts.bluetooth.notConnected;
   String get getLocked => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.isLocked.toString() : StringConsts.bluetooth.notConnected;
   String get getOpenAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getOpenAngle : StringConsts.bluetooth.notConnected;
   String get getClosedAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getClosedAngle : StringConsts.bluetooth.notConnected;
@@ -73,7 +83,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
-        bluetoothMessageHandler.requestAngle();
+        // bluetoothMessageHandler.requestAngle();
         bluetoothMessageHandler.requestTemperature();
         bluetoothMessageHandler.requestBatteryVoltage();
       });

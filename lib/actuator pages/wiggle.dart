@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../asset_manager.dart';
 import '../actuator/actuator.dart';
 import '../app_bar.dart';
+import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../date_time.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class WigglePage extends StatefulWidget {
   const WigglePage({Key? key}) : super(key: key);
@@ -78,14 +78,15 @@ class _WigglePageState extends State<WigglePage> {
                 Style.sizedWidth
           ]),
           SwitchTile(
-                  title: Text(
+              title: Text(
                     style: Style.normalText,
                     StringConsts.actuators.wiggle,
                   ),
-                  initValue: Actuator.connectedActuator.wiggle ?? false,
+                  initValue: Actuator.connectedActuator.wiggle,
                   callback: (bool value) {
                     Actuator.connectedActuator.wiggle = value;
-                    bluetoothMessageHandler.setWiggleEnabled(Actuator.connectedActuator.wiggle ?? false);
+                    bluetoothMessageHandler
+                        .setWiggleEnabled(Actuator.connectedActuator.wiggle);
                   }),
           TextInputTile(
                 title: Text(style: Style.normalText, StringConsts.actuators.wiggleAngle),

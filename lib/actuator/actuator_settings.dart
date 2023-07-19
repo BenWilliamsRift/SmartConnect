@@ -116,10 +116,6 @@ class ActuatorSettings {
   }
 
   double calibratedClosedAngle = 0.0;
-  double torqueBand = 0;
-
-  String get getTorqueBand =>
-      "${Settings.convertTorqueUnits(torque: torqueBand)}${Settings.getTorqueUnits()}";
 
   // torque limit
   double torqueLimitNm = 0.0;

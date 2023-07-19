@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:actuatorapp2/web_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -207,7 +208,9 @@ class _SettingsPageState extends State<SettingsPage> {
 
       default:
         WebController().checkAccessCodeRequest(key).then((value) {
-          print("Value: $value");
+          if (kDebugMode) {
+            print("Value: $value");
+          }
           return value;
         });
         break;

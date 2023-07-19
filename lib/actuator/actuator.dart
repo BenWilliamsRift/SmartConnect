@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/material.dart';
 
 import '../String_consts.dart';
@@ -85,6 +86,8 @@ class Actuator {
 
   late BluetoothManager bluetoothManager;
 
+  String name = "";
+
   bool connectedToBoard = false;
   bool bootloaderFlashing = false;
   bool writingToFlash = false;
@@ -95,7 +98,7 @@ class Actuator {
 
   int? boardNumber;
 
-  late String? type;
+  String type = "";
 
   static const String typeSmall = "small";
   static const String typeEcoSmall = "ecosmall";
@@ -126,6 +129,40 @@ class Actuator {
         bluetoothManager.getName().startsWith("PF") ||
         type == typeSmall;
   }
+
+  bool isMediumActuator() {
+    return Actuator.connectedActuator.name.startsWith("SACO1");
+  }
+
+  void updateTorqueBand() {
+    // on website there are options for 10, 20 and 30 but in actuator small uses same flag as 60, 80 and 100 for some reason
+    if (isSmallActuator()) {
+      if (isNm100) {
+        torqueBand = 30;
+      } else if (isNm80) {
+        torqueBand = 20;
+      } else if (isNm60) {
+        torqueBand = 10;
+      } else {
+        torqueBand = 10;
+      }
+    }
+
+    if (isMediumActuator()) {
+      if (isNm100) {
+        torqueBand = 100;
+      } else if (isNm80) {
+        torqueBand = 80;
+      } else if (isNm60) {
+        torqueBand = 60;
+      } else {
+        torqueBand = 40;
+      }
+    }
+  }
+
+  String get getTorqueBand =>
+      "${Settings.convertTorqueUnits(torque: torqueBand.roundToDouble())}${Settings.getTorqueUnits()}";
 
   static List<String> indicationModes = [
     "Normal Two Way",
@@ -202,6 +239,7 @@ class Actuator {
   bool isLocked = false;
 
   bool torqueLimit = false;
+  int torqueBand = 0;
   bool isNm60 = false;
   bool isNm80 = false;
   bool isNm100 = false;

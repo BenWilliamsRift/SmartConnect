@@ -37,10 +37,20 @@ class _CalibrationPageState extends State<CalibrationPage> {
 
     // initial requests
     requestAll();
+
+    Future.delayed(const Duration(seconds: 2), () {
+      setState(() {
+        requestAll();
+      });
+    });
   }
 
   bool autoManualReleased = false;
   Color? autoManualColor;
+
+  void getTorqueBand() {
+    Actuator.connectedActuator.updateTorqueBand();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,12 +59,12 @@ class _CalibrationPageState extends State<CalibrationPage> {
     Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         setState(() {
-          bluetoothMessageHandler.requestAngle();
           bluetoothMessageHandler.requestClosedAngleAddition();
           bluetoothMessageHandler.requestWorkingAngle();
           Actuator.connectedActuator.settings.openAngle =
               Actuator.connectedActuator.settings.closedAngle +
                   Actuator.connectedActuator.settings.workingAngle;
+          getTorqueBand();
         });
       }
     });
@@ -167,17 +177,14 @@ class _CalibrationPageState extends State<CalibrationPage> {
             Style.sizedWidth,
           ]),
           // angle
-          TextInputTile(
+          // TODO convert to text
+          TextTile(
             title:
                 Text(style: Style.normalText, StringConsts.actuators.rawAngle),
-            initialValue: Actuator.connectedActuator.settings.getAngle,
-            onSaved: (String? newValue) {
-              setState(() {
-                // set angle
-                bluetoothMessageHandler.setAngle(double.parse(newValue ??
-                    Actuator.connectedActuator.settings.angle.toString()));
-              });
-            },
+            text: Text(
+              Actuator.connectedActuator.settings.getRawAngle,
+              style: Style.normalText,
+            ),
           ),
           // open angle
           TextInputTile(
@@ -277,7 +284,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
                   style: Style.normalText, StringConsts.actuators.torqueBand),
               text: Text(
                   style: Style.normalText,
-                  Actuator.connectedActuator.settings.torqueBand.toString())),
+                  Actuator.connectedActuator.getTorqueBand)),
         ],
       )),
     );

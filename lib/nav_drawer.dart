@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'actuator pages/torque_limit.dart';
+import 'actuator/actuator.dart';
 import 'actuator pages/basic_settings.dart';
 import 'actuator pages/calibration.dart';
 import 'actuator pages/connect.dart';
@@ -9,9 +9,9 @@ import 'actuator pages/failsafe.dart';
 import 'actuator pages/features.dart';
 import 'actuator pages/modulating.dart';
 import 'actuator pages/speed_control.dart';
+import 'actuator pages/torque_limit.dart';
 import 'actuator pages/update_firmware.dart';
 import 'actuator pages/wiggle.dart';
-import 'actuator/actuator.dart';
 import 'asset_manager.dart';
 import 'bluetooth/bluetooth_manager.dart';
 import 'color_manager.dart';
@@ -149,7 +149,11 @@ class _NavDrawerState extends State<NavDrawer> {
                   }),
                 ))
             : Container(),
-        (isConnected && (Actuator.connectedActuator.failsafe ?? false) || (Actuator.connectedActuator.modulating ?? false) || (Actuator.connectedActuator.speedControl ?? false) || (Actuator.connectedActuator.wiggle ?? false) || (Settings.devSettingsEnabled))
+        (isConnected && (Actuator.connectedActuator.failsafe) ||
+                (Actuator.connectedActuator.modulating) ||
+                (Actuator.connectedActuator.speedControl) ||
+                (Actuator.connectedActuator.wiggle) ||
+                (Settings.devSettingsEnabled))
             ? Row(children: [
                 Expanded(flex: 3, child: div),
                 Expanded(
@@ -159,8 +163,9 @@ class _NavDrawerState extends State<NavDrawer> {
                 Expanded(flex: 3, child: div)
               ])
             : Container(),
-        ((isConnected && (Actuator.connectedActuator.torqueLimit ?? false)) || Settings.devSettingsEnabled)
-          ? Card(
+        ((isConnected && (Actuator.connectedActuator.torqueLimit)) ||
+                Settings.devSettingsEnabled)
+            ? Card(
           color: selectedPage == StringConsts.torqueLimit
               ? ColorManager.colorAccent
               : ColorManager.navDrawBackground,
@@ -176,7 +181,8 @@ class _NavDrawerState extends State<NavDrawer> {
               }),
             )
         ) : Container(),
-        ((isConnected && (Actuator.connectedActuator.failsafe ?? false)) || Settings.devSettingsEnabled)
+        ((isConnected && (Actuator.connectedActuator.failsafe)) ||
+                Settings.devSettingsEnabled)
             ? Card(
                 color: selectedPage == StringConsts.failsafe
                     ? ColorManager.colorAccent
@@ -193,7 +199,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   }),
                 ))
             : Container(),
-        ((isConnected && (Actuator.connectedActuator.modulating ?? false)) || Settings.devSettingsEnabled)
+        ((isConnected && (Actuator.connectedActuator.modulating)) ||
+                Settings.devSettingsEnabled)
             ? Card(
                 color: selectedPage == StringConsts.modulating
                     ? ColorManager.colorAccent
@@ -210,7 +217,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   }),
                 ))
             : Container(),
-        ((isConnected && (Actuator.connectedActuator.speedControl ?? false)) || Settings.devSettingsEnabled)
+        ((isConnected && (Actuator.connectedActuator.speedControl)) ||
+                Settings.devSettingsEnabled)
             ? Card(
                 color: selectedPage == StringConsts.speedControl
                     ? ColorManager.colorAccent
@@ -227,7 +235,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   }),
                 ))
             : Container(),
-        ((isConnected && (Actuator.connectedActuator.wiggle ?? false)) || Settings.devSettingsEnabled)
+        ((isConnected && (Actuator.connectedActuator.wiggle)) ||
+                Settings.devSettingsEnabled)
             ? Card(
                 color: selectedPage == StringConsts.wiggle
                     ? ColorManager.colorAccent

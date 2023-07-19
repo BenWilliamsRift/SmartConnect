@@ -101,15 +101,15 @@ class BluetoothManager {
   }
 
   String getName() {
-    // TODO getName
-
-    return "";
+    return Actuator.connectedActuator.name;
   }
 
   void getPairedDevices() {
     androidPlatform.invokeMethod("getBonded").then((temp) {
       for (LinkedHashMap device in temp) {
-        print(device["name"]?.startsWith("RIFT") ?? false);
+        if (kDebugMode) {
+          print(device["name"]?.startsWith("RIFT") ?? false);
+        }
         if (!deviceAddresses.contains(device["address"])) {
           if (device["name"]?.startsWith("RIFT") ?? false) {
             if (kDebugMode) {
@@ -201,7 +201,6 @@ class BluetoothManager {
 
     bool timedOut = false;
 
-    // Test this
     // Still connecting
     while (connectionStatus == connecting && timedOut == false) {
       if (result == connecting) {

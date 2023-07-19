@@ -144,8 +144,10 @@ class BluetoothMessageHandler {
     for (String message in messages) {
       switch (message[0]) {
         case codeRequestAngle: // a
-          Actuator.connectedActuator.settings.angle =  roundDouble((double.parse(message.substring(1)) % 360), 2);
-          Actuator.connectedActuator.settings.rawAngle =  double.parse(message.substring(1));
+          Actuator.connectedActuator.settings.angle =
+              (double.parse(message.substring(1)) % 360);
+          Actuator.connectedActuator.settings.rawAngle =
+              double.parse(message.substring(1));
           break;
         case codeRequestLEDS: // l
           Actuator.connectedActuator.settings.leds =
@@ -210,6 +212,7 @@ class BluetoothMessageHandler {
         case codeRequestReverseActing: //34
           Actuator.connectedActuator.settings.reverseActing =
               int.parse(message.split(",")[1]) == 1;
+          // maybe add receivedReverseActing like from bluetoothHandler 431:55
           break;
         case codeRequestNumberOfStarts: // 36
           Actuator.connectedActuator.settings.numberOfStarts =
