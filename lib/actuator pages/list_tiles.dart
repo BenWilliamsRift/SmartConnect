@@ -983,7 +983,9 @@ class _AutoManualButtonState extends State<AutoManualButton> {
     // Cancel request if auto manual hasn't been activated
     bluetoothMessageHandler.stopActuator();
     bluetoothMessageHandler.requestAutoManual();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   // ignore: unused_element
@@ -1002,9 +1004,11 @@ class _AutoManualButtonState extends State<AutoManualButton> {
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        bluetoothMessageHandler.requestAutoManual();
-      });
+      if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.requestAutoManual();
+        });
+      }
     });
 
     return GestureDetector(

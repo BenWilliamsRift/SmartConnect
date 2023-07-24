@@ -54,9 +54,8 @@ class _NavDrawerState extends State<NavDrawer> {
 
     Divider div = Divider(thickness: 3, color: ColorManager.navDrawDiv);
 
-    final bool isConnected = BluetoothManager.isActuatorConnected
-        // TODO DEV SETTING - REMOVE
-        || Settings.emulateConnectedActuator;
+    final bool isConnected = BluetoothManager.isActuatorConnected ||
+        Settings.emulateConnectedActuator;
 
     final drawerItems = ListView(
       children: [

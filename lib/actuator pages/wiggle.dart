@@ -33,17 +33,19 @@ class _WigglePageState extends State<WigglePage> {
     bluetoothMessageHandler.requestWiggleTimeBetween();
 
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (Actuator.connectedActuator.writingToFlash) {
-        if (!loading) {
-          setState(() {
-            loading = true;
-          });
-          Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        if (Actuator.connectedActuator.writingToFlash) {
+          if (!loading) {
             setState(() {
-              loading = false;
-              Actuator.connectedActuator.writingToFlash = false;
+              loading = true;
             });
-          });
+            Future.delayed(const Duration(seconds: 2), () {
+              setState(() {
+                loading = false;
+                Actuator.connectedActuator.writingToFlash = false;
+              });
+            });
+          }
         }
       }
     });

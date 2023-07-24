@@ -22,6 +22,7 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
 
   late Timer updateInfoTimer;
+  late Timer timer;
 
   bool hasShownAlert = false;
   bool showLoading = false;
@@ -37,6 +38,15 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
       });
     });
 
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.getBootloaderStatus();
+          bluetoothMessageHandler.requestFirmwareVersion();
+        });
+      }
+    });
+
     hasShownAlert = false;
   }
 
@@ -45,20 +55,12 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
     super.dispose();
 
     updateInfoTimer.cancel();
+    timer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     Style.update();
-
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          bluetoothMessageHandler.getBootloaderStatus();
-          bluetoothMessageHandler.requestFirmwareVersion();
-        });
-      }
-    });
 
     return Scaffold(
         appBar: appBar(title: getTitle()),

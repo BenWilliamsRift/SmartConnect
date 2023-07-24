@@ -296,7 +296,11 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {if (enabled) {setState(() {});}});
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) if (enabled) {
+        setState(() {});
+      }
+    });
 
     return Scaffold(
       appBar: appBar(
