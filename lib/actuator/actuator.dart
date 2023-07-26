@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/material.dart';
 
@@ -106,19 +104,6 @@ class Actuator {
   static const String typeEcoMedium = "ecomedium";
   static const String typeLarge = "large";
   static const String typeSubsea = "subsea";
-
-  Future<bool> isConnected() async {
-    return await bluetoothManager.isConnected();
-  }
-
-  bool connect() {
-    // TODO connect methods
-    return false;
-  }
-
-  Future<bool> isConnecting() async {
-    return await bluetoothManager.isConnecting();
-  }
 
   void disconnect() {
     bluetoothManager.disconnect();

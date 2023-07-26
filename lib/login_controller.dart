@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'actuator pages/connect.dart';
-import 'encrypter.dart';
 import 'actuator/actuator.dart';
 import 'actuator/actuator_settings.dart';
+import 'actuator pages/connect.dart';
 import 'asset_manager.dart';
 import 'bluetooth/bluetooth_manager.dart';
 import 'color_manager.dart';
+import 'encrypter.dart';
 import 'main.dart';
 import 'person_data.dart';
 import 'preference_manager.dart';
@@ -380,7 +380,11 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
     _password = FocusNode();
     PreferenceManager.loadSettingsPrefs();
 
-    Future.delayed(const Duration(milliseconds: 10), () {setState(() {});});
+    Future.delayed(const Duration(milliseconds: 10), () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
 
     BluetoothManager.initBluetoothResponse();
   }

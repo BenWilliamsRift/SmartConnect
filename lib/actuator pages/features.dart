@@ -178,6 +178,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
       switch (password.toLowerCase()) {
         case "none":
         // Hide feature
+          // todo this means that they don't have the feature so an ad could go here
           setFeature(i, false);
           break;
         case "disable":
@@ -190,13 +191,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
       if (!didComplete) {
         setFeature(i, true);
       }
-      // if (password.toLowerCase() == "none" || password.toLowerCase() == "disable" && !featureSwitch.initValue) {
-      // //     uses a callback set for each switch
-      //     featureSwitch.setValue!(false);
-      //   } else {
-      //     featureSwitch.setValue!(true);
-      //     // TODO Add different features
-      //   }
     }
 
     setState(() {});

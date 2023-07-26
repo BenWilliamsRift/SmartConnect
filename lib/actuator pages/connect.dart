@@ -11,6 +11,7 @@ import '../color_manager.dart';
 import '../main.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'help_page.dart';
 import 'list_tiles.dart';
 
 class ConnectToActuatorPage extends StatefulWidget {
@@ -36,6 +37,9 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     // get paired devices
     // bluetoothManager.getPairedDevices();
 
+    // start scan here
+    _refreshList();
+
     aliasFocusNode = FocusNode();
   }
 
@@ -51,21 +55,27 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
 
   Future<void> _refreshList() async {
     bluetoothManager.scan();
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
 
     final timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      setState(() {
-        bluetoothManager.refresh();
-      });
+      if (mounted) {
+        setState(() {});
+      }
+      bluetoothManager.refresh();
     });
 
     return Future.delayed(Duration(seconds: BluetoothManager.timeOutDelay), () {
-      setState(() {
-        showSnackBar(context, StringConsts.bluetooth.scanFinished, null, null);
-        bluetoothManager.refresh();
-        timer.cancel();
-        bluetoothManager.getIsScanning();
-      });
+      if (mounted) {
+        setState(() {
+          showSnackBar(
+              context, StringConsts.bluetooth.scanFinished, null, null);
+          bluetoothManager.refresh();
+          timer.cancel();
+          bluetoothManager.getIsScanning();
+        });
+      }
     });
   }
 
@@ -192,11 +202,6 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
                     }
                   });
                 },
-                onLongPress: () {
-                  setState(() {
-                    // TODO  Edit Alias
-                  });
-                },
                 title: Text(device.alias),
                 subtitle: Text(device.name),
                 trailing: (Actuator.connectedDeviceAddress == device.address)
@@ -255,10 +260,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
         }
 
         if (await Permission.bluetooth.isPermanentlyDenied) {
-          // TODO open settings
-          if (kDebugMode) {
-            print("Open settings");
-          }
+          openAppSettings();
         }
 
         Map<Permission, PermissionStatus> statusScan =
@@ -284,12 +286,12 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
       }
 
       if (await Permission.location.isPermanentlyDenied) {
-        // TODO open settings
-        if (kDebugMode) {
-          print("Open settings");
-        }
+        openAppSettings();
       }
     }
+
+    // todo get bluetooth permissions
+    // move all permissions to here
   }
 
   bool enabled = true;
@@ -297,8 +299,10 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) if (enabled) {
-        setState(() {});
+      if (mounted) {
+        if (enabled) {
+          setState(() {});
+        }
       }
     });
 
@@ -315,15 +319,6 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
         },
         child: Column(
           children: [
-            // Style.sizedHeight,
-            // Style.sizedHeight,
-            // Style.sizedHeight,
-            // Row(children: [
-            //   Expanded(flex: 1, child: Style.sizedWidth),
-            //   const Expanded(flex: 20, child: search.SearchBar()),
-            //   Expanded(flex: 1, child: Style.sizedWidth),
-            // ]),
-            // Style.sizedHeight,
             Style.sizedHeight,
             Row(children: [
               Expanded(flex: 1, child: Style.sizedWidth),
@@ -356,7 +351,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
                       ? Card(
                           child: ListTile(
                               onTap: () {
-                                // TODO open to actuator help page
+                                routeToPage(context, const HelpPage());
                               },
                               title: Text(StringConsts.help.actuatorScan),
                               subtitle: Text(StringConsts.help.pullDown)))

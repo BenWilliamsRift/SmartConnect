@@ -16,7 +16,7 @@ class StringConsts {
   static const String speedControl = "Speed Control";
   static const String wiggle = "Wiggle";
   static const String logOut = "Log out";
-  static const String connectToActuator = "Connect to Actuator";
+  static const String connectToActuator = "Connect to an Actuator";
   static const String appSettings = "App Settings";
   static const String contactUs = "Report a Bug";
   static const String faq = "FAQ";
@@ -60,6 +60,8 @@ class Statistics {
 class Help {
   final String actuatorScan = "Click for help finding actuators";
   final String pullDown = "Pull down to refresh";
+
+  final String title = "Help";
 }
 
 class Bluetooth {
@@ -141,7 +143,7 @@ class ActuatorsStrings {
   // TODO only use this while the old bootloader system is in place
   // remove once the update process is streamlined
   final String bootloaderDoYouKnowWhatYourDoing =
-      "Do you know what you are doing?";
+      "Are you sure you want to do this?";
 
   String moveOpenAngle(String value) {
     return "Do you want to move the open angle, to maintain a working angle of: $value?";
@@ -183,9 +185,8 @@ class ActuatorsStrings {
   final String indicationMode = "Indication Mode";
   final String reverseActing = "Reverse Acting";
 
-  String confirmLock(bool locked) {
-    return "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
-  }
+  String confirmLock(bool locked) =>
+      "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
 
   final String lock = "Lock";
   final String unlock = "Unlock";

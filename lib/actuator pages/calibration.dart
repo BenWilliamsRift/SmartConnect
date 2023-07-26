@@ -83,7 +83,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
             Style.sizedHeight,
             Row(children: [
                   Style.sizedWidth,
-                  // cant be const otherwise they wont be rebuilt
                   const SizedBox(
                       width: 30, height: 30, child: ActuatorConnectedIndicator())
                 ]),
@@ -180,7 +179,6 @@ class _CalibrationPageState extends State<CalibrationPage> {
                 Style.sizedWidth,
               ]),
               // angle
-              // TODO convert to text
               TextTile(
                 title:
                 Text(style: Style.normalText, StringConsts.actuators.rawAngle),

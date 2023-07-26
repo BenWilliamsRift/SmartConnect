@@ -197,14 +197,21 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
   late _LinePainter angleLine;
   late _ArcPainter angleArc;
 
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
 
     radius = widget.radius;
-  }
 
-  Timer? t;
+    timer = Timer.periodic(const Duration(microseconds: 50), (timer) {
+      if (mounted) {
+        bluetoothMessageHandler.requestAngle();
+        setState(() {});
+      }
+    });
+  }
 
   List<int> previousAngles = [];
 
@@ -220,7 +227,7 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
   @override
   void dispose() {
     super.dispose();
-    t?.cancel();
+    timer.cancel();
   }
 
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();

@@ -24,14 +24,10 @@ class BluetoothMessageHandler {
 
   // m- commands - in order
   static const String codeRequestFirmwareVersion = "m4";
-  static const String codeOpenActuator =
-      "m5"; // Open the actuator until there is a stop command, limited to the open angle
-  static const String codeStopActuator =
-      "m6"; // Stop the actuator for normal opening and closing.
-  static const String codeCloseActuator =
-      "m7"; // Close the actuator until there is a stop command, limited to the close angle
-  static const String codeSetAutoManual =
-      "m9"; // Once this is sent, wait 4 seconds then send the stop command.
+  static const String codeOpenActuator = "m5";
+  static const String codeStopActuator = "m6";
+  static const String codeCloseActuator = "m7";
+  static const String codeSetAutoManual = "m9";
   static const String codeRequestWorkingTime = "m10";
   static const String codeWriteToFlash = "m11";
   static const String codeSetWorkingTime = "m12";
@@ -361,7 +357,9 @@ class BluetoothMessageHandler {
               int.parse(message.split(",")[1]) == 1;
           break;
         case codeRequestAutoManual: // set auto manual : 734
-          Actuator.connectedActuator.settings.autoManual = int.parse(message.split(",")[1]);
+          print(message.split(","));
+          Actuator.connectedActuator.settings.autoManual =
+              int.parse(message.split(",")[1]);
           break;
         case "154": // unused???? : 740
           break;
