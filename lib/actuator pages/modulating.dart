@@ -65,13 +65,13 @@ class _ModulatingPageState extends State<ModulatingPage> {
     Style.update();
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
             child: Stack(
-              children: [
-                Column(
           children: [
+            Column(
+              children: [
                 Style.sizedHeight,
                 Row(children: [
                   Style.sizedWidth,

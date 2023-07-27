@@ -66,18 +66,18 @@ class _ControlPageState extends State<ControlPage> {
     });
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
             child: Column(
-              children: [
-                Style.sizedHeight,
-                Row(children: [
-                  Style.sizedWidth,
-                  const SizedBox(
-                      width: 30, height: 30, child: ActuatorConnectedIndicator())
-                ]),
-                const Row(
+          children: [
+            Style.sizedHeight,
+            Row(children: [
+              Style.sizedWidth,
+              const SizedBox(
+                  width: 30, height: 30, child: ActuatorConnectedIndicator())
+            ]),
+            const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ActuatorIndicator(radius: 100),

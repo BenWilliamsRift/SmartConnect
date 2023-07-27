@@ -193,7 +193,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: StringConsts.contactUs),
+        appBar: appBar(title: StringConsts.contactUs, context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),

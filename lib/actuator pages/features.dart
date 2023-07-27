@@ -404,18 +404,18 @@ class _FeaturesPageState extends State<FeaturesPage> {
     ];
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [
             SingleChildScrollView(
                 child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: Row(children: [
-                        Expanded(flex: 1, child: Style.sizedWidth),
-                        Expanded(
+              children: [
+                SizedBox(
+                  height: 50,
+                  child: Row(children: [
+                    Expanded(flex: 1, child: Style.sizedWidth),
+                    Expanded(
                             flex: 3,
                             child: Button(
                                 child: Text(

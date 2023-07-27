@@ -307,9 +307,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     });
 
     return Scaffold(
-      appBar: appBar(
-        title: StringConsts.connectToActuator,
-      ),
+      appBar: appBar(title: StringConsts.connectToActuator, context: context),
       drawer: const NavDrawer(),
       body: GestureDetector(
         onTap: () {

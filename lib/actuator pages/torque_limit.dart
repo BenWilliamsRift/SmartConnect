@@ -62,18 +62,17 @@ class _TorqueLimitPageState extends State<TorqueLimitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(title: getTitle()),
-      drawer: const NavDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Style.sizedHeight,
-            Row(
-              children: [
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
+      appBar: appBar(title: getTitle(), context: context),
+        drawer: const NavDrawer(),
+        body: SingleChildScrollView(
+            child: Column(children: [
+          Style.sizedHeight,
+          Row(
+            children: [
+              Style.sizedWidth,
+              Expanded(
+                  child: Button(
+                onPressed: () {
                     setState(() {
                       Actuator.writeToFlash(context, bluetoothMessageHandler);
                     });

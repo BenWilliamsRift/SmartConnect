@@ -77,17 +77,17 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     TextEditingController lockTextController = TextEditingController();
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [
             SingleChildScrollView(
                 child: Column(children: [
-              AbsorbPointer(
-                absorbing: isLocked || loading,
-                child: Column(
-                  children: [
-                    Style.sizedHeight,
+                  AbsorbPointer(
+                    absorbing: isLocked || loading,
+                    child: Column(
+                      children: [
+                        Style.sizedHeight,
                     Row(
                       children: [
                         Style.sizedWidth,

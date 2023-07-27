@@ -65,7 +65,7 @@ class _FailsafePageState extends State<FailsafePage> {
   Widget build(BuildContext context) {
     Style.update();
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [
@@ -74,9 +74,9 @@ class _FailsafePageState extends State<FailsafePage> {
               children: [
                 Style.sizedHeight,
                 Row(children: [
-                      Style.sizedWidth,
-                      Expanded(
-                          child: Button(
+                  Style.sizedWidth,
+                  Expanded(
+                      child: Button(
                               child: Text(
                                   style: Style.normalText,
                                   StringConsts.actuators.writeToFlash),

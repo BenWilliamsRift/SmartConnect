@@ -73,7 +73,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
     Style.update();
 
     return Scaffold(
-      appBar: appBar(title: getTitle()),
+      appBar: appBar(title: getTitle(), context: context),
       drawer: const NavDrawer(),
       body: SingleChildScrollView(
           child: Column(
@@ -82,9 +82,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
           Column(children: [
             Style.sizedHeight,
             Row(children: [
-                  Style.sizedWidth,
-                  const SizedBox(
-                      width: 30, height: 30, child: ActuatorConnectedIndicator())
+              Style.sizedWidth,
+              const SizedBox(
+                  width: 30, height: 30, child: ActuatorConnectedIndicator())
                 ]),
                 const Row(
                   mainAxisAlignment: MainAxisAlignment.center,

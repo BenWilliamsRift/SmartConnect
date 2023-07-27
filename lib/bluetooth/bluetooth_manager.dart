@@ -175,6 +175,15 @@ class BluetoothManager {
 
   bool isScanning = false;
 
+  void enableBluetooth(BuildContext context) async {
+    await androidPlatform.invokeMethod("enableBluetooth").then((value) {
+      if (value) {
+        showSnackBar(
+            context, StringConsts.bluetooth.successfullyTurnedOn, null, null);
+      }
+    });
+  }
+
   Future<void> scan() async {
     // returns a list of hashmaps
     tempDevices = await androidPlatform.invokeMethod("scan");

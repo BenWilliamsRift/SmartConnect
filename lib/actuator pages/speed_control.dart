@@ -54,13 +54,13 @@ class _SpeedControlPageState extends State<SpeedControlPage> {
     Style.update();
 
     return Scaffold(
-      appBar: appBar(title: getTitle()),
+      appBar: appBar(title: getTitle(), context: context),
       drawer: const NavDrawer(),
       body: SingleChildScrollView(
           child: Stack(
-            children: [
-              Column(
         children: [
+          Column(
+            children: [
               Style.sizedHeight,
               Row(
                 children: [

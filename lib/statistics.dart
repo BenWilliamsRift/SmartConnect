@@ -114,19 +114,36 @@ class _StatisticsPageState extends State<StatisticsPage> {
     Divider div = Divider(color: ColorManager.colorAccent, thickness: 1, indent: 15, endIndent: 15);
 
     return Scaffold(
-      appBar: appBar(
-        title: StringConsts.statistics.title,
-      ),
+      appBar: appBar(title: StringConsts.statistics.title, context: context),
       drawer: const NavDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
-          setState(() { getInformation(); });
+          setState(() {
+            getInformation();
+          });
         },
         child: ListView(
           children: [
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.appVersionTitle), text: Text(style: Style.normalText, StringConsts.appVersion)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.boardNumber), text: Text(style: Style.normalText, getBoardNumber)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.firmwareVersion), text: Text(style: Style.normalText, getFirmware)), div,
+            TextTile(
+                compact: true,
+                title:
+                    Text(style: Style.normalText, StringConsts.appVersionTitle),
+                text: Text(style: Style.normalText, StringConsts.appVersion)),
+            div,
+            TextTile(
+                compact: true,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.boardNumber),
+                text: Text(style: Style.normalText, getBoardNumber)),
+            div,
+            TextTile(
+                compact: true,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.firmwareVersion),
+                text: Text(style: Style.normalText, getFirmware)),
+            div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.type), text: Text(style: Style.normalText, getType)), div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.angle), text: Text(style: Style.normalText, getAngle)), div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.locked), text: Text(style: Style.normalText, getLocked)), div,

@@ -61,13 +61,13 @@ class _WigglePageState extends State<WigglePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
             child: Stack(
-              children: [
-                Column(children: [
-          Row(children: [
+          children: [
+            Column(children: [
+              Row(children: [
                 Style.sizedWidth,
                 Expanded(
                     child: Button(

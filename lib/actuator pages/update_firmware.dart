@@ -63,7 +63,7 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
     Style.update();
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [

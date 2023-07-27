@@ -62,6 +62,13 @@ class Help {
   final String pullDown = "Pull down to refresh";
 
   final String title = "Help";
+  final String isItPowered =
+      "Are the LEDs turned on at the top of the actuator?";
+  final String setAppPermissions =
+      "Does the app have the correct permissions enabled?";
+  final String isBluetoothEnabled = "Is Bluetooth enabled?";
+  final String openSettings = "Open permission settings";
+  final String enableBluetooth = "Enable Bluetooth";
 }
 
 class Bluetooth {
@@ -80,10 +87,12 @@ class Bluetooth {
   final String unconnected = "Unconnected";
   final String disconnected = "Disconnected";
   final String notConnected = "Not connected";
+  final String successfullyTurnedOn = "Bluetooth was successfully turned on";
+  final String unsuccessfullyTurnedOn =
+      "Bluetooth could not be turned on automatically, please turn it on manually";
 
-  String disconnect() {
-    return "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
-  }
+  String disconnect() =>
+      "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
 }
 
 class NetworkText {
