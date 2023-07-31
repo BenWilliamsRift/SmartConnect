@@ -26,8 +26,8 @@ class _HelpPageState extends State<HelpPage> {
         appBar: appBar(title: StringConsts.help.title),
         drawer: const NavDrawer(),
         body: ListView(children: [
-          // Make sure actuator has power
           const SizedBox(height: 10),
+          // Make sure actuator has power
           Card(
             child: ExpansionTile(
               iconColor: ColorManager.companyYellow,
@@ -57,6 +57,7 @@ class _HelpPageState extends State<HelpPage> {
               ],
             ),
           ),
+          // Make sure the app has all the correct permissions
           Card(
               child: ExpansionTile(
                   iconColor: ColorManager.companyYellow,
@@ -102,9 +103,7 @@ class _HelpPageState extends State<HelpPage> {
                           child: Text(StringConsts.help.enableBluetooth))),
                 )
               ]))
-          // Make sure the left led is flashing blue
-          // Make sure the app has all the correct permissions
-          // Pull down in the connect page to scan for devices
+
           // Click a device to connect to
           //  if the connection fails logout then login again
           // if it keeps failing then close the app and reopen it
