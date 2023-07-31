@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -115,24 +117,23 @@ class _FeaturesPageState extends State<FeaturesPage> {
     }
   }
 
-  List<String> splitPasswords(
-      String source, String boardNumber, int index, String separator) {
+  List<String> splitPasswords(String source, String boardNumber, int index, String separator) {
     List<String> passwords = source.split("\n");
 
     // return the line that has the board number in
     return passwords.firstWhere(
-        (element) => element.split(separator).elementAt(0) == boardNumber,
+            (element) => element.split(separator).elementAt(0) == boardNumber,
         orElse: () {
-      if (kDebugMode) {
-        print("Actuator not found");
-      }
-      return "";
-    }).split(separator);
+          if (kDebugMode) {
+            print("Actuator not found");
+          }
+          return "";
+        }).split(separator);
   }
 
   void featurePasswordsIntoActuator(bool shouldOpenPasswords) {
     String? passwords =
-        PreferenceManager.getString(PreferenceManager.passwords);
+    PreferenceManager.getString(PreferenceManager.passwords);
 
     if (passwords == null) return;
 
@@ -161,7 +162,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
     if (shouldOpenPasswords) {
       updatePasswords();
     }
-
   }
 
   void updatePasswords() {
@@ -177,11 +177,12 @@ class _FeaturesPageState extends State<FeaturesPage> {
       bool didComplete = true;
       switch (password.toLowerCase()) {
         case "none":
-          // Hide feature
+        // Hide feature
+          // todo this means that they don't have the feature so an ad could go here
           setFeature(i, false);
           break;
         case "disable":
-          // Show feature but disable switch
+        // Show feature but disable switch
           setFeature(i, false);
           break;
         default:
@@ -190,13 +191,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
       if (!didComplete) {
         setFeature(i, true);
       }
-      // if (password.toLowerCase() == "none" || password.toLowerCase() == "disable" && !featureSwitch.initValue) {
-      // //     uses a callback set for each switch
-      //     featureSwitch.setValue!(false);
-      //   } else {
-      //     featureSwitch.setValue!(true);
-      //     // TODO Add different features
-      //   }
     }
 
     setState(() {});
@@ -214,7 +208,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
         isLocked: !Actuator.connectedActuator.torqueLimit,
         visible: true,
         title:
-            Text(style: Style.normalText, StringConsts.actuators.torqueLimit),
+        Text(style: Style.normalText, StringConsts.actuators.torqueLimit),
         initValue: Actuator.connectedActuator.torqueLimit,
         callback: (bool value) {
           Actuator.connectedActuator.torqueLimit = value;
@@ -410,7 +404,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
     ];
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [
@@ -422,23 +416,23 @@ class _FeaturesPageState extends State<FeaturesPage> {
                   child: Row(children: [
                     Expanded(flex: 1, child: Style.sizedWidth),
                     Expanded(
-                        flex: 3,
-                        child: Button(
-                            child: Text(
-                                style: Style.normalText,
-                                StringConsts.actuators.syncFromInternet),
-                            onPressed: () {
-                              setState(() {
-                                showLoading = true;
-                                updateFeatures();
-                              });
-                            })),
-                    Expanded(flex: 1, child: Style.sizedWidth)
-                  ]),
-                ),
-                for (Widget featureSwitch in switches) featureSwitch
-              ],
-            )),
+                            flex: 3,
+                            child: Button(
+                                child: Text(
+                                    style: Style.normalText,
+                                    StringConsts.actuators.syncFromInternet),
+                                onPressed: () {
+                                  setState(() {
+                                    showLoading = true;
+                                    updateFeatures();
+                                  });
+                                })),
+                        Expanded(flex: 1, child: Style.sizedWidth)
+                      ]),
+                    ),
+                    for (Widget featureSwitch in switches) featureSwitch
+                  ],
+                )),
             (showLoading) ? Center(child: AssetManager.loading) : Container()
           ],
         ));

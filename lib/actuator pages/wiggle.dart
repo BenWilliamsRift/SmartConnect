@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../asset_manager.dart';
 import '../actuator/actuator.dart';
 import '../app_bar.dart';
+import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../date_time.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class WigglePage extends StatefulWidget {
   const WigglePage({Key? key}) : super(key: key);
@@ -33,17 +33,19 @@ class _WigglePageState extends State<WigglePage> {
     bluetoothMessageHandler.requestWiggleTimeBetween();
 
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (Actuator.connectedActuator.writingToFlash) {
-        if (!loading) {
-          setState(() {
-            loading = true;
-          });
-          Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        if (Actuator.connectedActuator.writingToFlash) {
+          if (!loading) {
             setState(() {
-              loading = false;
-              Actuator.connectedActuator.writingToFlash = false;
+              loading = true;
             });
-          });
+            Future.delayed(const Duration(seconds: 2), () {
+              setState(() {
+                loading = false;
+                Actuator.connectedActuator.writingToFlash = false;
+              });
+            });
+          }
         }
       }
     });
@@ -59,13 +61,13 @@ class _WigglePageState extends State<WigglePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
             child: Stack(
-              children: [
-                Column(children: [
-          Row(children: [
+          children: [
+            Column(children: [
+              Row(children: [
                 Style.sizedWidth,
                 Expanded(
                     child: Button(
@@ -78,14 +80,15 @@ class _WigglePageState extends State<WigglePage> {
                 Style.sizedWidth
           ]),
           SwitchTile(
-                  title: Text(
+              title: Text(
                     style: Style.normalText,
                     StringConsts.actuators.wiggle,
                   ),
-                  initValue: Actuator.connectedActuator.wiggle ?? false,
+                  initValue: Actuator.connectedActuator.wiggle,
                   callback: (bool value) {
                     Actuator.connectedActuator.wiggle = value;
-                    bluetoothMessageHandler.setWiggleEnabled(Actuator.connectedActuator.wiggle ?? false);
+                    bluetoothMessageHandler
+                        .setWiggleEnabled(Actuator.connectedActuator.wiggle);
                   }),
           TextInputTile(
                 title: Text(style: Style.normalText, StringConsts.actuators.wiggleAngle),

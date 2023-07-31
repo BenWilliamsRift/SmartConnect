@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:actuatorapp2/web_controller.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -178,8 +180,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   late final SharedPreferences prefs;
 
-  int devSettingsCounter = 0;
-
   @override
   void initState() {
     super.initState();
@@ -198,6 +198,25 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  bool advancedSettingsOpen = false;
+
+  void checkAccessCode(String key) {
+    switch (key.toLowerCase()) {
+      case "dev settings":
+        Settings.devSettingsEnabled = !Settings.devSettingsEnabled;
+        break;
+
+      default:
+        WebController().checkAccessCodeRequest(key).then((value) {
+          if (kDebugMode) {
+            print("Value: $value");
+          }
+          return value;
+        });
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeNotification themeNotifier = ThemeNotification();
@@ -206,108 +225,148 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text(StringConsts.settings.title),
       ),
       drawer: widget.login ? null : const NavDrawer(),
-      body: ListView(
+      body: Stack(
         children: [
-          const SizedBox(height: 8),
-          SwitchTile(
-            title: Text(StringConsts.settings.isDarkMode),
-            initValue: Settings.isDarkMode,
-            callback: (bool value) {
-              setState(() {
-                Settings.isDarkMode = value;
-                writeSettingsToPrefs(
-                    "${PreferenceManager.settingsPrefix}-${PreferenceManager.isDarkModeSuffix}", Settings.isDarkMode);
-              });
-              themeNotifier.updateTheme(context);
-            },
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Center(
+              child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Text(
+                      "${StringConsts.settings.appVersion} ${StringConsts.appVersion}")),
+            ),
           ),
-          DropDownTile(
-              items: Settings.temperatureUnits,
-              value: Settings.temperatureUnits
-                  .elementAt(Settings.selectedTemperatureUnits),
-              onChanged: (String? unit) {
-                setState(() {
-                  Settings.selectedTemperatureUnits = Settings.temperatureUnits.indexOf(unit!);
-                  writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.temperatureUnitsSuffix}", Settings.selectedTemperatureUnits);
-                });
+          ListView(
+            children: [
+              const SizedBox(height: 8),
+              SwitchTile(
+                title: Text(StringConsts.settings.isDarkMode),
+                initValue: Settings.isDarkMode,
+                callback: (bool value) {
+                  setState(() {
+                    Settings.isDarkMode = value;
+                    writeSettingsToPrefs(
+                        "${PreferenceManager.settingsPrefix}-${PreferenceManager.isDarkModeSuffix}",
+                        Settings.isDarkMode);
+                  });
+                  themeNotifier.updateTheme(context);
+                },
+              ),
+              DropDownTile(
+                  items: Settings.temperatureUnits,
+                  value: Settings.temperatureUnits
+                      .elementAt(Settings.selectedTemperatureUnits),
+                  onChanged: (String? unit) {
+                    setState(() {
+                      Settings.selectedTemperatureUnits =
+                          Settings.temperatureUnits.indexOf(unit!);
+                      writeSettingsToPrefs(
+                          "${PreferenceManager.settingsPrefix}-${PreferenceManager.temperatureUnitsSuffix}",
+                          Settings.selectedTemperatureUnits);
+                    });
 
-                return Settings.selectedTemperatureUnits.toString();
-              },
-              title: Text(StringConsts.settings.temperature)),
-          DropDownTile(
-              items: Settings.torqueUnits,
-              value:
-              Settings.torqueUnits.elementAt(Settings.selectedTorqueUnits),
-              onChanged: (String? unit) {
-                setState(() {
-                  Settings.selectedTorqueUnits =
-                      Settings.torqueUnits.indexOf(unit!);
-                  writeSettingsToPrefs(
-                      "${PreferenceManager.settingsPrefix}-${PreferenceManager.torqueUnitsSuffix}", Settings.selectedTorqueUnits);
-                });
-
-                return Settings.selectedTorqueUnits.toString();
-              },
-              title: Text(StringConsts.settings.torqueUnits)),
-          DropDownTile(
-              items: Settings.timeUnits,
-              value:
-              Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
-              onChanged: (String? unit) {
-                setState(() {
-                  Settings.selectedTimeUnits = Settings.timeUnits.indexOf(unit!);
-                  writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.timeUnitsSuffix}", Settings.selectedTimeUnits);
-                });
-
-                return Settings.selectedTimeUnits.toString();
-              },
-              title: Text(StringConsts.settings.timeUnits)),
-          SwitchTile(
-            title: Text(StringConsts.settings.saveLoginDetails),
-            subtitle: Text(StringConsts.settings.saveLoginDetailsSub, style: Style.subtitle),
-            visible: !widget.login,
-            initValue: Settings.saveLoginDetails,
-            callback: ((bool value) {
-              setState(() {
-                Settings.saveLoginDetails = value;
-                writeSettingsToPrefs("${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}", Settings.saveLoginDetails);
-              });
-            }),
-          ),
-          // Dev Settings
-          Settings.devSettingsEnabled ? Row(children: const [
-            Expanded(child: Divider()),
-            Text("Dev Settings"),
-            Expanded(child: Divider()),
-          ]) : Container(),
-          Settings.devSettingsEnabled ? SwitchTile(
-              title: const Text("Emulate Connection to Actuator"),
-              subtitle: const Text("Unlocks all features of the app"),
-              initValue: Settings.emulateConnectedActuator,
-              callback: (bool value) {
-                setState(
-                      () {
-                    Settings.emulateConnectedActuator = value;
+                    return Settings.selectedTemperatureUnits.toString();
                   },
-                );
-              }) : Container(),
+                  title: Text(StringConsts.settings.temperature)),
+              DropDownTile(
+                  items: Settings.torqueUnits,
+                  value: Settings.torqueUnits
+                      .elementAt(Settings.selectedTorqueUnits),
+                  onChanged: (String? unit) {
+                    setState(() {
+                      Settings.selectedTorqueUnits =
+                          Settings.torqueUnits.indexOf(unit!);
+                      writeSettingsToPrefs(
+                          "${PreferenceManager.settingsPrefix}-${PreferenceManager.torqueUnitsSuffix}",
+                          Settings.selectedTorqueUnits);
+                    });
+
+                    return Settings.selectedTorqueUnits.toString();
+                  },
+                  title: Text(StringConsts.settings.torqueUnits)),
+              DropDownTile(
+                  items: Settings.timeUnits,
+                  value:
+                      Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
+                  onChanged: (String? unit) {
+                    setState(() {
+                      Settings.selectedTimeUnits =
+                          Settings.timeUnits.indexOf(unit!);
+                      writeSettingsToPrefs(
+                          "${PreferenceManager.settingsPrefix}-${PreferenceManager.timeUnitsSuffix}",
+                          Settings.selectedTimeUnits);
+                    });
+
+                    return Settings.selectedTimeUnits.toString();
+                  },
+                  title: Text(StringConsts.settings.timeUnits)),
+              SwitchTile(
+                title: Text(StringConsts.settings.saveLoginDetails),
+                subtitle: Text(StringConsts.settings.saveLoginDetailsSub,
+                    style: Style.subtitle),
+                visible: !widget.login,
+                initValue: Settings.saveLoginDetails,
+                callback: ((bool value) {
+                  setState(() {
+                    Settings.saveLoginDetails = value;
+                    writeSettingsToPrefs(
+                        "${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}",
+                        Settings.saveLoginDetails);
+                  });
+                }),
+              ),
+              // Advanced settings
+              GestureDetector(
+                  onTap: () {
+                    // open advanced settings
+                    setState(() {
+                      advancedSettingsOpen = !advancedSettingsOpen;
+                    });
+                  },
+                  child: Row(children: [
+                    const Expanded(child: Divider(indent: 1, endIndent: 1)),
+                    Center(child: Text(StringConsts.settings.advancedSettings)),
+                    Center(
+                        child: Icon(advancedSettingsOpen
+                            ? Icons.arrow_drop_up_sharp
+                            : Icons.arrow_drop_down_sharp)),
+                    const Expanded(child: Divider(indent: 1, endIndent: 1)),
+                  ])),
+              advancedSettingsOpen
+                  ? TextInputTile(
+                      onSaved: (String? newValue) {
+                        setState(() {
+                          checkAccessCode(newValue ?? "");
+                        });
+                      },
+                      keyboardType: TextInputType.text,
+                      title: Text(StringConsts.settings.accessCodes),
+                    )
+                  : Container(),
+              // Dev Settings
+              Settings.devSettingsEnabled
+                  ? const Row(children: [
+                      Expanded(child: Divider()),
+                      Text("Dev Settings"),
+                      Expanded(child: Divider()),
+                    ])
+                  : Container(),
+              Settings.devSettingsEnabled
+                  ? SwitchTile(
+                      title: const Text("Emulate Connection to Actuator"),
+                      subtitle: const Text("Unlocks all features of the app"),
+                      initValue: Settings.emulateConnectedActuator,
+                      callback: (bool value) {
+                        setState(
+                          () {
+                            Settings.emulateConnectedActuator = value;
+                          },
+                        );
+                      })
+                  : Container(),
+            ],
+          ),
         ],
-      ),
-      floatingActionButton: GestureDetector(
-        onTapDown: (details) {
-          setState(() {
-            devSettingsCounter += 1;
-            if (devSettingsCounter >= 10) {
-              Settings.devSettingsEnabled = true;
-            }
-          });
-        },
-        child: Center(
-          child: Align(
-              alignment: FractionalOffset.bottomCenter,
-              child: Text(
-                  "${StringConsts.settings.appVersion} ${StringConsts.appVersion}")),
-        ),
       ),
     );
   }

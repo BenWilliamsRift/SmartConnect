@@ -1,9 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
 import '../actuator/actuator_settings.dart';
@@ -24,14 +24,10 @@ class BluetoothMessageHandler {
 
   // m- commands - in order
   static const String codeRequestFirmwareVersion = "m4";
-  static const String codeOpenActuator =
-      "m5"; // Open the actuator until there is a stop command, limited to the open angle
-  static const String codeStopActuator =
-      "m6"; // Stop the actuator for normal opening and closing.
-  static const String codeCloseActuator =
-      "m7"; // Close the actuator until there is a stop command, limited to the close angle
-  static const String codeSetAutoManual =
-      "m9"; // Once this is sent, wait 4 seconds then send the stop command.
+  static const String codeOpenActuator = "m5";
+  static const String codeStopActuator = "m6";
+  static const String codeCloseActuator = "m7";
+  static const String codeSetAutoManual = "m9";
   static const String codeRequestWorkingTime = "m10";
   static const String codeWriteToFlash = "m11";
   static const String codeSetWorkingTime = "m12";
@@ -135,23 +131,6 @@ class BluetoothMessageHandler {
   static const String codeModulatingInversion = "m1222";
   static const String codeRequestModulatingInversion = "m1223";
 
-  void getOpenAngle() {
-    requestClosedAngleAddition();
-    requestWorkingAngle();
-    requestReverseActing();
-
-    bool reverseActing = Actuator.connectedActuator.settings.reverseActing;
-    Future.delayed(const Duration(seconds: 1), () {
-     if (reverseActing) {
-      double workingAngle = Actuator.connectedActuator.settings.workingAngle;
-      double closedAddition = Actuator.connectedActuator.settings.calibratedClosedAngle;
-      Actuator.connectedActuator.settings.openAngle = closedAddition + workingAngle;
-     }
-    });
-
-    Actuator.connectedActuator.settings.openAngle = Actuator.connectedActuator.settings.closedAngle + Actuator.connectedActuator.settings.workingAngle;
-  }
-
   double roundDouble(double value, int places) {
     num mod = pow(10.0, places);
     return ((value * mod).round().toDouble() / mod);
@@ -161,8 +140,10 @@ class BluetoothMessageHandler {
     for (String message in messages) {
       switch (message[0]) {
         case codeRequestAngle: // a
-          Actuator.connectedActuator.settings.angle =  roundDouble((double.parse(message.substring(1)) % 360), 2);
-          Actuator.connectedActuator.settings.rawAngle =  double.parse(message.substring(1));
+          Actuator.connectedActuator.settings.angle =
+              (double.parse(message.substring(1)) % 360);
+          Actuator.connectedActuator.settings.rawAngle =
+              double.parse(message.substring(1));
           break;
         case codeRequestLEDS: // l
           Actuator.connectedActuator.settings.leds =
@@ -227,6 +208,7 @@ class BluetoothMessageHandler {
         case codeRequestReverseActing: //34
           Actuator.connectedActuator.settings.reverseActing =
               int.parse(message.split(",")[1]) == 1;
+          // maybe add receivedReverseActing like from bluetoothHandler 431:55
           break;
         case codeRequestNumberOfStarts: // 36
           Actuator.connectedActuator.settings.numberOfStarts =
@@ -375,7 +357,9 @@ class BluetoothMessageHandler {
               int.parse(message.split(",")[1]) == 1;
           break;
         case codeRequestAutoManual: // set auto manual : 734
-          Actuator.connectedActuator.settings.autoManual = int.parse(message.split(",")[1]);
+          print(message.split(","));
+          Actuator.connectedActuator.settings.autoManual =
+              int.parse(message.split(",")[1]);
           break;
         case "154": // unused???? : 740
           break;
@@ -413,6 +397,29 @@ class BluetoothMessageHandler {
     return value ? "1" : "0";
   }
 
+  void setAngle(double angle) {}
+
+  void getOpenAngle() {
+    requestClosedAngleAddition();
+    requestWorkingAngle();
+    requestReverseActing();
+
+    bool reverseActing = Actuator.connectedActuator.settings.reverseActing;
+    Future.delayed(const Duration(seconds: 1), () {
+      if (reverseActing) {
+        double workingAngle = Actuator.connectedActuator.settings.workingAngle;
+        double closedAddition =
+            Actuator.connectedActuator.settings.calibratedClosedAngle;
+        Actuator.connectedActuator.settings.openAngle =
+            closedAddition + workingAngle;
+      }
+    });
+
+    Actuator.connectedActuator.settings.openAngle =
+        Actuator.connectedActuator.settings.closedAngle +
+            Actuator.connectedActuator.settings.workingAngle;
+  }
+
   void writeToFlash() {
     Actuator.connectedActuator.writingToFlash = true;
 
@@ -446,6 +453,20 @@ class BluetoothMessageHandler {
     requestFailsafeDelay();
     requestFailsafeMode();
     requestFeaturePasswordDigits();
+  }
+
+  Duration getEstimatedTimeForFirmware() {
+    // failed the last page
+    return const Duration(minutes: 1, seconds: 30);
+
+    // 3Mbits per second // bluetooth 2.0 + EDR
+    // 375,000 bytes per second
+    // the file contains 165160 characters
+    // which is 82,580 number of bytes
+    // so it should take less than a second
+    // using 721Kbits per second, the slowest data rate // bluetooth 1.2
+    // 90,125 bytes per second
+    // it should take around a second to transfer
   }
 
   void requestAngle() {
@@ -871,10 +892,12 @@ class BluetoothMessageHandler {
   }
 
   void lock() {
+    Actuator.connectedActuator.isLocked = true;
     bluetoothManager.sendMessage(code: codeLock);
   }
 
   void unlock() {
+    Actuator.connectedActuator.isLocked = false;
     bluetoothManager.sendMessage(code: codeUnlock);
   }
 
@@ -889,12 +912,14 @@ class BluetoothMessageHandler {
     }
   }
 
-  void updateFirmware(BuildContext context) {
-    bluetoothManager.writeBootloader(context);
+  void updateFirmware() {
+    bluetoothManager.writeBootloader();
   }
 
   void setFailsafeDelay(Delay time) {
-    bluetoothManager.sendMessage(code: codeSetFailsafeDelay, value: (time.totalSeconds.floor()).toString());
+    bluetoothManager.sendMessage(
+        code: codeSetFailsafeDelay,
+        value: (time.totalSeconds.floor()).toString());
   }
 
   void requestFailsafeDelay() {

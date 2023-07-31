@@ -6,9 +6,9 @@ import '../actuator/actuator.dart';
 import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
-import 'list_tiles.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
+import 'list_tiles.dart';
 
 class ModulatingPage extends StatefulWidget {
   const ModulatingPage({Key? key}) : super(key: key);
@@ -35,17 +35,19 @@ class _ModulatingPageState extends State<ModulatingPage> {
     bluetoothMessageHandler.requestModulatingInversion();
 
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (Actuator.connectedActuator.writingToFlash) {
-        if (!loading) {
-          setState(() {
-            loading = true;
-          });
-          Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        if (Actuator.connectedActuator.writingToFlash) {
+          if (!loading) {
             setState(() {
-              loading = false;
-              Actuator.connectedActuator.writingToFlash = false;
+              loading = true;
             });
-          });
+            Future.delayed(const Duration(seconds: 2), () {
+              setState(() {
+                loading = false;
+                Actuator.connectedActuator.writingToFlash = false;
+              });
+            });
+          }
         }
       }
     });
@@ -63,13 +65,13 @@ class _ModulatingPageState extends State<ModulatingPage> {
     Style.update();
 
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: SingleChildScrollView(
             child: Stack(
-              children: [
-                Column(
           children: [
+            Column(
+              children: [
                 Style.sizedHeight,
                 Row(children: [
                   Style.sizedWidth,

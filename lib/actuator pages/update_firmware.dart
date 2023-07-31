@@ -22,6 +22,7 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
 
   late Timer updateInfoTimer;
+  late Timer timer;
 
   bool hasShownAlert = false;
   bool showLoading = false;
@@ -37,6 +38,15 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
       });
     });
 
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.getBootloaderStatus();
+          bluetoothMessageHandler.requestFirmwareVersion();
+        });
+      }
+    });
+
     hasShownAlert = false;
   }
 
@@ -45,22 +55,15 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
     super.dispose();
 
     updateInfoTimer.cancel();
+    timer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     Style.update();
 
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          bluetoothMessageHandler.getBootloaderStatus();
-        });
-      }
-    });
-
     return Scaffold(
-        appBar: appBar(title: getTitle()),
+        appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),
         body: Stack(
           children: [
@@ -80,7 +83,10 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                     text: Text(
                         style: Style.normalText,
                         Actuator.connectedActuator.settings.firmwareVersion
-                            .toString())),
+                            .toString()),
+                    update: () {
+                      bluetoothMessageHandler.requestFirmwareVersion();
+                    }),
                 Row(children: [
                   Style.sizedWidth,
                   Expanded(
@@ -94,29 +100,32 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                 print(Actuator.connectedActuator.inBootLoader);
                               }
 
-                              if (hasShownAlert) {
-                                if (Actuator.connectedActuator.inBootLoader) {
-                                  bluetoothMessageHandler.exitBootloader();
-                                  Actuator.connectedActuator.inBootLoader =
-                                      false;
-                                } else {
-                                  bluetoothMessageHandler.enterBootloader();
-                                  Actuator.connectedActuator.inBootLoader =
-                                      true;
-                                }
-                              } else {
-                                hasShownAlert = true;
-                                confirmationMessage(
-                                    context: context,
-                                    text: StringConsts.actuators
-                                        .bootloaderDoYouKnowWhatYourDoing,
-                                    yesAction: () {
-                                      // let the user continue
-                                    },
-                                    noAction: () {
+                              // if (hasShownAlert) {
+                              //   if (Actuator.connectedActuator.inBootLoader) {
+                              //     bluetoothMessageHandler.exitBootloader();
+                              //     Actuator.connectedActuator.inBootLoader =
+                              //         false;
+                              //   } else {
+                              //     bluetoothMessageHandler.enterBootloader();
+                              //     Actuator.connectedActuator.inBootLoader =
+                              //         true;
+                              //   }
+                              // } else {
+                              hasShownAlert = true;
+                              confirmationMessage(
+                                  context: context,
+                                  text: StringConsts.actuators
+                                      .bootloaderDoYouKnowWhatYourDoing,
+                                  yesAction: () {
+                                    // let the user continue
+                                    bluetoothMessageHandler.enterBootloader();
+                                    Actuator.connectedActuator.inBootLoader =
+                                        true;
+                                  },
+                                  noAction: () {
                                       Navigator.pop(context);
                                     });
-                              }
+                              // }
                             });
                           })),
                   Style.sizedWidth,
@@ -130,16 +139,19 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                                     Text(StringConsts.actuators.uploadFirmware),
                                 onPressed: () {
                                   setState(() {
-                                    bluetoothMessageHandler
-                                        .updateFirmware(context);
-                                    showLoading = true;
-                                    // TODO how do i know when upload is done?
-                                    Future.delayed(const Duration(seconds: 10),
-                                        () {
-                                      setState(() {
-                                        showLoading = false;
+                                    if (!showLoading) {
+                                      bluetoothMessageHandler.updateFirmware();
+
+                                      showLoading = true;
+                                      Future.delayed(
+                                          bluetoothMessageHandler
+                                              .getEstimatedTimeForFirmware(),
+                                          () {
+                                        setState(() {
+                                          showLoading = false;
+                                        });
                                       });
-                                    });
+                                    }
                                   });
                                 })),
                         Style.sizedWidth,

@@ -20,14 +20,18 @@ class AssetManager {
       image: AssetImage("assets/angle_ring.png"),
       filterQuality: FilterQuality.high);
   static Image logo =
-      const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
-  static String hexFileName = "actuator_hex.txt";
+  const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
+  static String hexFileName = "assets/actuator_hexs/actuator_hex.txt";
   static Image locked = const Image(
       image: AssetImage("assets/locked.png"), width: 40, height: 40);
 
   // Load files
   static Future<String> loadAsset(String assetName) async {
     return await rootBundle.loadString(assetName);
+  }
+
+  static Future<String> getActuatorHex() async {
+    return await rootBundle.loadString(AssetManager.hexFileName);
   }
 }
 
@@ -193,14 +197,21 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
   late _LinePainter angleLine;
   late _ArcPainter angleArc;
 
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
 
     radius = widget.radius;
-  }
 
-  Timer? t;
+    timer = Timer.periodic(const Duration(microseconds: 50), (timer) {
+      if (mounted) {
+        bluetoothMessageHandler.requestAngle();
+        setState(() {});
+      }
+    });
+  }
 
   List<int> previousAngles = [];
 
@@ -216,14 +227,14 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
   @override
   void dispose() {
     super.dispose();
-    t?.cancel();
+    timer.cancel();
   }
 
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 1), () {
+    Future.delayed(const Duration(microseconds: 50), () {
       bluetoothMessageHandler.requestAngle();
       setState(() {});
     });
@@ -231,13 +242,31 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
     int actualAngle =
         Actuator.connectedActuator.settings.angle.truncate() % 360;
 
-    // reduce jumpiness in angle values
-    previousAngles.add(actualAngle);
-    if (previousAngles.length > 3) {
-      previousAngles.removeAt(0);
+    int angle = actualAngle;
+
+    if (previousAngles.isNotEmpty) {
+      if (previousAngles.last - angle > 10) {
+        angle = previousAngles.last;
+      } else {
+        previousAngles.add(angle);
+      }
+    } else {
+      previousAngles.add(angle);
     }
 
-    int angle = (averageAngle());
+    // int angle = actualAngle;
+    // if (previousAngles.isNotEmpty) {
+    //   angle = previousAngles[0];
+    // reduce jumpiness in angle values
+    // if (previousAngles[0] - actualAngle <= 10) {
+    //   int angle = (averageAngle());
+    // angle = actualAngle;
+    // }
+    // }
+    //   previousAngles.add(actualAngle);
+    //   if (previousAngles.length > 3) {
+    //     previousAngles.removeAt(0);
+    //   }
 
     angleRing =
         _CirclePainter(radius: radius, color: ColorManager.angleRingColor);

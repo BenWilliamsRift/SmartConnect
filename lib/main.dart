@@ -22,16 +22,19 @@ void showSnackBar(
 }
 
 void routeToPage(BuildContext context, Widget page, {bool removeStack = false}) {
+  // refactor
+  while (Navigator.of(context).canPop()) {
+    Navigator.of(context).pop();
+  }
+  Navigator.of(context).pop(context);
   if (removeStack) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute<void>(builder: (context) {
-          return page;
+      return page;
     }), (route) => false);
   } else {
-    Navigator.pop(context);
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (context) {
-      return page;
-    }));
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (context) => page));
   }
 }
 

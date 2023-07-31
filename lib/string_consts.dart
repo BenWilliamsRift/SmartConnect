@@ -16,9 +16,9 @@ class StringConsts {
   static const String speedControl = "Speed Control";
   static const String wiggle = "Wiggle";
   static const String logOut = "Log out";
-  static const String connectToActuator = "Connect to Actuator";
+  static const String connectToActuator = "Connect to an Actuator";
   static const String appSettings = "App Settings";
-  static const String contactUs = "Contact Us";
+  static const String contactUs = "Report a Bug";
   static const String faq = "FAQ";
   static const String torqueLimit = "Torque Limit";
 
@@ -60,6 +60,15 @@ class Statistics {
 class Help {
   final String actuatorScan = "Click for help finding actuators";
   final String pullDown = "Pull down to refresh";
+
+  final String title = "Help";
+  final String isItPowered =
+      "Are the LEDs turned on at the top of the actuator?";
+  final String setAppPermissions =
+      "Does the app have the correct permissions enabled?";
+  final String isBluetoothEnabled = "Is Bluetooth enabled?";
+  final String openSettings = "Open permission settings";
+  final String enableBluetooth = "Enable Bluetooth";
 }
 
 class Bluetooth {
@@ -78,10 +87,12 @@ class Bluetooth {
   final String unconnected = "Unconnected";
   final String disconnected = "Disconnected";
   final String notConnected = "Not connected";
+  final String successfullyTurnedOn = "Bluetooth was successfully turned on";
+  final String unsuccessfullyTurnedOn =
+      "Bluetooth could not be turned on automatically, please turn it on manually";
 
-  String disconnect() {
-    return "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
-  }
+  String disconnect() =>
+      "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
 }
 
 class NetworkText {
@@ -141,7 +152,7 @@ class ActuatorsStrings {
   // TODO only use this while the old bootloader system is in place
   // remove once the update process is streamlined
   final String bootloaderDoYouKnowWhatYourDoing =
-      "Do you know what you are doing?";
+      "Are you sure you want to do this?";
 
   String moveOpenAngle(String value) {
     return "Do you want to move the open angle, to maintain a working angle of: $value?";
@@ -183,9 +194,8 @@ class ActuatorsStrings {
   final String indicationMode = "Indication Mode";
   final String reverseActing = "Reverse Acting";
 
-  String confirmLock(bool locked) {
-    return "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
-  }
+  String confirmLock(bool locked) =>
+      "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";
 
   final String lock = "Lock";
   final String unlock = "Unlock";
@@ -311,6 +321,9 @@ class Values {
 
 class SettingsStrings {
   final String title = "Settings";
+
+  final String advancedSettings = "Advanced Settings";
+  final String accessCodes = "Access Codes";
 
   final String specialBorders = "Special borders";
   final String visualDensity = "Visual density";

@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../date_time.dart';
-import '../nav_drawer.dart';
 import '../actuator/actuator.dart';
 import '../app_bar.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
+import '../date_time.dart';
+import '../nav_drawer.dart';
 import '../settings.dart';
 import '../string_consts.dart';
 import 'list_tiles.dart';
@@ -34,17 +34,19 @@ class _TorqueLimitPageState extends State<TorqueLimitPage> {
     bluetoothMessageHandler.requestTorqueLimitDelayBeforeRetry();
 
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
-      if (Actuator.connectedActuator.writingToFlash) {
-        if (!loading) {
-          setState(() {
-            loading = true;
-          });
-          Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        if (Actuator.connectedActuator.writingToFlash) {
+          if (!loading) {
             setState(() {
-              loading = false;
-              Actuator.connectedActuator.writingToFlash = false;
+              loading = true;
             });
-          });
+            Future.delayed(const Duration(seconds: 2), () {
+              setState(() {
+                loading = false;
+                Actuator.connectedActuator.writingToFlash = false;
+              });
+            });
+          }
         }
       }
     });
@@ -60,18 +62,17 @@ class _TorqueLimitPageState extends State<TorqueLimitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: appBar(title: getTitle()),
-      drawer: const NavDrawer(),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Style.sizedHeight,
-            Row(
-              children: [
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
+      appBar: appBar(title: getTitle(), context: context),
+        drawer: const NavDrawer(),
+        body: SingleChildScrollView(
+            child: Column(children: [
+          Style.sizedHeight,
+          Row(
+            children: [
+              Style.sizedWidth,
+              Expanded(
+                  child: Button(
+                onPressed: () {
                     setState(() {
                       Actuator.writeToFlash(context, bluetoothMessageHandler);
                     });

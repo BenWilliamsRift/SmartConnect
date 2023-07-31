@@ -155,22 +155,17 @@ class _SwitchTileState extends State<SwitchTile> {
               trailing: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                 child: isLocked
-                    ? GestureDetector(
-                        onTap: () {
-                          // TODO open ad for features
-                          // Show text saying that they need to buy these features to have them active
-                        },
-                        child: AssetManager.locked)
+                    ? AssetManager.locked
                     : Switch(
-                        value: value,
-                        onChanged: (bool value) {
-                          if (touchInputDisabled) {
-                            setState(() {});
-                            return;
-                          } else {
-                            setState(() {
-                              this.value = value;
-                              // run a custom callback if needed
+                  value: value,
+                  onChanged: (bool value) {
+                    if (touchInputDisabled) {
+                      setState(() {});
+                      return;
+                    } else {
+                      setState(() {
+                        this.value = value;
+                        // run a custom callback if needed
                               if (callback != null) {
                                 callback?.call(value);
                               }
@@ -431,7 +426,7 @@ class TextInputTile extends StatefulWidget {
 class _TextInputTileState extends State<TextInputTile> {
   late Text title;
   late Text? subtitle;
-  // late String initialValue;
+  late String initialValue;
   late Function(String? newValue) onSaved;
   late TextEditingController controller;
   late TextInputType keyboardType;
@@ -450,6 +445,11 @@ class _TextInputTileState extends State<TextInputTile> {
     title = widget.title;
     subtitle = widget.subtitle;
     keyboardType = widget.keyboardType;
+
+    if (widget.initialValue != null) {
+      initialValue = widget.initialValue!;
+      controller.text = initialValue;
+    }
 
     return Card(
       child: ListTile(
@@ -951,47 +951,21 @@ class AutoManualButton extends StatefulWidget {
 }
 
 class _AutoManualButtonState extends State<AutoManualButton> {
-  double radius = 4;
-  double width = Style.buttonWidth;
-  // ignore: unused_field
-  double _animatedWidth = 0;
-  Duration fastDuration = const Duration(milliseconds: 250);
-  Duration slowDuration = const Duration(seconds: 1, milliseconds: 100);
-  late Duration animationDuration;
-  bool complete = false;
+  double x = 0;
 
   @override
   void initState() {
     super.initState();
-    animationDuration = slowDuration;
     bluetoothMessageHandler.requestAutoManual();
   }
 
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
-
-  void getWidth() {
-    // todo fix width for auto manual button
-    width = (MediaQuery.of(context).size.width - Style.padding) / 3;
-  }
 
   void _cancel() {
     // Cancel request if auto manual hasn't been activated
     bluetoothMessageHandler.stopActuator();
     bluetoothMessageHandler.requestAutoManual();
     setState(() {});
-  }
-
-  // ignore: unused_element
-  void _startAnimation(bool reversed) {
-    if (reversed) {
-      setState(() {
-        _animatedWidth = 0;
-      });
-    } else {
-      setState(() {
-        _animatedWidth = width;
-      });
-    }
   }
 
   @override

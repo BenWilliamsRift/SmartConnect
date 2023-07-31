@@ -40,9 +40,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
   }
 
   String get getBoardNumber => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.boardNumber.toString() : StringConsts.bluetooth.notConnected;
-  String get getFirmware => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.firmwareVersion.toString() : StringConsts.bluetooth.notConnected;
-  String get getType => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.type == null ? StringConsts.bluetooth.notConnected : Actuator.connectedActuator.type ?? StringConsts.loading : StringConsts.bluetooth.notConnected;
-  String get getAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getAngle : StringConsts.bluetooth.notConnected;
+  String get getFirmware => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.firmwareVersion.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getType => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.type == ""
+          ? StringConsts.loading
+          : Actuator.connectedActuator.type
+      : StringConsts.bluetooth.notConnected;
+
+  String get getAngle => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.getAngle
+      : StringConsts.bluetooth.notConnected;
   String get getLocked => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.isLocked.toString() : StringConsts.bluetooth.notConnected;
   String get getOpenAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getOpenAngle : StringConsts.bluetooth.notConnected;
   String get getClosedAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getClosedAngle : StringConsts.bluetooth.notConnected;
@@ -73,7 +83,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
     Future.delayed(const Duration(seconds: 1), () {
       setState(() {
-        bluetoothMessageHandler.requestAngle();
+        // bluetoothMessageHandler.requestAngle();
         bluetoothMessageHandler.requestTemperature();
         bluetoothMessageHandler.requestBatteryVoltage();
       });
@@ -104,19 +114,36 @@ class _StatisticsPageState extends State<StatisticsPage> {
     Divider div = Divider(color: ColorManager.colorAccent, thickness: 1, indent: 15, endIndent: 15);
 
     return Scaffold(
-      appBar: appBar(
-        title: StringConsts.statistics.title,
-      ),
+      appBar: appBar(title: StringConsts.statistics.title, context: context),
       drawer: const NavDrawer(),
       body: RefreshIndicator(
         onRefresh: () async {
-          setState(() { getInformation(); });
+          setState(() {
+            getInformation();
+          });
         },
         child: ListView(
           children: [
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.appVersionTitle), text: Text(style: Style.normalText, StringConsts.appVersion)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.boardNumber), text: Text(style: Style.normalText, getBoardNumber)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.firmwareVersion), text: Text(style: Style.normalText, getFirmware)), div,
+            TextTile(
+                compact: true,
+                title:
+                    Text(style: Style.normalText, StringConsts.appVersionTitle),
+                text: Text(style: Style.normalText, StringConsts.appVersion)),
+            div,
+            TextTile(
+                compact: true,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.boardNumber),
+                text: Text(style: Style.normalText, getBoardNumber)),
+            div,
+            TextTile(
+                compact: true,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.firmwareVersion),
+                text: Text(style: Style.normalText, getFirmware)),
+            div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.type), text: Text(style: Style.normalText, getType)), div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.angle), text: Text(style: Style.normalText, getAngle)), div,
             TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.locked), text: Text(style: Style.normalText, getLocked)), div,
