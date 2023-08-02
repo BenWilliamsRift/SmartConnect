@@ -20,16 +20,30 @@ class PreferenceManager {
   static const String actuatorPrefix = "actuator";
   static const String passwordsSuffix = "Passwords";
 
+  static const String firstTimeSeen = "firstTimeSeen";
+
   static SharedPreferences? prefs;
 
   static void loadSettingsPrefs() async {
     prefs ??= await SharedPreferences.getInstance();
-    bool? isDarkMode = prefs?.getBool("${PreferenceManager.settingsPrefix}-${PreferenceManager.isDarkModeSuffix}") ?? false;
-    bool? twelveHourTime = prefs?.getBool("${PreferenceManager.settingsPrefix}-${PreferenceManager.twelveHourTimeSuffix}") ?? false;
-    bool? saveLoginDetails = prefs?.getBool("${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}") ?? false;
-    int? temperatureUnits = prefs?.getInt("${PreferenceManager.settingsPrefix}-${PreferenceManager.temperatureUnitsSuffix}") ?? 0;
-    int? torqueUnits = prefs?.getInt("${PreferenceManager.settingsPrefix}-${PreferenceManager.torqueUnitsSuffix}") ?? 0;
-    int? timeUnits = prefs?.getInt("${PreferenceManager.settingsPrefix}-${PreferenceManager.timeUnitsSuffix}") ?? 0;
+    bool? isDarkMode = prefs?.getBool(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.isDarkModeSuffix}") ??
+        false;
+    bool? twelveHourTime = prefs?.getBool(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.twelveHourTimeSuffix}") ??
+        false;
+    bool? saveLoginDetails = prefs?.getBool(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.saveLoginDetailsSuffix}") ??
+        false;
+    int? temperatureUnits = prefs?.getInt(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.temperatureUnitsSuffix}") ??
+        0;
+    int? torqueUnits = prefs?.getInt(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.torqueUnitsSuffix}") ??
+        0;
+    int? timeUnits = prefs?.getInt(
+            "${PreferenceManager.settingsPrefix}-${PreferenceManager.timeUnitsSuffix}") ??
+        0;
 
     Settings.isDarkMode = isDarkMode;
     Settings.twelveHourTime = twelveHourTime;
@@ -49,5 +63,13 @@ class PreferenceManager {
 
   static void removeString(String key) {
     prefs?.remove(key);
+  }
+
+  static bool? getBool(String key) {
+    return prefs?.getBool(key);
+  }
+
+  static void setBool(String key, bool value) {
+    prefs?.setBool(key, value);
   }
 }

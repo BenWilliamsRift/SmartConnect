@@ -37,10 +37,11 @@ void routeToPage(BuildContext context, Widget page, {bool removeStack = false}) 
   }
 }
 
-void showAlert({required BuildContext context,
-  required Text content,
-  Text? title,
-  required List<Widget> actions}) {
+void showAlert(
+    {required BuildContext context,
+    required Widget content,
+    Text? title,
+    required List<Widget> actions}) {
   showDialog(
       context: context,
       builder: (context) {

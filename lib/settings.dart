@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:actuatorapp2/person_data.dart';
 import 'package:actuatorapp2/web_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -166,12 +167,20 @@ class Settings {
     // newton meters
     return "Nm";
   }
+
+  static final _devEmails = ["ben@rifttechnology.com"];
+
+  static bool isDevEmail() {
+    return _devEmails.contains(PersonData.currentEmail);
+  }
 }
 
 class SettingsPage extends StatefulWidget {
-  const SettingsPage({Key? key, this.login = false}) : super(key: key);
+  const SettingsPage({Key? key, this.login = false, this.firstTime = false})
+      : super(key: key);
 
   final bool login;
+  final bool firstTime;
 
   @override
   State<SettingsPage> createState() => _SettingsPageState();
@@ -224,7 +233,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         title: Text(StringConsts.settings.title),
       ),
-      drawer: widget.login ? null : const NavDrawer(),
+      drawer: (widget.login || widget.firstTime) ? null : const NavDrawer(),
       body: Stack(
         children: [
           Align(

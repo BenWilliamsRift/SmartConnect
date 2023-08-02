@@ -31,6 +31,7 @@ class StringConsts {
   static Bluetooth bluetooth = Bluetooth();
   static Help help = Help();
   static Statistics statistics = Statistics();
+  static FirstTime firstTime = FirstTime();
 
   static const String search = "Search";
 
@@ -83,6 +84,7 @@ class Help {
       "$bulletPoint Close the app and then re-open the app.";
   final String somethingElse = "Something not listed?";
   final String contactUs = "Contact us here.";
+  final String exampleActuatorName = "Example Actuator";
 }
 
 class Bluetooth {
@@ -428,4 +430,12 @@ class ContactUsStrings {
 
     bugTypes = [bugApp, bugActuator, bugRiftDevWebsite];
   }
+}
+
+class FirstTime {
+  final String title = "First Time";
+  final String checkOutSettings = "Check out the settings page";
+  final String takeATour = "Do you want to take a tour?";
+  final String takeTheTour = "Take the Tour";
+  final String noThanks = "No, thanks";
 }
