@@ -1,4 +1,4 @@
-import 'package:actuatorapp2/actuator%20pages/help_page.dart';
+import 'package:actuatorapp2/help_page.dart';
 import 'package:actuatorapp2/main.dart';
 import 'package:flutter/material.dart';
 

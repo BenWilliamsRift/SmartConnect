@@ -49,6 +49,8 @@ flutter:
   assets:
     - assets/
     - assets/actuator_hexs/
+    - assets/help/
+    - assets/help/permissions/
 
 
   fonts:

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -217,8 +218,6 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
 
     // show connect screen
     showSnackBar(context, StringConsts.network.finishedSyncingData, null, null);
-
-    routeToPage(context, const ConnectToActuatorPage());
   }
 
   void featurePasswordsIntoActuators(String passwords) {
@@ -243,6 +242,7 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
     isLoggedIn = true;
     updateFeaturePasswords();
     routeToPage(context, const ConnectToActuatorPage());
+    NavDrawController.selectedPage = StringConsts.connectToActuator;
 
     // hide loading spinner
     setState(() {

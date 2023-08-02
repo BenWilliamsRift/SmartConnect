@@ -8,10 +8,10 @@ import '../actuator/actuator.dart';
 import '../app_bar.dart';
 import '../bluetooth/bluetooth_manager.dart';
 import '../color_manager.dart';
+import '../help_page.dart';
 import '../main.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
-import 'help_page.dart';
 import 'list_tiles.dart';
 
 class ConnectToActuatorPage extends StatefulWidget {

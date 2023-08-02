@@ -1,11 +1,14 @@
 import 'package:actuatorapp2/app_bar.dart';
+import 'package:actuatorapp2/asset_manager.dart';
 import 'package:actuatorapp2/bluetooth/bluetooth_manager.dart';
 import 'package:actuatorapp2/color_manager.dart';
 import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-import '../String_consts.dart';
+import 'String_consts.dart';
+import 'contact_us.dart';
+import 'main.dart';
 
 class HelpPage extends StatefulWidget {
   const HelpPage({super.key});
@@ -16,7 +19,6 @@ class HelpPage extends StatefulWidget {
 
 class _HelpPageState extends State<HelpPage> {
   final EdgeInsets padding = const EdgeInsets.all(10);
-  final String bulletPoint = "\u2022";
 
   int selectedTile = -1;
 
@@ -43,15 +45,14 @@ class _HelpPageState extends State<HelpPage> {
                         alignment: Alignment.centerLeft,
                         child: Padding(
                           padding: padding,
-                          child: Text("$bulletPoint Is the battery charged?"),
+                          child: Text(StringConsts.help.isTheBatteryCharged),
                         ),
                       ),
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Padding(
                             padding: padding,
-                            child: Text(
-                                "$bulletPoint Is the actuator plugged in?")),
+                            child: Text(StringConsts.help.isActuatorPluggedIn)),
                       )
                     ]),
               ],
@@ -65,7 +66,11 @@ class _HelpPageState extends State<HelpPage> {
                   title: Text(StringConsts.help.setAppPermissions),
                   children: [
                 // show how to set permissions
-
+                AssetManager.getPermissionsHelp(0),
+                const Divider(),
+                AssetManager.getPermissionsHelp(1),
+                const Divider(),
+                AssetManager.getPermissionsHelp(2),
                 //  add button to open permissions
                 Padding(
                   padding: padding,
@@ -82,6 +87,7 @@ class _HelpPageState extends State<HelpPage> {
                           child: Text(StringConsts.help.openSettings))),
                 )
               ])),
+          // Is bluetooth enabled
           Card(
               child: ExpansionTile(
                   iconColor: ColorManager.companyYellow,
@@ -97,12 +103,52 @@ class _HelpPageState extends State<HelpPage> {
                               BluetoothManager().enableBluetooth(context),
                           style: ButtonStyle(
                               backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) => ColorManager.blue2),
-                              foregroundColor: MaterialStateColor.resolveWith(
-                                  (states) => ColorManager.companyYellow)),
+                                  (states) => ColorManager.blue2)),
                           child: Text(StringConsts.help.enableBluetooth))),
                 )
-              ]))
+              ])),
+          // Close the app then re open it
+          Card(
+              child: ExpansionTile(
+                  iconColor: ColorManager.companyYellow,
+                  collapsedIconColor: ColorManager.companyYellow,
+                  title: Text(StringConsts.help.deviceWontConnect),
+                  children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                      padding: padding, child: Text(StringConsts.help.reLogin)),
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                      padding: padding,
+                      child: Text(StringConsts.help.closeTheAppAndOpenIt)),
+                )
+              ])),
+          // Something else
+          Card(
+              child: ExpansionTile(
+                  iconColor: ColorManager.companyYellow,
+                  collapsedIconColor: ColorManager.companyYellow,
+                  title: Text(StringConsts.help.somethingElse),
+                  children: [
+                Padding(
+                  padding: padding,
+                  child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            routeToPage(context, const ContactUsPage());
+                            NavDrawController.selectedPage =
+                                StringConsts.contactUs;
+                          },
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) => ColorManager.blue2)),
+                          child: Text(StringConsts.help.contactUs))),
+                )
+              ])),
 
           // Click a device to connect to
           //  if the connection fails logout then login again

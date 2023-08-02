@@ -21,6 +21,7 @@ class StringConsts {
   static const String contactUs = "Report a Bug";
   static const String faq = "FAQ";
   static const String torqueLimit = "Torque Limit";
+  static const String none = "None";
 
   static LoginText login = LoginText();
   static ActuatorsStrings actuators = ActuatorsStrings();
@@ -58,6 +59,7 @@ class Statistics {
 }
 
 class Help {
+  final String bulletPoint = "\u2022";
   final String actuatorScan = "Click for help finding actuators";
   final String pullDown = "Pull down to refresh";
 
@@ -69,6 +71,18 @@ class Help {
   final String isBluetoothEnabled = "Is Bluetooth enabled?";
   final String openSettings = "Open permission settings";
   final String enableBluetooth = "Enable Bluetooth";
+  final String deviceWontConnect = "Device won't connect?";
+
+  String get isActuatorPluggedIn => "$bulletPoint Is the actuator plugged in?";
+
+  String get isTheBatteryCharged => "$bulletPoint Is the battery charged?";
+
+  String get reLogin => "$bulletPoint Log out then login again";
+
+  String get closeTheAppAndOpenIt =>
+      "$bulletPoint Close the app and then re-open the app.";
+  final String somethingElse = "Something not listed?";
+  final String contactUs = "Contact us here.";
 }
 
 class Bluetooth {

@@ -1,6 +1,8 @@
+import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'String_consts.dart';
 import 'actuator/actuator.dart';
 import 'bluetooth/bluetooth_manager.dart';
 import 'color_manager.dart';
@@ -9,8 +11,7 @@ import 'preference_manager.dart';
 import 'settings.dart';
 import 'theme_manager.dart';
 
-void showSnackBar(
-    BuildContext context, String text, int? duration, SnackBarAction? action) {
+void showSnackBar(BuildContext context, String text, int? duration, SnackBarAction? action) {
   SnackBar snackBar = SnackBar(
     content: Text(text, style: TextStyle(color: ColorManager.snackBar)),
     duration: Duration(seconds: duration ?? 3),
@@ -22,27 +23,24 @@ void showSnackBar(
 }
 
 void routeToPage(BuildContext context, Widget page, {bool removeStack = false}) {
-  // refactor
-  while (Navigator.of(context).canPop()) {
-    Navigator.of(context).pop();
-  }
-  Navigator.of(context).pop(context);
+  NavDrawController.selectedPage = StringConsts.none;
+
   if (removeStack) {
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute<void>(builder: (context) {
-      return page;
-    }), (route) => false);
+    while (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+    Navigator.of(context)
+        .push(MaterialPageRoute<void>(builder: (context) => page));
   } else {
     Navigator.of(context)
         .push(MaterialPageRoute<void>(builder: (context) => page));
   }
 }
 
-void showAlert(
-    {required BuildContext context,
-    required Text content,
-    Text? title,
-    required List<Widget> actions}) {
+void showAlert({required BuildContext context,
+  required Text content,
+  Text? title,
+  required List<Widget> actions}) {
   showDialog(
       context: context,
       builder: (context) {
@@ -83,13 +81,13 @@ class _MainAppState extends State<MainApp> {
     ]);
 
     return NotificationListener<ConnectedNotification>(
-          onNotification: (notification) {
-            setState(() {
-              Actuator.connectedDeviceAddress = Actuator.connectingDeviceAddress;
-              Actuator.connectingDeviceAddress = null;
-            });
-            return true;
-          },
+      onNotification: (notification) {
+        setState(() {
+          Actuator.connectedDeviceAddress = Actuator.connectingDeviceAddress;
+          Actuator.connectingDeviceAddress = null;
+        });
+        return true;
+      },
       child: NotificationListener<ThemeNotification>(
         // Change the theme
         onNotification: (notification) {

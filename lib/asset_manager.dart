@@ -20,8 +20,9 @@ class AssetManager {
       image: AssetImage("assets/angle_ring.png"),
       filterQuality: FilterQuality.high);
   static Image logo =
-  const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
+      const Image(image: AssetImage("assets/logo.png"), width: 40, height: 40);
   static String hexFileName = "assets/actuator_hexs/actuator_hex.txt";
+  static String permissionsHelpFolder = "assets/help/permissions";
   static Image locked = const Image(
       image: AssetImage("assets/locked.png"), width: 40, height: 40);
 
@@ -32,6 +33,13 @@ class AssetManager {
 
   static Future<String> getActuatorHex() async {
     return await rootBundle.loadString(AssetManager.hexFileName);
+  }
+
+  static Image getPermissionsHelp(int index) {
+    return Image(
+      image: AssetImage("$permissionsHelpFolder/$index.png"),
+      filterQuality: FilterQuality.high,
+    );
   }
 }
 
