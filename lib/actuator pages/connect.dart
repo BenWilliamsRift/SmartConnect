@@ -26,8 +26,7 @@ class ConnectToActuatorPage extends StatefulWidget {
 
 List<Widget> deviceWidgets = [];
 
-class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
-    with SingleTickerProviderStateMixin {
+class _ConnectToActuatorPageState extends State<ConnectToActuatorPage> {
   BluetoothManager bluetoothManager = BluetoothManager();
 
   Timer? updateTimer;
@@ -63,12 +62,12 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
             align: ContentAlign.top,
             builder: (context, controller) => Container(
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text('Pull down to refresh the list',
+                  Text(StringConsts.firstTime.pullDown,
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         fontSize: 20,
@@ -92,13 +91,13 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
             align: ContentAlign.bottom,
             builder: (context, controller) => Container(
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    "Click this to connect to a device",
+                    StringConsts.firstTime.clickToConnect,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20,
@@ -123,13 +122,13 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
             align: ContentAlign.bottom,
             builder: (context, controller) => Container(
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Click this if you need help with something else',
+                    StringConsts.firstTime.clickForMoreHelp,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20,
@@ -154,13 +153,13 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
             align: ContentAlign.bottom,
             builder: (context, controller) => Container(
               alignment: Alignment.center,
-              child: const Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Click this to navigate to different pages',
+                    StringConsts.firstTime.clickToNavigate,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                       fontSize: 20,
@@ -182,7 +181,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
   void _initialPageTour() {
     _tutCoach = TutorialCoachMark(
       targets: addTourTargets(),
-      colorShadow: Colors.teal,
+      colorShadow: ColorManager.tutorialBackgroundColor,
       hideSkip: true,
       onFinish: () {
         isDoingTut = false;
@@ -191,8 +190,8 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     );
   }
 
-  void _showTour() => Future.delayed(
-      const Duration(seconds: 1), () => _tutCoach.show(context: context));
+  void _showTour() => Future.delayed(const Duration(milliseconds: 500),
+      () => _tutCoach.show(context: context));
 
   @override
   void initState() {
@@ -311,93 +310,9 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
     List<Widget> widgetDevices = [];
 
     for (Device device in devices) {
-      widgetDevices.add(GestureDetector(
-        onHorizontalDragStart: (details) {
-          setState(() {
-            disconnect();
-          });
-        },
-        child: Card(
-            child: ListTile(
-                tileColor: Actuator.connectedDeviceAddress == device.address
-                    ? ColorManager.companyYellow
-                    : null,
-                onTap: () {
-                  setState(() {
-                    showSnackBar(
-                        context,
-                        "${StringConsts.bluetooth.attemptingConnection}${device.name}",
-                        null,
-                        null);
-
-                    bluetoothManager.connectingDeviceAddress = device.address;
-                    Actuator.connectingDeviceAddress = device.address;
-
-                    // Start update timer to update state
-                    updateTimer =
-                        Timer.periodic(const Duration(seconds: 1), (timer) {
-                      setState(() {
-                        if (Actuator.connectedDeviceAddress != null &&
-                            Actuator.connectingDeviceAddress == null) {
-                          Future.delayed(const Duration(seconds: 10), () {
-                            setState(() {
-                              timer.cancel();
-                            });
-                          });
-                        }
-                      });
-                    });
-
-                    try {
-                      // Start connection attempt
-                      bluetoothManager.connect(device.address, context);
-                      Future.delayed(
-                          Duration(seconds: BluetoothManager.timeOutDelay), () {
-                        if (Actuator.connectedDeviceAddress == null) {
-                          setState(() {});
-                        }
-                      });
-                    } catch (e) {
-                      if (kDebugMode) {
-                        print(e.toString());
-                      }
-                      showSnackBar(
-                          context,
-                          "${StringConsts.bluetooth.failedConnection}${device.name}",
-                          null,
-                          null);
-                      setState(() {
-                        bluetoothManager.connectingDeviceAddress = null;
-                        Actuator.connectingDeviceAddress = null;
-                      });
-                      updateTimer?.cancel();
-                    }
-                  });
-                },
-                title: Text(device.alias),
-                subtitle: Text(device.name),
-                trailing: (Actuator.connectedDeviceAddress == device.address)
-                    ? IconButton(
-                        onPressed: () {
-                          setState(() {
-                            disconnect();
-                            Actuator.connectingDeviceAddress = null;
-                            Actuator.connectedDeviceAddress = null;
-                            bluetoothManager.connectingDeviceAddress = null;
-                            bluetoothManager.connectedDeviceAddress = null;
-                          });
-
-                          Future.delayed(const Duration(seconds: 3), () {
-                            setState(() {});
-                          });
-                        },
-                        icon: Icon(Icons.cancel, color: ColorManager.close),
-                      )
-                    : (Actuator.connectingDeviceAddress == device.address)
-                        ? const CircularProgressIndicator()
-                        : null)),
-      ));
-      if (widgetDevices.length == connectedDevices.length) {
+      // once at the end of connected devices add unconnected device separator
+      if (widgetDevices.length == connectedDevices.length ||
+          connectedDevices.isEmpty) {
         widgetDevices.add(Row(children: [
           Expanded(
               child: Divider(
@@ -410,6 +325,93 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
               child: Divider(
                   color: ColorManager.colorPrimary, indent: 2, endIndent: 2)),
         ]));
+
+        widgetDevices.add(GestureDetector(
+          onHorizontalDragStart: (details) {
+            setState(() {
+              disconnect();
+            });
+          },
+          child: Card(
+              child: ListTile(
+                  tileColor: Actuator.connectedDeviceAddress == device.address
+                      ? ColorManager.companyYellow
+                      : null,
+                  onTap: () {
+                    setState(() {
+                      showSnackBar(
+                          context,
+                          "${StringConsts.bluetooth.attemptingConnection}${device.name}",
+                          null,
+                          null);
+
+                      bluetoothManager.connectingDeviceAddress = device.address;
+                      Actuator.connectingDeviceAddress = device.address;
+
+                      // Start update timer to update state
+                      updateTimer =
+                          Timer.periodic(const Duration(seconds: 1), (timer) {
+                            setState(() {
+                              if (Actuator.connectedDeviceAddress != null &&
+                                  Actuator.connectingDeviceAddress == null) {
+                                Future.delayed(const Duration(seconds: 10), () {
+                                  setState(() {
+                                    timer.cancel();
+                                  });
+                                });
+                              }
+                            });
+                          });
+
+                      try {
+                        // Start connection attempt
+                        bluetoothManager.connect(device.address, context);
+                        Future.delayed(
+                            Duration(seconds: BluetoothManager.timeOutDelay), () {
+                          if (Actuator.connectedDeviceAddress == null) {
+                            setState(() {});
+                          }
+                        });
+                      } catch (e) {
+                        if (kDebugMode) {
+                          print(e.toString());
+                        }
+                        showSnackBar(
+                            context,
+                            "${StringConsts.bluetooth.failedConnection}${device.name}",
+                            null,
+                            null);
+                        setState(() {
+                          bluetoothManager.connectingDeviceAddress = null;
+                          Actuator.connectingDeviceAddress = null;
+                        });
+                        updateTimer?.cancel();
+                      }
+                    });
+                  },
+                  title: Text(device.alias),
+                  subtitle: Text(device.name),
+                  trailing: (Actuator.connectedDeviceAddress == device.address)
+                      ? IconButton(
+                    onPressed: () {
+                      setState(() {
+                        disconnect();
+                        Actuator.connectingDeviceAddress = null;
+                        Actuator.connectedDeviceAddress = null;
+                        bluetoothManager.connectingDeviceAddress = null;
+                        bluetoothManager.connectedDeviceAddress = null;
+                      });
+
+                      Future.delayed(const Duration(seconds: 3), () {
+                        setState(() {});
+                      });
+                    },
+                    icon: Icon(Icons.cancel, color: ColorManager.close),
+                  )
+                      : (Actuator.connectingDeviceAddress == device.address)
+                      ? const CircularProgressIndicator()
+                      : null)),
+        ));
       }
     }
 
@@ -519,6 +521,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
       }
     });
 
+    // prevents the tutorial from breaking when trying to leave the page
     return WillPopScope(
       onWillPop: () async => !isDoingTut,
       child: Scaffold(
@@ -529,7 +532,9 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
         drawer: const NavDrawer(),
         body: Stack(
           children: [
+            // Need this because tut doesn't work with the drawer widget
             Transform.translate(
+              // check if offset covers larger devices
                 offset: const Offset(12.5, -42.5),
                 child: Align(
                     alignment: Alignment.topLeft,
@@ -573,6 +578,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
                       child: ListView(children: [
                         Stack(
                           children: [
+                            // Box for the tutorial for scanning
                             Align(
                               alignment: Alignment.center,
                               child: Container(
@@ -597,8 +603,10 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage>
                                             ? StringConsts
                                                 .help.exampleActuatorName
                                             : StringConsts.help.actuatorScan),
-                                        subtitle:
-                                            Text(StringConsts.help.pullDown)))
+                                        subtitle: Text(isDoingTut
+                                            ? StringConsts
+                                                .help.exampleActuatorAddress
+                                            : StringConsts.help.pullDown)))
                                 : Container(),
                             for (Widget widget in sortedDevices()) widget
                           ],

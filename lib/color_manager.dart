@@ -94,6 +94,9 @@ class ColorManager {
   // Default button
   static get defaultButtonBackground => colorPrimary;
 
+  // Tutorial
+  static get tutorialBackgroundColor => companyYellow.withAlpha(80);
+
   // Other colors
   static get companyYellow => const Color.fromARGB(255, 255, 181, 43);
 

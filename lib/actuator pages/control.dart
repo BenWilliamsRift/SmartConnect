@@ -57,14 +57,6 @@ class _ControlPageState extends State<ControlPage> {
   Widget build(BuildContext context) {
     Style.update();
 
-    Future.delayed(const Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          bluetoothMessageHandler.requestBatteryVoltage();
-        });
-      }
-    });
-
     return Scaffold(
         appBar: appBar(title: getTitle(), context: context),
         drawer: const NavDrawer(),

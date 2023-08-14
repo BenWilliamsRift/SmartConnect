@@ -21,7 +21,13 @@ dependencies:
   provider: 6.0.5
   url_launcher: ^6.1.8
   encrypt: ^5.0.1
-  tutorial_coach_mark: ^1.2.9
+
+  # use github version which adds swiping which hasn't been published yet
+  # tutorial_coach_mark: ^1.2.9
+  tutorial_coach_mark:
+    git:
+      url: https://github.com/punit1111/tutorial_coach_mark.git
+      ref: master
 
 dev_dependencies:
   flutter_test:

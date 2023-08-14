@@ -85,6 +85,7 @@ class Help {
   final String somethingElse = "Something not listed?";
   final String contactUs = "Contact us here.";
   final String exampleActuatorName = "Example Actuator";
+  final String exampleActuatorAddress = "Example Address";
 }
 
 class Bluetooth {
@@ -438,4 +439,9 @@ class FirstTime {
   final String takeATour = "Do you want to take a tour?";
   final String takeTheTour = "Take the Tour";
   final String noThanks = "No, thanks";
+  final String pullDown = "Pull down to refresh the list";
+  final String clickToConnect = "Click this to connect to a device";
+  final String clickForMoreHelp =
+      "Click this if you need help with something else";
+  final String clickToNavigate = "Click this to navigate to different pages";
 }

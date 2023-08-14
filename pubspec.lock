@@ -664,11 +664,12 @@ packages:
   tutorial_coach_mark:
     dependency: "direct main"
     description:
-      name: tutorial_coach_mark
-      sha256: ba60583d1b500111bf5040eb24330862b25162d926f72923b8e45c16621878b0
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.9"
+      path: "."
+      ref: master
+      resolved-ref: a15e705556127f24fc4a2c1f8f105af163a81784
+      url: "https://github.com/punit1111/tutorial_coach_mark.git"
+    source: git
+    version: "1.2.8"
   typed_data:
     dependency: transitive
     description:
