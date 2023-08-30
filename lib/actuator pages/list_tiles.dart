@@ -446,11 +446,6 @@ class _TextInputTileState extends State<TextInputTile> {
     subtitle = widget.subtitle;
     keyboardType = widget.keyboardType;
 
-    if (widget.initialValue != null) {
-      initialValue = widget.initialValue!;
-      controller.text = initialValue;
-    }
-
     return Card(
       child: ListTile(
           title: title,
@@ -459,19 +454,19 @@ class _TextInputTileState extends State<TextInputTile> {
               width: 100,
               child: Card(
                 margin: EdgeInsets.all(Style.padding),
-                child: TextField(
-                    textAlign: TextAlign.center,
-                    style: Style.normalText,
-                    controller: controller,
-                    keyboardType: keyboardType,
-                    decoration: const InputDecoration(border: InputBorder.none),
-                    onChanged: (value) {},
-                    onSubmitted: (String? value) {
-                      setState(() {
-                        controller.text = value ?? controller.text;
-                        onSaved.call(value);
-                      });
-                    }),
+                child: TextFormField(
+                  textAlign: TextAlign.center,
+                  style: Style.normalText,
+                  controller: controller,
+                  keyboardType: keyboardType,
+                  decoration: const InputDecoration(border: InputBorder.none),
+                  onSaved: (String? value) {
+                    setState(() {
+                      controller.text = value ?? controller.text;
+                    });
+                    onSaved.call(value);
+                  },
+                ),
               ))),
     );
   }

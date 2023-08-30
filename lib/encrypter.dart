@@ -1,5 +1,4 @@
 import 'package:encrypt/encrypt.dart';
-import 'package:flutter/foundation.dart' as foundation;
 
 class EncrypterDecrypter {
 
@@ -24,10 +23,6 @@ class EncrypterDecrypter {
   }
 
   String decrypt(String data) {
-    if (foundation.kDebugMode) {
-      // ignore: avoid_print
-      print("data: $data");
-    }
     return encrypter.decrypt(Encrypted.fromBase64(data), iv: iv);
   }
 }

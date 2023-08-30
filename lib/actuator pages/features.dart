@@ -1,16 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
-import '../actuator/actuator_settings.dart';
 import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../main.dart';
 import '../nav_drawer.dart';
-import '../preference_manager.dart';
 import '../string_consts.dart';
 import '../web_controller.dart';
 import 'list_tiles.dart';
@@ -32,7 +29,7 @@ class _FeaturesPageState extends State<FeaturesPage> {
   void initState() {
     super.initState();
 
-    featurePasswordsIntoActuator(false);
+    Actuator.connectedActuator.settings.featurePasswordsIntoActuator(false);
 
     showLoading = true;
     updateFeatures();
@@ -42,24 +39,8 @@ class _FeaturesPageState extends State<FeaturesPage> {
 
   bool showLoading = false;
 
-  // TODO test features
   void updateFeatures() async {
-    response = await webController.getFeaturePasswords();
-
-    if (response == null) {
-      // ignore: use_build_context_synchronously
-      showSnackBar(
-          context, StringConsts.actuators.failedToUpdateFeatures, null, null);
-    } else {
-      // write passwords to file
-
-      response = response?.replaceAll("<br>", "\n");
-
-      PreferenceManager.writeString(
-          PreferenceManager.passwords, response.toString());
-
-      featurePasswordsIntoActuator(true);
-    }
+    Actuator.connectedActuator.settings.updateFeatures();
 
     Future.delayed(const Duration(seconds: 3), () {
       setState(() {
@@ -70,131 +51,6 @@ class _FeaturesPageState extends State<FeaturesPage> {
     });
   }
 
-  void setFeature(int index, bool value) {
-    switch (index) {
-      case 0:
-        Actuator.connectedActuator.torqueLimit = value;
-        break;
-      case 1:
-        Actuator.connectedActuator.isNm60 = value;
-        break;
-      case 2:
-        Actuator.connectedActuator.isNm80 = value;
-        break;
-      case 3:
-        Actuator.connectedActuator.isNm100 = value;
-        break;
-      case 4:
-        Actuator.connectedActuator.twoWireControl = value;
-        break;
-      case 5:
-        Actuator.connectedActuator.failsafe = value;
-        break;
-      case 6:
-        Actuator.connectedActuator.modulating = value;
-        break;
-      case 7:
-        Actuator.connectedActuator.speedControl = value;
-        break;
-      case 8:
-        Actuator.connectedActuator.multiTurn = value;
-        break;
-      case 9:
-        Actuator.connectedActuator.offGridTimer = value;
-        break;
-      case 10:
-        Actuator.connectedActuator.wiggle = value;
-        break;
-      case 11:
-        Actuator.connectedActuator.controlSystem = value;
-        break;
-      case 12:
-        Actuator.connectedActuator.valveProfile = value;
-        break;
-      case 13:
-        Actuator.connectedActuator.analogDeadband = value;
-        break;
-    }
-  }
-
-  List<String> splitPasswords(String source, String boardNumber, int index, String separator) {
-    List<String> passwords = source.split("\n");
-
-    // return the line that has the board number in
-    return passwords.firstWhere(
-            (element) => element.split(separator).elementAt(0) == boardNumber,
-        orElse: () {
-          if (kDebugMode) {
-            print("Actuator not found");
-          }
-          return "";
-        }).split(separator);
-  }
-
-  void featurePasswordsIntoActuator(bool shouldOpenPasswords) {
-    String? passwords =
-    PreferenceManager.getString(PreferenceManager.passwords);
-
-    if (passwords == null) return;
-
-    String boardNumber = Actuator.connectedActuator.boardNumber.toString();
-    List<String> line = splitPasswords(passwords, boardNumber, 0, " ");
-
-    if (line.length < ActuatorConstants.numberOfFeatures) return;
-
-    try {
-      for (int i = 0; i < ActuatorConstants.numberOfFeatures; i++) {
-        // Set all Passwords
-        Actuator.connectedActuator.settings
-            .setFeaturePassword(i, line.elementAt(i + 1));
-
-        // lock features if they are not enabled on the website
-        // change features in the app if they are enabled
-        // save if the feature was turned off and keep it turned off even if they have the feature
-      }
-    } on Exception {
-      // log error
-      if (kDebugMode) {
-        print("Error");
-      }
-    }
-
-    if (shouldOpenPasswords) {
-      updatePasswords();
-    }
-  }
-
-  void updatePasswords() {
-    // get features
-    bluetoothMessageHandler.requestFeatures();
-
-    List<String> passwords =
-        Actuator.connectedActuator.settings.featuresPasswords;
-    for (int i = 0; i < ActuatorConstants.numberOfFeatures - 1; i++) {
-      String password = passwords.elementAt(i);
-      // String password = Actuator.connectedActuator.settings.featuresPasswords[i];
-
-      bool didComplete = true;
-      switch (password.toLowerCase()) {
-        case "none":
-        // Hide feature
-          // todo this means that they don't have the feature so an ad could go here
-          setFeature(i, false);
-          break;
-        case "disable":
-        // Show feature but disable switch
-          setFeature(i, false);
-          break;
-        default:
-          didComplete = false;
-      }
-      if (!didComplete) {
-        setFeature(i, true);
-      }
-    }
-
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -22,13 +22,6 @@ dependencies:
   url_launcher: ^6.1.8
   encrypt: ^5.0.1
 
-  # use github version which adds swiping which hasn't been published yet
-  # tutorial_coach_mark: ^1.2.9
-  tutorial_coach_mark:
-    git:
-      url: https://github.com/punit1111/tutorial_coach_mark.git
-      ref: master
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -37,10 +30,11 @@ dev_dependencies:
   test: ^1.0.0
   flutter_launcher_icons: ^0.11.0
 
+# flutter pub run flutter_launcher_icons
 flutter_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/logo_launcher_new.png"
+  image_path: "assets/logo_launcher.png"
   min_sdk_android: 21
   web:
     generate: false
@@ -48,6 +42,7 @@ flutter_icons:
     generate: false
   macos:
     generate: false
+
 
 flutter:
 

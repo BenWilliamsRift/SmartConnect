@@ -11,7 +11,6 @@ import 'package:flutter/services.dart';
 import '../actuator/actuator.dart';
 import '../asset_manager.dart';
 import '../main.dart';
-import '../preference_manager.dart';
 import '../string_consts.dart';
 import '../web_controller.dart';
 import 'bluetooth_message_handler.dart';
@@ -306,21 +305,9 @@ class BluetoothManager {
       // routeToPage(context, const ControlPage());
       isActuatorConnected = true;
       messageHandler.getInformation();
-      String? response = await WebController().getFeaturePasswords();
+      Actuator.connectedActuator.settings.updateFeatures();
 
       Actuator.connectedActuator.status = StringConsts.actuators.connected;
-
-      if (response == null) {
-        showSnackBar(
-            context, StringConsts.actuators.failedToUpdateFeatures, null, null);
-      } else {
-        // write passwords to file
-
-        response = response.replaceAll("<br>", "\n");
-
-        PreferenceManager.writeString(
-            PreferenceManager.passwords, response.toString());
-      }
 
       Future.delayed(const Duration(seconds: 1), () {
         messageHandler.getBootloaderStatus();

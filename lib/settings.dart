@@ -210,6 +210,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool advancedSettingsOpen = false;
 
   void checkAccessCode(String key) {
+    //TODO
     switch (key.toLowerCase()) {
       case "dev settings":
         Settings.devSettingsEnabled = !Settings.devSettingsEnabled;
