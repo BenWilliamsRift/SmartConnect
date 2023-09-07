@@ -210,6 +210,8 @@ class ActuatorsStrings {
   final String startInManualMode = "Start In Manual Mode";
   final String indicationMode = "Indication Mode";
   final String reverseActing = "Reverse Acting";
+  final String pidP = "PID P Value";
+  final String pidI = "PID I Value";
 
   String confirmLock(bool locked) =>
       "Type '${locked ? 'UNLOCK' : 'LOCK'}' to confirm";

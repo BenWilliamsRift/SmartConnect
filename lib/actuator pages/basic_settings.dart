@@ -2,6 +2,7 @@
 
 import 'dart:async';
 
+import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
@@ -49,6 +50,11 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
 
     timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
       if (mounted) {
+        setState(() {
+          bluetoothMessageHandler.requestPIDP();
+          bluetoothMessageHandler.requestPIDI();
+        });
+
         if (Actuator.connectedActuator.writingToFlash) {
           if (!loading) {
             setState(() {
@@ -115,6 +121,23 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                             style: Style.normalText,
                             Actuator.connectedActuator.settings.firmwareVersion
                                 .toString())),
+
+                    // pid access code
+                    Settings.pidAccessUnlocked
+                        ? TextInputTile(
+                            onSaved: (String? value) {
+                              setState(() {});
+                            },
+                            title: Text(StringConsts.actuators.pidP))
+                        : Container(),
+                    Settings.pidAccessUnlocked
+                        ? TextInputTile(
+                            onSaved: (String? value) {
+                              setState(() {});
+                            },
+                            title: Text(StringConsts.actuators.pidI))
+                        : Container(),
+
                     DropDownTile(
                         title: Text(
                             style: Style.normalText,

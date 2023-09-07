@@ -196,55 +196,56 @@ class BluetoothManager {
     getDevices();
   }
 
-  void isTimedOut(BuildContext context, bool timedOut) {
-    if (timedOut && connectionStatus != connected) {
-      showSnackBar(context, StringConsts.bluetooth.timedOut, null, null);
-    }
-  }
+  final int connectionAttemptsLimit = 5;
+  int connectionsAttempted = 0;
 
   Future<void> connect(String address, BuildContext context) async {
-    int result = 0;
-    result = await androidPlatform.invokeMethod(
-        "connect", {"address": address.toString(), "secure": "true"});
-
     bool timedOut = false;
-
-    // Still connecting
-    while (connectionStatus == connecting && timedOut == false) {
+    androidPlatform.invokeMethod("connect",
+        {"address": address.toString(), "secure": "true"}).then((result) async {
       if (result == connecting) {
-        connectionStatus = connecting;
-        // Start timeout counter
+        // still connecting need to wait longer and continually check the result
+        // only check while timeout time is less than time passed
         Future.delayed(Duration(seconds: timeOutDelay), () {
-          if (Actuator.connectedDeviceAddress != null) {
-            timedOut = true;
-            isTimedOut(context, timedOut);
-            result = failed;
-            Actuator.connectingDeviceAddress = null;
-          }
+          // timeout
+          timedOut = true;
         });
+        connectionStatus = connecting;
 
-        // Every 3 seconds check if the connection status had changed
-        await Future.delayed(const Duration(seconds: 3), () async {
+        // check connection status
+        while (result == connecting && !timedOut) {
           result = await androidPlatform.invokeMethod("getConnectionStatus");
-        });
+          connectionStatus = result;
+        }
       }
-      // Failed connection
-      else if (result == failed) {
-        // throw  a Exception("Error connecting");
-        connectionStatus = failed;
-        showSnackBar(context,
-            "${StringConsts.bluetooth.failedConnection}$address", null, null);
-        Actuator.connectingDeviceAddress = null;
-        Actuator.connectedDeviceAddress = null;
-        connectingDeviceAddress = null;
-        connectedDeviceAddress = null;
+
+      if (result == failed) {
+        connectionsAttempted++;
+
+        if (connectionsAttempted <= connectionAttemptsLimit) {
+          // retry connection
+          disconnect();
+          connect(address, context);
+        } else {
+          // fail connection
+          showSnackBar(context,
+              "${StringConsts.bluetooth.failedConnection}$address", null, null);
+          Actuator.connectingDeviceAddress = null;
+          Actuator.connectedDeviceAddress = null;
+          connectingDeviceAddress = null;
+          connectedDeviceAddress = null;
+          connectionStatus = failed;
+          disconnect();
+        }
       }
-      // Successful connection
-      else if (result == connected) {
+
+      if (result == connected) {
+        connectionsAttempted = 0;
+        // success
         _startKeepAlive();
+        connectionStatus = connected;
         showSnackBar(
             context, StringConsts.bluetooth.connectedSuccessfully, null, null);
-        connectionStatus = connected;
         connectedDeviceAddress = connectingDeviceAddress;
         // Stop the progress indicator
         connectingDeviceAddress = null;
@@ -263,59 +264,57 @@ class BluetoothManager {
             startInManualMode: false,
             indicationMode: 0,
             reverseActing: false);
-      }
-    }
 
-    if (connectionStatus == connected) {
-      BluetoothMessageHandler messageHandler = BluetoothMessageHandler();
-      // messageHandler.requestAngle();
-      String boardNumber = await getBoardNumber();
-      Actuator.connectedActuator.boardNumber = int.parse(boardNumber);
+        BluetoothMessageHandler messageHandler = BluetoothMessageHandler();
+        // messageHandler.requestAngle();
+        String boardNumber = await getBoardNumber();
+        Actuator.connectedActuator.boardNumber = int.parse(boardNumber);
 
-      // Should process the string down to just a few letters and numbers
+        // Should process the string down to just a few letters and numbers
 
-      // Example Line of passwords
-      // \":\"243\",\"android_verification\":\"\",\"Type\":\"medium\",\"note\":null},{\"
+        // Example Line of passwords
+        // \":\"243\",\"android_verification\":\"\",\"Type\":\"medium\",\"note\":null},{\"
 
-      // Board Number: 20319, Password: sX4vt1eX
-      String? password = Actuator.passwords
-          .split("board_number")
-          .firstWhere((line) => line.contains(boardNumber.toString()),
-              orElse: () => "")
-          .replaceAll("\n", "")
-          .split('"')[6];
+        // Board Number: 20319, Password: sX4vt1eX
+        String? password = Actuator.passwords
+            .split("board_number")
+            .firstWhere((line) => line.contains(boardNumber.toString()),
+                orElse: () => "")
+            .replaceAll("\n", "")
+            .split('"')[6];
 
-      String? type = Actuator.passwords
-          .split("board_number")
-          .firstWhere((line) => line.contains(boardNumber.toString()),
-              orElse: () => "")
-          .replaceAll("\n", "")
-          .split('Type":"')[1]
-          .split('","')[0];
+        String? type = Actuator.passwords
+            .split("board_number")
+            .firstWhere((line) => line.contains(boardNumber.toString()),
+                orElse: () => "")
+            .replaceAll("\n", "")
+            .split('Type":"')[1]
+            .split('","')[0];
 
-      Actuator.connectedActuator.type = type;
+        Actuator.connectedActuator.type = type;
 
-      if (password != null) {
-        messageHandler.verify(password);
-      } else {
-        showSnackBar(context, StringConsts.actuators.errorValidatingActuators,
-            null, null);
-      }
+        if (password != null) {
+          messageHandler.verify(password);
+        } else {
+          showSnackBar(context, StringConsts.actuators.errorValidatingActuators,
+              null, null);
+        }
 
-      // routeToPage(context, const ControlPage());
-      isActuatorConnected = true;
-      messageHandler.getInformation();
-      Actuator.connectedActuator.settings.updateFeatures();
-
-      Actuator.connectedActuator.status = StringConsts.actuators.connected;
-
-      Future.delayed(const Duration(seconds: 1), () {
-        messageHandler.getBootloaderStatus();
-        messageHandler.requestAutoManual();
-        WebController().getFeaturePasswords();
+        // routeToPage(context, const ControlPage());
+        isActuatorConnected = true;
         messageHandler.getInformation();
-      });
-    }
+        Actuator.connectedActuator.settings.updateFeatures();
+
+        Actuator.connectedActuator.status = StringConsts.actuators.connected;
+
+        Future.delayed(const Duration(seconds: 1), () {
+          messageHandler.getBootloaderStatus();
+          messageHandler.requestAutoManual();
+          WebController().getFeaturePasswords();
+          messageHandler.getInformation();
+        });
+      }
+    });
   }
 
   void _startKeepAlive() {

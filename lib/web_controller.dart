@@ -8,7 +8,7 @@ class WebController {
   static Uri featurePasswordsUrl =
       Uri.https("riftdev.co.uk", "/passwords.html");
   static Uri setGroupingUrl =
-      Uri.https("https://riftdev.co.uk", "/php/checkAccessPassword.php");
+      Uri.https("riftdev.co.uk", "/php/checkAccessPassword.php");
 
   Future<String> login(String username, String password) async {
     var response = await http

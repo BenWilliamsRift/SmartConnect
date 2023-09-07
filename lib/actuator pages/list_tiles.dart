@@ -454,13 +454,13 @@ class _TextInputTileState extends State<TextInputTile> {
               width: 100,
               child: Card(
                 margin: EdgeInsets.all(Style.padding),
-                child: TextFormField(
+                child: TextField(
                   textAlign: TextAlign.center,
                   style: Style.normalText,
                   controller: controller,
                   keyboardType: keyboardType,
                   decoration: const InputDecoration(border: InputBorder.none),
-                  onSaved: (String? value) {
+                  onSubmitted: (String? value) {
                     setState(() {
                       controller.text = value ?? controller.text;
                     });

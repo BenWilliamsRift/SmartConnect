@@ -16,6 +16,9 @@ class Settings {
   static bool devSettingsEnabled = false;
   static bool emulateConnectedActuator = false;
 
+  static bool pidAccessUnlocked = true;
+  static bool testingAccessUnlocked = true;
+
   static const int newtonMeter = 0;
   static const int footPound = 1;
   static const int inchPound = 2;
@@ -212,6 +215,7 @@ class _SettingsPageState extends State<SettingsPage> {
   void checkAccessCode(String key) {
     //TODO
     switch (key.toLowerCase()) {
+    // custom codes
       case "dev settings":
         Settings.devSettingsEnabled = !Settings.devSettingsEnabled;
         break;
@@ -221,6 +225,18 @@ class _SettingsPageState extends State<SettingsPage> {
           if (kDebugMode) {
             print("Value: $value");
           }
+
+          switch (value) {
+            case "pid":
+              // set pid unlocked
+              break;
+            case "testing":
+              // set testing unlocked
+              break;
+            default:
+            // invalid code
+          }
+
           return value;
         });
         break;
@@ -352,6 +368,38 @@ class _SettingsPageState extends State<SettingsPage> {
                       keyboardType: TextInputType.text,
                       title: Text(StringConsts.settings.accessCodes),
                     )
+                  : Container(),
+              advancedSettingsOpen && Settings.pidAccessUnlocked
+                  ? Card(
+                      child: ListTile(
+                      title: const Text(
+                        "PID Access Unlocked",
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            // show confirmation to disable access
+                          });
+                        },
+                        child: const Text("Disable Access"),
+                      ),
+                    ))
+                  : Container(),
+              advancedSettingsOpen && Settings.testingAccessUnlocked
+                  ? Card(
+                      child: ListTile(
+                      title: const Text(
+                        "Testing Unlocked",
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            // show confirmation to disable access
+                          });
+                        },
+                        child: const Text("Disable Access"),
+                      ),
+                    ))
                   : Container(),
               // Dev Settings
               Settings.devSettingsEnabled

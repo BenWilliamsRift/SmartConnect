@@ -213,7 +213,7 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
 
     radius = widget.radius;
 
-    timer = Timer.periodic(const Duration(microseconds: 50), (timer) {
+    timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
       if (mounted) {
         bluetoothMessageHandler.requestAngle();
         setState(() {});
@@ -242,11 +242,6 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(microseconds: 50), () {
-      bluetoothMessageHandler.requestAngle();
-      setState(() {});
-    });
-
     int actualAngle =
         Actuator.connectedActuator.settings.angle.truncate() % 360;
 
@@ -261,20 +256,6 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
     } else {
       previousAngles.add(angle);
     }
-
-    // int angle = actualAngle;
-    // if (previousAngles.isNotEmpty) {
-    //   angle = previousAngles[0];
-    // reduce jumpiness in angle values
-    // if (previousAngles[0] - actualAngle <= 10) {
-    //   int angle = (averageAngle());
-    // angle = actualAngle;
-    // }
-    // }
-    //   previousAngles.add(actualAngle);
-    //   if (previousAngles.length > 3) {
-    //     previousAngles.removeAt(0);
-    //   }
 
     angleRing =
         _CirclePainter(radius: radius, color: ColorManager.angleRingColor);

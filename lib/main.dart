@@ -1,3 +1,4 @@
+import 'package:actuatorapp2/actuator%20pages/list_tiles.dart';
 import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +12,8 @@ import 'preference_manager.dart';
 import 'settings.dart';
 import 'theme_manager.dart';
 
-void showSnackBar(BuildContext context, String text, int? duration, SnackBarAction? action) {
+void showSnackBar(
+    BuildContext context, String text, int? duration, SnackBarAction? action) {
   SnackBar snackBar = SnackBar(
     content: Text(text, style: TextStyle(color: ColorManager.snackBar)),
     duration: Duration(seconds: duration ?? 3),
@@ -22,7 +24,8 @@ void showSnackBar(BuildContext context, String text, int? duration, SnackBarActi
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-void routeToPage(BuildContext context, Widget page, {bool removeStack = false}) {
+void routeToPage(BuildContext context, Widget page,
+    {bool removeStack = false}) {
   NavDrawController.selectedPage = StringConsts.none;
 
   if (removeStack) {
@@ -37,11 +40,10 @@ void routeToPage(BuildContext context, Widget page, {bool removeStack = false}) 
   }
 }
 
-void showAlert(
-    {required BuildContext context,
-    required Widget content,
-    Text? title,
-    required List<Widget> actions}) {
+void showAlert({required BuildContext context,
+  required Widget content,
+  Text? title,
+  required List<Widget> actions}) {
   showDialog(
       context: context,
       builder: (context) {
@@ -74,12 +76,12 @@ class _MainAppState extends State<MainApp> {
 
   @override
   Widget build(BuildContext context) {
+    Style.update();
+
     PreferenceManager.loadSettingsPrefs();
 
     // Only allow the app to be in portrait up position
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp
-    ]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return NotificationListener<ConnectedNotification>(
       onNotification: (notification) {

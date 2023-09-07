@@ -85,9 +85,9 @@ class ActuatorSettings {
 
   // ignore: non_constant_identifier_names
   late double PIDP;
-
   // ignore: non_constant_identifier_names
   late double PIDI;
+
   late bool startInManualMode;
   double backlash = 0;
   late bool sleepWhenNotPowered;
