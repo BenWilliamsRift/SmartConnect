@@ -13,7 +13,9 @@ import '../web_controller.dart';
 import 'list_tiles.dart';
 
 class FeaturesPage extends StatefulWidget {
-  const FeaturesPage({Key? key}) : super(key: key);
+  const FeaturesPage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<FeaturesPage> createState() => _FeaturesPageState();

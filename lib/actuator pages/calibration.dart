@@ -12,7 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class CalibrationPage extends StatefulWidget {
-  const CalibrationPage({Key? key}) : super(key: key);
+  const CalibrationPage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<CalibrationPage> createState() => _CalibrationPageState();
@@ -49,6 +51,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
               Actuator.connectedActuator.settings.closedAngle +
                   Actuator.connectedActuator.settings.workingAngle;
           getTorqueBand();
+          if (!NavDrawController.isSelectedPage(widget)) {
+            timer.cancel();
+          }
         });
       }
     });
@@ -86,11 +91,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
               const SizedBox(
                   width: 30, height: 30, child: ActuatorConnectedIndicator())
             ]),
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ActuatorIndicator(radius: 120),
-              ],
+              children: [ActuatorIndicator.widget(large: true)],
             )
           ]),
           Style.sizedHeight,
@@ -143,7 +146,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
               ),
             )),
             Style.sizedWidth,
-            const Expanded(child: AutoManualButton())
+            Expanded(child: AutoManualButton.widget)
           ]),
           Style.sizedWidth,
           Row(children: [

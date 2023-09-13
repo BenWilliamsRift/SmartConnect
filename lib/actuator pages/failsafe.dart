@@ -12,7 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class FailsafePage extends StatefulWidget {
-  const FailsafePage({Key? key}) : super(key: key);
+  const FailsafePage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<FailsafePage> createState() => _FailsafePageState();

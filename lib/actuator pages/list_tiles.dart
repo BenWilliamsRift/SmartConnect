@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -157,15 +158,15 @@ class _SwitchTileState extends State<SwitchTile> {
                 child: isLocked
                     ? AssetManager.locked
                     : Switch(
-                  value: value,
-                  onChanged: (bool value) {
-                    if (touchInputDisabled) {
-                      setState(() {});
-                      return;
-                    } else {
-                      setState(() {
-                        this.value = value;
-                        // run a custom callback if needed
+                        value: value,
+                        onChanged: (bool value) {
+                          if (touchInputDisabled) {
+                            setState(() {});
+                            return;
+                          } else {
+                            setState(() {
+                              this.value = value;
+                              // run a custom callback if needed
                               if (callback != null) {
                                 callback?.call(value);
                               }
@@ -184,15 +185,13 @@ class TextTile extends StatefulWidget {
   final Text title;
   final Text? subtitle;
   final bool compact;
-  final Function()? update;
 
   const TextTile(
       {Key? key,
       required this.text,
       required this.title,
       this.subtitle,
-      this.compact = false,
-      this.update})
+      this.compact = false})
       : super(key: key);
 
   @override
@@ -204,22 +203,8 @@ class _TextTileState extends State<TextTile> {
   late Text title;
   late Text? subtitle;
   late bool compact;
-  late Function() update;
 
   Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (timer == null) {
-      // update the value of text
-      update = widget.update ?? () {};
-      timer = Timer.periodic(const Duration(milliseconds: 500), (timer) {
-        update.call();
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -431,6 +416,8 @@ class _TextInputTileState extends State<TextInputTile> {
   late TextEditingController controller;
   late TextInputType keyboardType;
 
+  bool changed = false;
+
   @override
   void initState() {
     super.initState();
@@ -446,6 +433,11 @@ class _TextInputTileState extends State<TextInputTile> {
     subtitle = widget.subtitle;
     keyboardType = widget.keyboardType;
 
+    if (!changed) {
+      controller =
+          widget.controller ?? TextEditingController(text: widget.initialValue);
+    }
+
     return Card(
       child: ListTile(
           title: title,
@@ -460,6 +452,9 @@ class _TextInputTileState extends State<TextInputTile> {
                   controller: controller,
                   keyboardType: keyboardType,
                   decoration: const InputDecoration(border: InputBorder.none),
+                  onChanged: (String? value) {
+                    changed = true;
+                  },
                   onSubmitted: (String? value) {
                     setState(() {
                       controller.text = value ?? controller.text;
@@ -938,20 +933,47 @@ class _HoldButtonState extends State<HoldButton> {
   }
 }
 
-class AutoManualButton extends StatefulWidget {
-  const AutoManualButton({Key? key}) : super(key: key);
+class AutoManualButton {
+  static bool shouldBeRequesting() => NavDrawController.isSelectedPage(
+      [StringConsts.control, StringConsts.calibration]);
 
-  @override
-  State<AutoManualButton> createState() => _AutoManualButtonState();
+  static const AutoManualButtonWidget _widget = AutoManualButtonWidget();
+
+  static Widget get widget => _widget;
 }
 
-class _AutoManualButtonState extends State<AutoManualButton> {
+class AutoManualButtonWidget extends StatefulWidget {
+  const AutoManualButtonWidget({Key? key}) : super(key: key);
+
+  @override
+  State<AutoManualButtonWidget> createState() => _AutoManualButtonWidgetState();
+}
+
+class _AutoManualButtonWidgetState extends State<AutoManualButtonWidget> {
   double x = 0;
+
+  late Timer timer;
 
   @override
   void initState() {
     super.initState();
-    bluetoothMessageHandler.requestAutoManual();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (AutoManualButton.shouldBeRequesting()) {
+        setState(() {
+          bluetoothMessageHandler.requestAutoManual();
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    timer.cancel();
   }
 
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
@@ -965,12 +987,6 @@ class _AutoManualButtonState extends State<AutoManualButton> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        bluetoothMessageHandler.requestAutoManual();
-      });
-    });
-
     return GestureDetector(
       onLongPress: () {
         setState(() {

@@ -26,6 +26,14 @@ import 'string_consts.dart';
 
 class NavDrawController {
   static String selectedPage = StringConsts.none;
+
+  static bool isSelectedPage(var page) {
+    if (page.runtimeType == List<String>) {
+      return page.contains(selectedPage);
+    }
+
+    return page.name == selectedPage;
+  }
 }
 
 class NavDrawer extends StatefulWidget {
@@ -78,7 +86,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(Icons.control_camera),
                   onTap: (() {
-                    routeToPage(context, const ControlPage());
+                    routeToPage(
+                        context, const ControlPage(name: StringConsts.control));
                     NavDrawController.selectedPage =
                         StringConsts.actuators.control;
                   }),
@@ -97,7 +106,10 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(Icons.settings_outlined),
                   onTap: (() {
-                    routeToPage(context, const BasicSettingsPage());
+                    routeToPage(
+                        context,
+                        const BasicSettingsPage(
+                            name: StringConsts.basicSettings));
                     NavDrawController.selectedPage = StringConsts.basicSettings;
                   }),
                 ))
@@ -115,7 +127,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(Icons.sync),
                   onTap: (() {
-                    routeToPage(context, const CalibrationPage());
+                    routeToPage(context,
+                        const CalibrationPage(name: StringConsts.calibration));
                     NavDrawController.selectedPage = StringConsts.calibration;
                   }),
                 ))
@@ -132,7 +145,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(Icons.list_alt),
                   onTap: (() {
-                    routeToPage(context, const FeaturesPage());
+                    routeToPage(context,
+                        const FeaturesPage(name: StringConsts.features));
                     NavDrawController.selectedPage = StringConsts.features;
                   }),
                 ))
@@ -150,7 +164,10 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(Icons.update),
                   onTap: (() {
-                    routeToPage(context, const UpdateFirmwarePage());
+                    routeToPage(
+                        context,
+                        const UpdateFirmwarePage(
+                            name: StringConsts.updateFirmware));
                     NavDrawController.selectedPage =
                         StringConsts.updateFirmware;
                   }),
@@ -184,7 +201,8 @@ class _NavDrawerState extends State<NavDrawer> {
               ),
               leading: const Icon(RiftIcons.torqueLimit),
               onTap: (() {
-                routeToPage(context, const TorqueLimitPage());
+                routeToPage(context,
+                        const TorqueLimitPage(name: StringConsts.torqueLimit));
                     NavDrawController.selectedPage = StringConsts.torqueLimit;
                   }),
             )
@@ -202,7 +220,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(RiftIcons.failsafe),
                   onTap: (() {
-                    routeToPage(context, const FailsafePage());
+                    routeToPage(context,
+                        const FailsafePage(name: StringConsts.failsafe));
                     NavDrawController.selectedPage = StringConsts.failsafe;
                   }),
                 ))
@@ -220,7 +239,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(RiftIcons.modulation),
                   onTap: (() {
-                    routeToPage(context, const ModulatingPage());
+                    routeToPage(context,
+                        const ModulatingPage(name: StringConsts.modulating));
                     NavDrawController.selectedPage = StringConsts.modulating;
                   }),
                 ))
@@ -239,7 +259,10 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(RiftIcons.speedControl),
                   onTap: (() {
-                    routeToPage(context, const SpeedControlPage());
+                    routeToPage(
+                        context,
+                        const SpeedControlPage(
+                            name: StringConsts.speedControl));
                     NavDrawController.selectedPage = StringConsts.speedControl;
                   }),
                 ))
@@ -257,7 +280,8 @@ class _NavDrawerState extends State<NavDrawer> {
                   ),
                   leading: const Icon(RiftIcons.modulation),
                   onTap: (() {
-                    routeToPage(context, const WigglePage());
+                    routeToPage(
+                        context, const WigglePage(name: StringConsts.wiggle));
                     NavDrawController.selectedPage = StringConsts.wiggle;
                   }),
                 ))
@@ -293,7 +317,10 @@ class _NavDrawerState extends State<NavDrawer> {
             ),
             leading: const Icon(Icons.bluetooth),
             onTap: (() {
-              routeToPage(context, const ConnectToActuatorPage());
+              routeToPage(
+                  context,
+                  const ConnectToActuatorPage(
+                      name: StringConsts.connectToActuator));
               NavDrawController.selectedPage = StringConsts.connectToActuator;
             }),
           ),

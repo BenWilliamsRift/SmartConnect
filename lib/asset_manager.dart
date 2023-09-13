@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -178,7 +179,8 @@ class _ArcPainter extends CustomPainter {
     double firstAngle = closedAngle;
     double secondAngle =  angle;
 
-    canvas.drawArc(rect, Vec2.degreesToRadians(firstAngle), Vec2.degreesToRadians(secondAngle), true, paint);
+    canvas.drawArc(rect, Vec2.degreesToRadians(firstAngle),
+        Vec2.degreesToRadians(secondAngle), true, paint);
   }
 
   @override
@@ -187,16 +189,29 @@ class _ArcPainter extends CustomPainter {
   }
 }
 
-class ActuatorIndicator extends StatefulWidget {
-  const ActuatorIndicator({Key? key, required this.radius}) : super(key: key);
+class ActuatorIndicator {
+  static bool shouldBeRequesting() => NavDrawController.isSelectedPage(
+      [StringConsts.control, StringConsts.calibration]);
+
+  static const _widgetSmall = ActuatorIndicatorWidget(radius: 100);
+  static const _widgetLarge = ActuatorIndicatorWidget(radius: 120);
+
+  static Widget widget({required bool large}) =>
+      large ? _widgetLarge : _widgetSmall;
+}
+
+class ActuatorIndicatorWidget extends StatefulWidget {
+  const ActuatorIndicatorWidget({Key? key, required this.radius})
+      : super(key: key);
 
   final double radius;
 
   @override
-  State<ActuatorIndicator> createState() => _ActuatorIndicatorState();
+  State<ActuatorIndicatorWidget> createState() =>
+      _ActuatorIndicatorWidgetState();
 }
 
-class _ActuatorIndicatorState extends State<ActuatorIndicator> {
+class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
   late double radius;
 
   late _CirclePainter angleRing;
@@ -213,10 +228,14 @@ class _ActuatorIndicatorState extends State<ActuatorIndicator> {
 
     radius = widget.radius;
 
-    timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        bluetoothMessageHandler.requestAngle();
-        setState(() {});
+        if (ActuatorIndicator.shouldBeRequesting()) {
+          bluetoothMessageHandler.requestAngle();
+          setState(() {});
+        } else {
+          timer.cancel();
+        }
       }
     });
   }

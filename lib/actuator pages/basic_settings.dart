@@ -17,7 +17,9 @@ import 'list_tiles.dart';
 bool isLocked = false;
 
 class BasicSettingsPage extends StatefulWidget {
-  const BasicSettingsPage({Key? key}) : super(key: key);
+  const BasicSettingsPage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<BasicSettingsPage> createState() => _BasicSettingsPageState();
@@ -48,11 +50,16 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     super.initState();
     requestAll();
 
-    timer = Timer.periodic(const Duration(milliseconds: 250), (timer) {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         setState(() {
           bluetoothMessageHandler.requestPIDP();
           bluetoothMessageHandler.requestPIDI();
+          bluetoothMessageHandler.requestNumberOfFullCycles();
+          bluetoothMessageHandler.requestNumberOfStarts();
+          if (!NavDrawController.isSelectedPage(widget)) {
+            timer.cancel();
+          }
         });
 
         if (Actuator.connectedActuator.writingToFlash) {
@@ -72,6 +79,13 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
     });
 
     bluetoothMessageHandler.requestLocked();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    timer.cancel();
   }
 
   bool loading = false;
@@ -202,10 +216,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                             style: Style.normalText,
                             Actuator
                                 .connectedActuator.settings.numberOfFullCycles
-                                .toString()),
-                        update: () {
-                          bluetoothMessageHandler.requestNumberOfFullCycles();
-                        }),
+                                .toString())),
                     TextTile(
                         title: Text(
                             style: Style.normalText,
@@ -213,10 +224,7 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                         text: Text(
                             style: Style.normalText,
                             Actuator.connectedActuator.settings.numberOfStarts
-                                .toString()),
-                        update: () {
-                          bluetoothMessageHandler.requestNumberOfStarts();
-                        }),
+                                .toString())),
                     SwitchTile(
                         title: Text(
                           style: Style.normalText,

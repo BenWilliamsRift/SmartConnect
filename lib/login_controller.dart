@@ -241,7 +241,8 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
 
     isLoggedIn = true;
     updateFeaturePasswords();
-    routeToPage(context, const ConnectToActuatorPage());
+    routeToPage(
+        context, const ConnectToActuatorPage(name: StringConsts.control));
     NavDrawController.selectedPage = StringConsts.connectToActuator;
 
     // hide loading spinner

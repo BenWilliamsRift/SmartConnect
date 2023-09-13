@@ -12,7 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class UpdateFirmwarePage extends StatefulWidget {
-  const UpdateFirmwarePage({Key? key}) : super(key: key);
+  const UpdateFirmwarePage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<UpdateFirmwarePage> createState() => _UpdateFirmwarePageState();
@@ -77,16 +79,14 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
                     text:
                         Text(style: Style.normalText, StringConsts.appVersion)),
                 TextTile(
-                    title: Text(
-                        style: Style.normalText,
-                        StringConsts.actuators.firmwareVersion),
-                    text: Text(
-                        style: Style.normalText,
-                        Actuator.connectedActuator.settings.firmwareVersion
-                            .toString()),
-                    update: () {
-                      bluetoothMessageHandler.requestFirmwareVersion();
-                    }),
+                  title: Text(
+                      style: Style.normalText,
+                      StringConsts.actuators.firmwareVersion),
+                  text: Text(
+                      style: Style.normalText,
+                      Actuator.connectedActuator.settings.firmwareVersion
+                          .toString()),
+                ),
                 Row(children: [
                   Style.sizedWidth,
                   Expanded(

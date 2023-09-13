@@ -15,7 +15,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class ConnectToActuatorPage extends StatefulWidget {
-  const ConnectToActuatorPage({Key? key}) : super(key: key);
+  const ConnectToActuatorPage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<ConnectToActuatorPage> createState() => _ConnectToActuatorPageState();

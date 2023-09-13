@@ -201,7 +201,7 @@ class BluetoothManager {
 
   Future<void> connect(String address, BuildContext context) async {
     bool timedOut = false;
-    androidPlatform.invokeMethod("connect",
+    await androidPlatform.invokeMethod("connect",
         {"address": address.toString(), "secure": "true"}).then((result) async {
       if (result == connecting) {
         // still connecting need to wait longer and continually check the result
@@ -213,6 +213,7 @@ class BluetoothManager {
         connectionStatus = connecting;
 
         // check connection status
+        // start on a different thread
         while (result == connecting && !timedOut) {
           result = await androidPlatform.invokeMethod("getConnectionStatus");
           connectionStatus = result;
@@ -404,6 +405,8 @@ class BluetoothManager {
       } else {
         androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code});
       }
+    } else {
+      androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code});
     }
   }
 

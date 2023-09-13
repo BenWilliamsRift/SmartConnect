@@ -12,7 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class WigglePage extends StatefulWidget {
-  const WigglePage({Key? key}) : super(key: key);
+  const WigglePage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<WigglePage> createState() => _WigglePageState();
