@@ -12,7 +12,7 @@ class Actuator {
   static String? connectingDeviceAddress = "";
   static String? connectedDeviceAddress = "";
 
-  static Actuator connectedActuator = Actuator(
+  static final empty = Actuator(
     firmwareVersion: 0,
     backlash: 0.0,
     buttonsEnabled: false,
@@ -25,10 +25,12 @@ class Actuator {
     startInManualMode: false,
     valveOrientation: 0,
   );
+  static Actuator connectedActuator = empty;
 
   static late String passwords;
 
-  static void writeToFlash(BuildContext context, BluetoothMessageHandler bluetoothMessageHandler) {
+  static void writeToFlash(
+      BuildContext context, BluetoothMessageHandler bluetoothMessageHandler) {
     showAlert(
         context: context,
         content: Text(StringConsts.actuators.confirmWriteToFlash),

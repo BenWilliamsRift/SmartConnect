@@ -12,8 +12,7 @@ import 'preference_manager.dart';
 import 'string_consts.dart';
 
 class Settings {
-  // TEMP VAR FOR TESTING ONLY
-  static bool devSettingsEnabled = false;
+  static bool devSettingsEnabled = true;
   static bool emulateConnectedActuator = false;
 
   static bool pidAccessUnlocked = true;
@@ -360,12 +359,13 @@ class _SettingsPageState extends State<SettingsPage> {
                   ])),
               advancedSettingsOpen
                   ? TextInputTile(
-                      onSaved: (String? newValue) {
+                onSaved: (String? newValue) {
                         setState(() {
                           checkAccessCode(newValue ?? "");
                         });
                       },
                       keyboardType: TextInputType.text,
+                      initialValue: "",
                       title: Text(StringConsts.settings.accessCodes),
                     )
                   : Container(),

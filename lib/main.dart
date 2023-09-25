@@ -33,10 +33,10 @@ void routeToPage(BuildContext context, Widget page,
       Navigator.of(context).pop();
     }
     Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (context) => page));
+        .pushReplacement(MaterialPageRoute<void>(builder: (context) => page));
   } else {
     Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (context) => page));
+        .pushReplacement(MaterialPageRoute<void>(builder: (context) => page));
   }
 }
 

@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import '../actuator/actuator.dart';
 import '../asset_manager.dart';
 import '../main.dart';
+import '../settings.dart';
 import '../string_consts.dart';
 import '../web_controller.dart';
 import 'bluetooth_message_handler.dart';
@@ -76,6 +77,8 @@ class BluetoothManager {
       bluetoothResponse.setMethodCallHandler((call) async {
         switch (call.method) {
           case "bluetoothCommandResponse":
+            // TODO bluetooth angle response is giving a null value
+            print("${call.arguments.split('\n')}");
             await BluetoothMessageHandler()
                 .processResponse(call.arguments.split("\n"));
             break;
@@ -259,7 +262,7 @@ class BluetoothManager {
             backlash: 0,
             buttonsEnabled: true,
             numberOfFullCycles: 0,
-            numberOfStarts: 36,
+            numberOfStarts: 0,
             sleepWhenNotPowered: true,
             magnetTestMode: false,
             startInManualMode: false,
@@ -267,7 +270,8 @@ class BluetoothManager {
             reverseActing: false);
 
         BluetoothMessageHandler messageHandler = BluetoothMessageHandler();
-        // messageHandler.requestAngle();
+        messageHandler.requestAngle();
+        messageHandler.requestFirmwareVersion();
         String boardNumber = await getBoardNumber();
         Actuator.connectedActuator.boardNumber = int.parse(boardNumber);
 
@@ -397,14 +401,46 @@ class BluetoothManager {
     isScanning = await androidPlatform.invokeMethod("isScanning");
   }
 
+  // only used for debug mode
+  static List<String> requests = [];
+  static Timer? timer;
+
+  //
+
   void sendMessage({required String code, String? value}) async {
-    if (!Actuator.connectedActuator.writingToFlash) {
-      if (value != null) {
-        androidPlatform.invokeMethod(
-            "sendBluetoothMessage", {"code": code, "param": value});
-      } else {
-        androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code});
-      }
+    if (kDebugMode && Settings.devSettingsEnabled) {
+      requests.add(code);
+
+      timer ??= Timer.periodic(const Duration(seconds: 1), (timer) {
+        List<String> temp = [];
+        List<String> dupes = [];
+        for (var element in requests) {
+          if (temp.contains(element)) {
+            dupes.add(element);
+          } else {
+            temp.add(element);
+          }
+        }
+
+        print(
+            "Num Of Requests: ${requests.length}, Requests: $requests Repeated Requests: $dupes");
+        requests = [];
+      });
+    }
+
+    if (code == BluetoothMessageHandler.codeWriteToFlash) {
+      Actuator.connectedActuator.writingToFlash = true;
+      print("Writing to flash");
+    }
+    if (Actuator.connectedActuator == null ||
+        (Actuator.connectedActuator.writingToFlash && code.startsWith("m")) ||
+        Actuator.connectedActuator.writingToFlash) {
+      return;
+    }
+
+    if (value != null) {
+      androidPlatform
+          .invokeMethod("sendBluetoothMessage", {"code": code, "param": value});
     } else {
       androidPlatform.invokeMethod("sendBluetoothMessage", {"code": code});
     }

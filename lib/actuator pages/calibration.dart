@@ -199,6 +199,7 @@ class _CalibrationPageState extends State<CalibrationPage> {
             onSaved: (String? newValue) {
               // set open angle
               if (newValue != null) {
+                print("NewValue $newValue");
                 double openAngle = double.parse(newValue);
 
                 Actuator.connectedActuator.settings.setOpenAngle(openAngle);

@@ -99,7 +99,7 @@ class ActuatorSettings {
   // calibration Settings
   double closedAngle = 0;
 
-  String get getClosedAngle => "${closedAngle.truncateToDouble()}$angleSymbol";
+  String get getClosedAngle => closedAngle.truncateToDouble().toString();
 
   void setClosedAngle(double angle) {
     closedAngle = angle;
@@ -117,8 +117,7 @@ class ActuatorSettings {
 
   double workingAngle = 0.0;
 
-  String get getWorkingAngle =>
-      "${workingAngle.truncateToDouble()}$angleSymbol";
+  String get getWorkingAngle => "${workingAngle.truncateToDouble()}";
 
   void setWorkingAngle(double angle) {
     workingAngle = angle;

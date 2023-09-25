@@ -231,11 +231,14 @@ class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
         if (ActuatorIndicator.shouldBeRequesting()) {
-          bluetoothMessageHandler.requestAngle();
-          setState(() {});
+          setState(() {
+            bluetoothMessageHandler.requestAngle();
+          });
         } else {
           timer.cancel();
         }
+      } else {
+        print("Actuator Indicator is not mounted : ln:241");
       }
     });
   }

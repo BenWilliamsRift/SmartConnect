@@ -13,7 +13,9 @@ import 'nav_drawer.dart';
 import 'string_consts.dart';
 
 class StatisticsPage extends StatefulWidget {
-  const StatisticsPage({Key? key}) : super(key: key);
+  const StatisticsPage({Key? key, required this.name}) : super(key: key);
+
+  final String name;
 
   @override
   State<StatisticsPage> createState() => _StatisticsPageState();
@@ -30,11 +32,23 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   bool snackBarShown = false;
 
+  late Timer timer;
+
   @override
   void initState() {
     super.initState();
 
     getInformation();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        bluetoothMessageHandler.requestTemperature();
+        bluetoothMessageHandler.requestBatteryVoltage();
+        if (!NavDrawController.isSelectedPage(widget)) {
+          timer.cancel();
+        }
+      });
+    });
 
     snackBarShown = false;
   }
@@ -80,14 +94,6 @@ class _StatisticsPageState extends State<StatisticsPage> {
     if (!stopwatch.isRunning) {
       stopwatch.start();
     }
-
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() {
-        // bluetoothMessageHandler.requestAngle();
-        bluetoothMessageHandler.requestTemperature();
-        bluetoothMessageHandler.requestBatteryVoltage();
-      });
-    });
 
     if (stopwatch.elapsed.inSeconds >= 15) {
       getInformation();

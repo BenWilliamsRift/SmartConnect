@@ -41,6 +41,7 @@ class StringConsts {
 
   static const String confirm = "Confirm";
   static const String cancel = "Cancel";
+  static const String close = "Close";
 
   static const String months = "Months";
   static const String weeks = "Weeks";
@@ -118,6 +119,10 @@ class NetworkText {
   final String finishedSyncingData = "Finished syncing data";
   final String failedToGetFeaturePassword = "Unable to get passwords";
   final String failedToGetLoginData = "Unable to get login data";
+  final String error = "ERROR";
+  final String unableToAccessInternet = "Unable to access the Internet.";
+  final String noInternet = "No Internet access available";
+  final String connectToNetwork = "You must connect to the Internet to Login";
 }
 
 class LoginText {

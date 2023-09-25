@@ -386,6 +386,8 @@ class _IconButtonTileState extends State<IconButtonTile> {
   }
 }
 
+int textInputTileCount = 0;
+
 class TextInputTile extends StatefulWidget {
   final Text title;
   final Text? subtitle;
@@ -416,15 +418,18 @@ class _TextInputTileState extends State<TextInputTile> {
   late TextEditingController controller;
   late TextInputType keyboardType;
 
-  bool changed = false;
-
   @override
   void initState() {
     super.initState();
 
-    controller =
-        widget.controller ?? TextEditingController(text: widget.initialValue);
+    value = widget.initialValue;
+
+    textInputTileCount++;
   }
+
+  String? value;
+  String? tempValue;
+  bool changed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -434,8 +439,7 @@ class _TextInputTileState extends State<TextInputTile> {
     keyboardType = widget.keyboardType;
 
     if (!changed) {
-      controller =
-          widget.controller ?? TextEditingController(text: widget.initialValue);
+      value = widget.initialValue;
     }
 
     return Card(
@@ -444,24 +448,43 @@ class _TextInputTileState extends State<TextInputTile> {
           subtitle: subtitle,
           trailing: SizedBox(
               width: 100,
-              child: Card(
-                margin: EdgeInsets.all(Style.padding),
-                child: TextField(
-                  textAlign: TextAlign.center,
-                  style: Style.normalText,
-                  controller: controller,
-                  keyboardType: keyboardType,
-                  decoration: const InputDecoration(border: InputBorder.none),
-                  onChanged: (String? value) {
-                    changed = true;
-                  },
-                  onSubmitted: (String? value) {
-                    setState(() {
-                      controller.text = value ?? controller.text;
-                    });
-                    onSaved.call(value);
-                  },
-                ),
+              child: ElevatedButton(
+                onPressed: () {
+                  changed = true;
+                  showDialog(
+                      context: context,
+                      builder: (context) => Dialog(
+                            child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text("Enter ${title.data}"),
+                                      const SizedBox(height: 15),
+                                      TextField(
+                                        textAlign: TextAlign.center,
+                                        style: Style.normalText,
+                                        keyboardType: keyboardType,
+                                        onChanged: (String? newValue) {
+                                          tempValue = newValue ?? "";
+                                        },
+                                      ),
+                                      const SizedBox(height: 15),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          setState(() {
+                                            value = tempValue ?? value;
+                                          });
+                                          onSaved.call(value);
+                                        },
+                                        child: const Text(StringConsts.confirm),
+                                      )
+                                    ])),
+                          ));
+                },
+                child: Text(value ?? StringConsts.loading),
               ))),
     );
   }

@@ -176,6 +176,7 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
     if (isLoggedIn) {
       isLoggedIn = false;
       Actuator.connectedActuator.disconnect();
+      Actuator.connectedActuator = Actuator.empty;
 
       clearUsernamePasswordLastLogin();
       routeToPage(context, const LoginPage(), removeStack: true);
@@ -278,15 +279,51 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
     Future<String> response = webController.login(username, password);
 
     Future<bool> value = response.then((value) {
+      if (value == StringConsts.network.error) {
+        showSnackBar(
+            context, StringConsts.network.unableToAccessInternet, null, null);
+        showDialog(
+            context: context,
+            builder: (context) {
+              Widget spacer = const SizedBox(height: 15);
+              return Dialog(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    spacer,
+                    Text(StringConsts.network.noInternet,
+                        style: const TextStyle(fontSize: 20)),
+                    spacer,
+                    Text(StringConsts.network.connectToNetwork),
+                    spacer,
+                    TextButton(
+                      child: const Text(StringConsts.close),
+                      onPressed: () {
+                        setState(() {
+                          Navigator.pop(context);
+                        });
+                      },
+                    ),
+                    spacer
+                  ],
+                ),
+              );
+            });
+        return false;
+      }
+
       Actuator.passwords = value.toString().replaceAll("<br>", "\n");
 
       // Save password to file for quick login next time
-      PreferenceManager.writeString("${PreferenceManager.actuatorPrefix}-${PreferenceManager.passwordsSuffix}", Actuator.passwords);
+      PreferenceManager.writeString(
+          "${PreferenceManager.actuatorPrefix}-${PreferenceManager.passwordsSuffix}",
+          Actuator.passwords);
 
       if (value != "0") {
         return true;
       } else {
-        showSnackBar(context, StringConsts.network.failedToGetLoginData, null, null);
+        showSnackBar(
+            context, StringConsts.network.failedToGetLoginData, null, null);
         return false;
       }
     });

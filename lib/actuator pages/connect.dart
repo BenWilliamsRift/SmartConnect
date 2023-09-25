@@ -205,6 +205,9 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage> {
                     // Start update timer to update state
                     updateTimer =
                         Timer.periodic(const Duration(seconds: 1), (timer) {
+                      if (!mounted) {
+                        timer.cancel();
+                      }
                       setState(() {
                         if (Actuator.connectedDeviceAddress != null &&
                             Actuator.connectingDeviceAddress == null) {

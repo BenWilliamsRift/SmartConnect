@@ -298,7 +298,8 @@ class _NavDrawerState extends State<NavDrawer> {
                         Text(StringConsts.statistics.title, style: titleStyle),
                     leading: const Icon(Icons.list_outlined),
                     onTap: (() {
-                      routeToPage(context, const StatisticsPage());
+                      routeToPage(context,
+                          StatisticsPage(name: StringConsts.statistics.title));
                       NavDrawController.selectedPage =
                           StringConsts.statistics.title;
                     })))

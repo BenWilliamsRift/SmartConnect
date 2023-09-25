@@ -2,6 +2,8 @@ import 'dart:async';
 
 import "package:http/http.dart" as http;
 
+import 'String_consts.dart';
+
 class WebController {
   static Uri loginURL =
       Uri.https("riftdev.co.uk", "/php/androidRetrievePasswords.php");
@@ -11,8 +13,15 @@ class WebController {
       Uri.https("riftdev.co.uk", "/php/checkAccessPassword.php");
 
   Future<String> login(String username, String password) async {
-    var response = await http
-        .post(loginURL, body: {"username": username, "password": password});
+    var response = await http.post(loginURL, body: {
+      "username": username,
+      "password": password
+    }).onError((error, stackTrace) {
+      return Future.delayed(const Duration(milliseconds: 1), () {
+        return http.Response(StringConsts.network.error, 400);
+      });
+      // return error
+    });
 
     return response.body;
   }

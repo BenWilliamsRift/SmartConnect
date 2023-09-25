@@ -23,7 +23,6 @@ class UpdateFirmwarePage extends StatefulWidget {
 class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
   BluetoothMessageHandler bluetoothMessageHandler = BluetoothMessageHandler();
 
-  late Timer updateInfoTimer;
   late Timer timer;
 
   bool hasShownAlert = false;
@@ -33,12 +32,6 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
   void initState() {
     super.initState();
     bluetoothMessageHandler.requestFirmwareVersion();
-
-    updateInfoTimer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      setState(() {
-        bluetoothMessageHandler.getBootloaderStatus();
-      });
-    });
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
@@ -56,7 +49,6 @@ class _UpdateFirmwarePageState extends State<UpdateFirmwarePage> {
   void dispose() {
     super.dispose();
 
-    updateInfoTimer.cancel();
     timer.cancel();
   }
 

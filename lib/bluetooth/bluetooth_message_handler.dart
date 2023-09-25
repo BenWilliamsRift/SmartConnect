@@ -138,12 +138,14 @@ class BluetoothMessageHandler {
 
   Future<void> processResponse(List<String> messages) async {
     for (String message in messages) {
+      print("MESSAGE: ${message}");
       switch (message[0]) {
         case codeRequestAngle: // a
           Actuator.connectedActuator.settings.angle =
               (double.parse(message.substring(1)) % 360);
           Actuator.connectedActuator.settings.rawAngle =
               double.parse(message.substring(1));
+          print("RAW ANGLE: ${Actuator.connectedActuator.settings.rawAngle}");
           break;
         case codeRequestLEDS: // l
           Actuator.connectedActuator.settings.leds =
@@ -258,7 +260,7 @@ class BluetoothMessageHandler {
           }
           break;
         case codeRequestFeaturePasswordDigits: // 58
-          // feature password digits
+        // feature password digits
           break;
         case codeRequestPositionMode: // 63
           Actuator.connectedActuator.settings.positionMode =
@@ -293,7 +295,7 @@ class BluetoothMessageHandler {
               double.parse(message.split(",")[1]) == 1;
           break;
         case codeRequestWiggleTimeBetween: // 79
-          // Actuator.connectedActuator.wiggleTime = double.parse(message.split(",")[1]);
+        // Actuator.connectedActuator.wiggleTime = double.parse(message.split(",")[1]);
           break;
         case codeRequestWiggleAngle: // 81
           Actuator.connectedActuator.settings.wiggleAngle =
@@ -307,10 +309,10 @@ class BluetoothMessageHandler {
           Actuator.connectedActuator.settings.torqueLimitDelayBeforeRetry = Delay.fromSecs(double.parse(message.split(",")[1]));
           break;
         case codeRequestControlSystemPIDP: // 87
-          // Actuator.connectedActuator.PIDP = double.parse(message.split(",")[1]);
+        // Actuator.connectedActuator.PIDP = double.parse(message.split(",")[1]);
           break;
         case codeRequestControlSystemPIDI: // 89
-          // Actuator.connectedActuator.PIDI
+        // Actuator.connectedActuator.PIDI
           break;
         case codeRequestControlSystemTargetFraction: // 91
           break;
@@ -421,8 +423,7 @@ class BluetoothMessageHandler {
   }
 
   void writeToFlash() {
-    Actuator.connectedActuator.writingToFlash = true;
-
+    // pause new requests
     stopActuator();
     bluetoothManager.sendMessage(code: codeWriteToFlash);
   }
@@ -681,6 +682,7 @@ class BluetoothMessageHandler {
   }
 
   void requestFeatures() {
+    // doesnt need to be this many
     for (int i = 0; i < ActuatorConstants.numberOfFeatures; i++) {
       bluetoothManager.sendMessage(
           code: codeRequestFeatures, value: i.toString());
