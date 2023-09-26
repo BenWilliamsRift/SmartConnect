@@ -85,6 +85,7 @@ class _ControlPageState extends State<ControlPage> {
             Row(
               children: [
                 Style.sizedWidth,
+                // open button
                 Expanded(
                     child: HoldButton(
                   onPressed: () {
@@ -105,6 +106,7 @@ class _ControlPageState extends State<ControlPage> {
                       style: Style.normalText, StringConsts.actuators.open),
                 )),
                 Style.sizedWidth,
+                // close button
                 Expanded(
                     child: HoldButton(
                         onPressed: () {
@@ -125,24 +127,7 @@ class _ControlPageState extends State<ControlPage> {
                             style: Style.normalText,
                             StringConsts.actuators.close))),
                 Style.sizedWidth,
-                Expanded(child: AutoManualButton.widget),
-                Style.sizedWidth,
-              ],
-            ),
-            Row(
-              children: [
-                Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
-                    bluetoothMessageHandler.setResetBoard();
-                  },
-                  backgroundColor: Style.darkBlue,
-                  child: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.softResetBoard),
-                )),
-                Style.sizedWidth,
+                // stop button
                 Expanded(
                     child: Button(
                   onPressed: () {
@@ -153,16 +138,13 @@ class _ControlPageState extends State<ControlPage> {
                       style: Style.normalText, StringConsts.actuators.stop),
                 )),
                 Style.sizedWidth,
-                Expanded(
-                    child: Button(
-                  onPressed: () {
-                    bluetoothMessageHandler.setDefaultSettings();
-                  },
-                  backgroundColor: Style.darkBlue,
-                  child: Text(
-                      style: Style.normalText,
-                      StringConsts.actuators.revertToDefaultValues),
-                )),
+              ],
+            ),
+            // auto manual button
+            Row(
+              children: [
+                Style.sizedWidth,
+                Expanded(child: AutoManualButton.widget),
                 Style.sizedWidth,
               ],
             ),

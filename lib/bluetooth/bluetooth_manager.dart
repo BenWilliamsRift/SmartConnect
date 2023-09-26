@@ -77,8 +77,6 @@ class BluetoothManager {
       bluetoothResponse.setMethodCallHandler((call) async {
         switch (call.method) {
           case "bluetoothCommandResponse":
-            // TODO bluetooth angle response is giving a null value
-            print("${call.arguments.split('\n')}");
             await BluetoothMessageHandler()
                 .processResponse(call.arguments.split("\n"));
             break;

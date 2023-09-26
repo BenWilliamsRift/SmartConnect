@@ -138,7 +138,6 @@ class BluetoothMessageHandler {
 
   Future<void> processResponse(List<String> messages) async {
     for (String message in messages) {
-      print("MESSAGE: $message");
       switch (message[0]) {
         case codeRequestAngle: // a
           Actuator.connectedActuator.settings.angle =
@@ -154,7 +153,8 @@ class BluetoothMessageHandler {
           Actuator.connectedActuator.settings.temperature = double.parse(message.substring(1)); // 20 == 2.0
           break;
         case codeGetBootloaderStatus: // @
-          Actuator.connectedActuator.settings.firmwareVersion = double.parse(message.substring(1));
+          Actuator.connectedActuator.settings.firmwareVersion =
+              double.parse(message.substring(1));
           Actuator.connectedActuator.inBootLoader = true;
           if (kDebugMode) {
             print("bootloader: ${Actuator.connectedActuator.inBootLoader}");
@@ -163,226 +163,233 @@ class BluetoothMessageHandler {
         case codeSendManualFirmwareEnter: // !
           break;
       }
-      switch (message.split(",")[0].substring(1)) {
-        case codeRequestWorkingTime: // m10
-          Actuator.connectedActuator.workingTime =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeWriteToFlash: // flash finished : 362
-          if (kDebugMode) {
-            print("STOP WRITE TO FLASH");
-          }
-          Actuator.connectedActuator.writingToFlash = false;
-          break;
-        case codeRequestMaximumDuty: // m20
-          Actuator.connectedActuator.settings.maximumDuty =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestTorqueLimit: // m21
-          Actuator.connectedActuator.settings.torqueLimitNm =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestValveOrientation: // m22
-          Actuator.connectedActuator.settings.valveOrientation =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestNumberOfFullCycles: // 23
-          Actuator.connectedActuator.settings.numberOfFullCycles =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestWorkingAngle: // 26
-          Actuator.connectedActuator.settings.workingAngle = double.parse(message.split(",")[1]);
-          getOpenAngle();
-          break;
-        case codeRequestFailsafeMode: // 28
-          Actuator.connectedActuator.settings.failsafeMode =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestFailsafeAngle: // 30
-          Actuator.connectedActuator.settings.failsafeAngle =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestAnalogSignalMode: // 32
-          Actuator.connectedActuator.analogSignalMode =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestReverseActing: //34
-          Actuator.connectedActuator.settings.reverseActing =
-              int.parse(message.split(",")[1]) == 1;
-          // maybe add receivedReverseActing like from bluetoothHandler 431:55
-          break;
-        case codeRequestNumberOfStarts: // 36
-          Actuator.connectedActuator.settings.numberOfStarts =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestIndicationMode: // 38
-          Actuator.connectedActuator.settings.indicationMode =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestClosedAngleAddition: // 42
-          Actuator.connectedActuator.settings.closedAngle = double.parse(message.split(",")[1]);
-          Actuator.connectedActuator.settings.calibratedClosedAngle = double.parse(message.split(",")[1]);
-          break;
-        case codeRequestBatteryVoltage: // 43
-          Actuator.connectedActuator.settings.batteryVoltage =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestPIDP: // 49
-          Actuator.connectedActuator.settings.PIDP =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestPIDI: // 51
-          Actuator.connectedActuator.settings.PIDI =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestLossOfSignalMode: // 53
-          Actuator.connectedActuator.settings.lossOfSignalMode =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestLossOfSignalAngle: // 55
-          Actuator.connectedActuator.settings.lossOfSignalAngle =
-              double.parse(message.split(",")[1]);
-          break;
-        case "57":
-          List<String> parts = message.substring(1).split(",");
-          if (parts.length < 3) {
-            return;
-          }
 
-          int index = int.parse(parts[1]);
-          int value = int.parse(parts[2]);
+      if (message.toLowerCase().startsWith("m")) {
+        switch (message.split(",")[0]) {
+          case codeRequestWorkingTime: // m10
+            Actuator.connectedActuator.workingTime =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeWriteToFlash: // flash finished : 362
+            if (kDebugMode) {
+              print("STOP WRITE TO FLASH");
+            }
+            Actuator.connectedActuator.writingToFlash = false;
+            break;
+          case codeRequestMaximumDuty: // m20
+            Actuator.connectedActuator.settings.maximumDuty =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestTorqueLimit: // m21
+            Actuator.connectedActuator.settings.torqueLimitNm =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestValveOrientation: // m22
+            Actuator.connectedActuator.settings.valveOrientation =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestNumberOfFullCycles: // 23
+            Actuator.connectedActuator.settings.numberOfFullCycles =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestWorkingAngle: // 26
+            Actuator.connectedActuator.settings.workingAngle =
+                double.parse(message.split(",")[1]);
+            getOpenAngle();
+            break;
+          case codeRequestFailsafeMode: // 28
+            Actuator.connectedActuator.settings.failsafeMode =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestFailsafeAngle: // 30
+            Actuator.connectedActuator.settings.failsafeAngle =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestAnalogSignalMode: // 32
+            Actuator.connectedActuator.analogSignalMode =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestReverseActing: //34
+            Actuator.connectedActuator.settings.reverseActing =
+                int.parse(message.split(",")[1]) == 1;
+            // maybe add receivedReverseActing like from bluetoothHandler 431:55
+            break;
+          case codeRequestNumberOfStarts: // 36
+            Actuator.connectedActuator.settings.numberOfStarts =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestIndicationMode: // 38
+            Actuator.connectedActuator.settings.indicationMode =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestClosedAngleAddition: // 42
+            Actuator.connectedActuator.settings.closedAngle =
+                double.parse(message.split(",")[1]);
+            Actuator.connectedActuator.settings.calibratedClosedAngle =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestBatteryVoltage: // 43
+            Actuator.connectedActuator.settings.batteryVoltage =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestPIDP: // 49
+            Actuator.connectedActuator.settings.PIDP =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestPIDI: // 51
+            Actuator.connectedActuator.settings.PIDI =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestLossOfSignalMode: // 53
+            Actuator.connectedActuator.settings.lossOfSignalMode =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestLossOfSignalAngle: // 55
+            Actuator.connectedActuator.settings.lossOfSignalAngle =
+                double.parse(message.split(",")[1]);
+            break;
+          case "57":
+            List<String> parts = message.substring(1).split(",");
+            if (parts.length < 3) {
+              return;
+            }
 
-          if (value == 0) {
-            Actuator.connectedActuator.settings.setFeaturesDisabled(index);
-          } else if (value == 1) {
-            Actuator.connectedActuator.settings.setFeaturesEnabled(index);
-          }
-          break;
-        case codeRequestFeaturePasswordDigits: // 58
-        // feature password digits
-          break;
-        case codeRequestPositionMode: // 63
-          Actuator.connectedActuator.settings.positionMode =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestBacklash: // 66
-          Actuator.connectedActuator.settings.backlash =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestStartInManual: // 67
-          Actuator.connectedActuator.settings.startInManualMode =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestOffGridTimeUntilFirstOpen: // 69
-          Actuator.connectedActuator.settings.offGridTimeUntilFirstOpen =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestOffGridTimeBetweenCycles: // 71
-          Actuator.connectedActuator.settings.offGridTimeBetweenCycles =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestOffGridOpenTime: // 73
-          Actuator.connectedActuator.settings.offGridOpenTime =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestOffGridTimerEnabled: // 75
-          Actuator.connectedActuator.settings.offGridTimerEnabled =
-              double.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestWiggleEnabled: // 77
-          Actuator.connectedActuator.settings.wiggleEnabled =
-              double.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestWiggleTimeBetween: // 79
-        // Actuator.connectedActuator.wiggleTime = double.parse(message.split(",")[1]);
-          break;
-        case codeRequestWiggleAngle: // 81
-          Actuator.connectedActuator.settings.wiggleAngle =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestTorqueLimitBackoffAngle: // 83
-          Actuator.connectedActuator.settings.torqueLimitBackoffAngle =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestTorqueLimitDelayBeforeRetry: // 85
-          Actuator.connectedActuator.settings.torqueLimitDelayBeforeRetry = Delay.fromSecs(double.parse(message.split(",")[1]));
-          break;
-        case codeRequestControlSystemPIDP: // 87
-        // Actuator.connectedActuator.PIDP = double.parse(message.split(",")[1]);
-          break;
-        case codeRequestControlSystemPIDI: // 89
-        // Actuator.connectedActuator.PIDI
-          break;
-        case codeRequestControlSystemTargetFraction: // 91
-          break;
-        case codeRequestControlSystemEnabled: // 93
-          break;
-        case codeRequestInputSignalVoltage:
-          break;
-        case "98": // unused???? : 658
-          break;
-        case "100": // unused : 664
-          break;
-        case codeRequestSleepEnabled:
-          break;
-        case codeRequestMagnetTest: // 107
-          Actuator.connectedActuator.settings.magnetTestMode =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestButtonsEnabled: // 109
-          Actuator.connectedActuator.settings.buttonsEnabled =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestNumberOfTests: // 115
-          Actuator.connectedActuator.settings.numberOfTests =
-              int.parse(message.split(",")[1]);
-          break;
-        case codeRequestMinimumBatteryVoltage: // 117
-          Actuator.connectedActuator.settings.minimumBatteryVoltageTest =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestTestingEnabled: // 120
-          Actuator.connectedActuator.settings.testingEnabled =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestAnalogDeadbandBackwards: // 125
-          Actuator.connectedActuator.deadbandBackwards =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestAnalogDeadbandForwards: // 123
-          Actuator.connectedActuator.deadbandForwards =
-              double.parse(message.split(",")[1]);
-          break;
-        case codeRequestModulatingInversion: // 1223
-          Actuator.connectedActuator.settings.modulatingInversion =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestAutoManual: // set auto manual : 734
-          Actuator.connectedActuator.settings.autoManual =
-              int.parse(message.split(",")[1]);
-          break;
-        case "154": // unused???? : 740
-          break;
-        case "155": // logging information : 743
-          break;
-        case "1551": // valve profile : 767
-          break;
-        case "1552": // pid information : 774
-          break;
-        case codeVerify:
-          break;
-        case codeLock:
-          break;
-        case codeUnlock:
-          break;
-        case codeRequestLocked:
-          Actuator.connectedActuator.isLocked =
-              int.parse(message.split(",")[1]) == 1;
-          break;
-        case codeRequestFailsafeDelay: // 203
-          Actuator.connectedActuator.failsafeDelay =
-              Delay.fromSecs(double.parse(message.split(",")[1]));
-          break;
+            int index = int.parse(parts[1]);
+            int value = int.parse(parts[2]);
+
+            if (value == 0) {
+              Actuator.connectedActuator.settings.setFeaturesDisabled(index);
+            } else if (value == 1) {
+              Actuator.connectedActuator.settings.setFeaturesEnabled(index);
+            }
+            break;
+          case codeRequestFeaturePasswordDigits: // 58
+            // feature password digits
+            break;
+          case codeRequestPositionMode: // 63
+            Actuator.connectedActuator.settings.positionMode =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestBacklash: // 66
+            Actuator.connectedActuator.settings.backlash =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestStartInManual: // 67
+            Actuator.connectedActuator.settings.startInManualMode =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestOffGridTimeUntilFirstOpen: // 69
+            Actuator.connectedActuator.settings.offGridTimeUntilFirstOpen =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestOffGridTimeBetweenCycles: // 71
+            Actuator.connectedActuator.settings.offGridTimeBetweenCycles =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestOffGridOpenTime: // 73
+            Actuator.connectedActuator.settings.offGridOpenTime =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestOffGridTimerEnabled: // 75
+            Actuator.connectedActuator.settings.offGridTimerEnabled =
+                double.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestWiggleEnabled: // 77
+            Actuator.connectedActuator.settings.wiggleEnabled =
+                double.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestWiggleTimeBetween: // 79
+            // Actuator.connectedActuator.wiggleTime = double.parse(message.split(",")[1]);
+            break;
+          case codeRequestWiggleAngle: // 81
+            Actuator.connectedActuator.settings.wiggleAngle =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestTorqueLimitBackoffAngle: // 83
+            Actuator.connectedActuator.settings.torqueLimitBackoffAngle =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestTorqueLimitDelayBeforeRetry: // 85
+            Actuator.connectedActuator.settings.torqueLimitDelayBeforeRetry =
+                Delay.fromSecs(double.parse(message.split(",")[1]));
+            break;
+          case codeRequestControlSystemPIDP: // 87
+            // Actuator.connectedActuator.PIDP = double.parse(message.split(",")[1]);
+            break;
+          case codeRequestControlSystemPIDI: // 89
+            // Actuator.connectedActuator.PIDI
+            break;
+          case codeRequestControlSystemTargetFraction: // 91
+            break;
+          case codeRequestControlSystemEnabled: // 93
+            break;
+          case codeRequestInputSignalVoltage:
+            break;
+          case "98": // unused???? : 658
+            break;
+          case "100": // unused : 664
+            break;
+          case codeRequestSleepEnabled:
+            break;
+          case codeRequestMagnetTest: // 107
+            Actuator.connectedActuator.settings.magnetTestMode =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestButtonsEnabled: // 109
+            Actuator.connectedActuator.settings.buttonsEnabled =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestNumberOfTests: // 115
+            Actuator.connectedActuator.settings.numberOfTests =
+                int.parse(message.split(",")[1]);
+            break;
+          case codeRequestMinimumBatteryVoltage: // 117
+            Actuator.connectedActuator.settings.minimumBatteryVoltageTest =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestTestingEnabled: // 120
+            Actuator.connectedActuator.settings.testingEnabled =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestAnalogDeadbandBackwards: // 125
+            Actuator.connectedActuator.deadbandBackwards =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestAnalogDeadbandForwards: // 123
+            Actuator.connectedActuator.deadbandForwards =
+                double.parse(message.split(",")[1]);
+            break;
+          case codeRequestModulatingInversion: // 1223
+            Actuator.connectedActuator.settings.modulatingInversion =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestAutoManual: // set auto manual : 734
+            Actuator.connectedActuator.settings.autoManual =
+                int.parse(message.split(",")[1]);
+            break;
+          case "154": // unused???? : 740
+            break;
+          case "155": // logging information : 743
+            break;
+          case "1551": // valve profile : 767
+            break;
+          case "1552": // pid information : 774
+            break;
+          case codeVerify:
+            break;
+          case codeLock:
+            break;
+          case codeUnlock:
+            break;
+          case codeRequestLocked:
+            Actuator.connectedActuator.isLocked =
+                int.parse(message.split(",")[1]) == 1;
+            break;
+          case codeRequestFailsafeDelay: // 203
+            Actuator.connectedActuator.failsafeDelay =
+                Delay.fromSecs(double.parse(message.split(",")[1]));
+            break;
+        }
       }
     }
   }
