@@ -780,39 +780,65 @@ class _TimePickerState extends State<TimePicker> {
       },
       sensitivity: sensitivity);
 
+  List<Widget> getTimeUnit() {
+    Widget sep = Expanded(flex: 2, child: sizedBox);
+    List<Widget> widgets = [sizedBox];
+
+    void addRot(TimePickerRot rot) {
+      widgets.add(rot);
+      widgets.add(sizedBox);
+    }
+
+    switch (Settings.selectedTimeUnits) {
+      case Settings.monthsWeekDaysHoursMinutesSeconds:
+        widgets.add(
+            Row(children: [sep, monthRot, sep, weekRot, sep, dayRot, sep]));
+        widgets.add(sizedBox);
+        widgets.add(sizedBox);
+        widgets.add(sizedBox);
+        widgets.add(
+            Row(children: [sep, hourRot, sep, minuteRot, sep, secondRot, sep]));
+        break;
+      case Settings.hoursMinutesSeconds:
+        widgets.add(
+            Row(children: [sep, hourRot, sep, minuteRot, sep, secondRot, sep]));
+        break;
+      case Settings.monthsWeekDays:
+        widgets.add(
+            Row(children: [sep, monthRot, sep, weekRot, sep, dayRot, sep]));
+        break;
+      case Settings.seconds:
+        addRot(secondRot);
+        break;
+      case Settings.minutes:
+        addRot(minuteRot);
+        break;
+      case Settings.hours:
+        addRot(hourRot);
+        break;
+      case Settings.days:
+        addRot(dayRot);
+        break;
+      case Settings.weeks:
+        addRot(weekRot);
+        break;
+      case Settings.months:
+        addRot(monthRot);
+        break;
+    }
+
+    return widgets;
+  }
+
+  SizedBox sizedBox = const SizedBox(height: 10);
+
   @override
   Widget build(BuildContext context) {
-    SizedBox sizedBox = const SizedBox(height: 10);
-
     return AlertDialog(
       title: const Text(StringConsts.timePickerTitle),
       content: SingleChildScrollView(
           physics: const NeverScrollableScrollPhysics(),
-          child: Column(
-            children: [
-              Row(children: [
-                Expanded(flex: 2, child: sizedBox),
-                monthRot,
-                Expanded(flex: 2, child: sizedBox),
-                weekRot,
-                Expanded(flex: 2, child: sizedBox),
-                dayRot,
-                Expanded(flex: 2, child: sizedBox),
-              ]),
-              sizedBox,
-              sizedBox,
-              sizedBox,
-              Row(children: [
-                Expanded(flex: 2, child: sizedBox),
-                hourRot,
-                Expanded(flex: 2, child: sizedBox),
-                minuteRot,
-                Expanded(flex: 2, child: sizedBox),
-                secondRot,
-                Expanded(flex: 2, child: sizedBox),
-              ]),
-            ],
-          )),
+          child: Column(children: getTimeUnit())),
       actions: [
         TextButton(
           child: const Text(StringConsts.cancel),

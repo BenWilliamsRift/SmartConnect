@@ -42,6 +42,7 @@ class Settings {
   static const int days = 5;
   static const int weeks = 6;
   static const int months = 7;
+  static const int monthsWeekDaysHoursMinutesSeconds = 8;
 
   static List<String> timeUnits = [
     "Hours : Minutes : Seconds",
@@ -51,7 +52,8 @@ class Settings {
     "Hours",
     "Days",
     "Weeks",
-    "Months (28 days)"
+    "Months (28 days)",
+    "M(28 days) : W : D : H : M : S"
   ];
 
   static bool isDarkMode = false;
