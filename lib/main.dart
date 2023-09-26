@@ -15,9 +15,24 @@ import 'theme_manager.dart';
 void showSnackBar(
     BuildContext context, String text, int? duration, SnackBarAction? action) {
   SnackBar snackBar = SnackBar(
-    content: Text(text, style: TextStyle(color: ColorManager.snackBar)),
-    duration: Duration(seconds: duration ?? 3),
-    action: action,
+    content: Container(
+      decoration: BoxDecoration(
+          color: ColorManager.snackBarBackground,
+          border: Border.all(width: 2.0, color: ColorManager.snackBarBorder),
+          borderRadius: BorderRadius.circular(20)),
+      margin: const EdgeInsets.all(8.0),
+      child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(text,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: ColorManager.snackBar))),
+    ),
+    backgroundColor: Colors.transparent,
+    elevation: 0,
+    margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height / 3),
+    behavior: SnackBarBehavior.floating,
+    duration: const Duration(seconds: 3),
+    dismissDirection: DismissDirection.none,
   );
 
   ScaffoldMessenger.of(context).clearSnackBars();
@@ -40,10 +55,11 @@ void routeToPage(BuildContext context, Widget page,
   }
 }
 
-void showAlert({required BuildContext context,
-  required Widget content,
-  Text? title,
-  required List<Widget> actions}) {
+void showAlert(
+    {required BuildContext context,
+    required Widget content,
+    Text? title,
+    required List<Widget> actions}) {
   showDialog(
       context: context,
       builder: (context) {

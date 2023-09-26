@@ -51,20 +51,14 @@ class ColorManager {
   // New app colors
   // App bar
   static get appBarBackground => colorPrimary;
-
   static get appBarBackgroundDark => colorPrimary;
 
   // Switch track
   static get switchTrackDisabled => disabled;
-
   static get switchTrackDisabledDark => Colors.purple.withOpacity(.48);
-
   static get switchTrackSelected => green2;
-
   static get switchTrackSelectedDark => Colors.white;
-
   static get switchTrackUnselected => red1;
-
   static get switchTrackUnselectedDark => Colors.black12;
 
   // Switch thumb
@@ -117,21 +111,38 @@ class ColorManager {
   static get searchBar => Settings.isDarkMode ? Colors.white70 : Colors.black45;
 
   static get actuatorOpenButton => Colors.green;
+
   static get actuatorCloseButton => Colors.red;
+
   static get rotateLeftOutlinedButton => Colors.green;
+
   static get rotateRightOutlinedButton => Colors.red;
+
   static get actuatorIcon => Colors.white;
+
   static get passwordFieldHoverColor => Colors.transparent;
-  static get snackBar => Settings.isDarkMode ? Colors.black : Colors.white;
+
+  static get snackBar => Colors.black;
+
+  static get snackBarBorder => Colors.transparent;
+
+  static get snackBarBackground => companyYellow;
+
   static get timePickerRotTextColor => Colors.white.withOpacity(0.8);
+
   static get checkBoxActiveColor =>
       Settings.isDarkMode ? Colors.purpleAccent : Colors.blue;
+
   static get divider => Settings.isDarkMode ? Colors.white54 : Colors.black26;
+
   static get angleRingColor => Settings.isDarkMode ? Colors.white : darkBlue;
+
   static get angleLineColor => companyYellow;
+
   static get angleRingBackground => Settings.isDarkMode
       ? const Color.fromARGB(255, 48, 48, 48)
       : const Color.fromARGB(255, 250, 250, 250);
+
   static get disabledRing => Settings.isDarkMode
       ? Colors.grey.withOpacity(0.7)
       : Colors.black.withOpacity(0.7);
