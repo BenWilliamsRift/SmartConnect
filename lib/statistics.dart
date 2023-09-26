@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/material.dart';
 
 import 'actuator/actuator.dart';
@@ -79,15 +80,38 @@ class _StatisticsPageState extends State<StatisticsPage> {
   String get getMaximumDuty => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.maximumDuty.toString() : StringConsts.bluetooth.notConnected;
   String get getDeadBandBackwards => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.analogDeadbandBackwards.toString() : StringConsts.bluetooth.notConnected;
   String get getDeadBandForwards => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.analogDeadbandForwards.toString() : StringConsts.bluetooth.notConnected;
-  String get getAnalogSignal => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.analogSignalMode.toString() : StringConsts.bluetooth.notConnected;
-  String get getBacklash => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.backlash.toString() : StringConsts.bluetooth.notConnected;
-  String get getBatteryVoltage => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getBatteryVoltage.toString() : StringConsts.bluetooth.notConnected;
-  String get getButtonsEnabled => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.buttonsEnabled.toString() : StringConsts.bluetooth.notConnected;
-  String get getFailsafeAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.failsafeAngle.toString() : StringConsts.bluetooth.notConnected;
-  String get getFailsafeDelay => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.failsafeDelay.toString() : StringConsts.bluetooth.notConnected;
-  String get getFailsafeMode => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.failsafeMode.toString() : StringConsts.bluetooth.notConnected;
+
+  String get getAnalogSignal => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.analogSignalMode.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getBacklash => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.backlash.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getBatteryVoltage => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.getBatteryVoltage.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getButtonsEnabled => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.buttonsEnabled.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getFailsafeAngle => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.failsafeAngle.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getFailsafeDelay => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.failsafeDelay.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getFailsafeMode => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.failsafeMode.toString()
+      : StringConsts.bluetooth.notConnected;
 
   Stopwatch stopwatch = Stopwatch();
+
+  bool compact = false;
 
   @override
   Widget build(BuildContext context) {
@@ -130,48 +154,190 @@ class _StatisticsPageState extends State<StatisticsPage> {
         },
         child: ListView(
           children: [
+            Settings.devSettingsEnabled
+                ? SwitchTile(
+                    title: const Text("Compact"),
+                    callback: (bool value) {
+                      setState(() {
+                        compact = value;
+                      });
+                    },
+                    initValue: compact,
+                  )
+                : Container(),
             TextTile(
-                compact: true,
+                compact: compact,
                 title:
                     Text(style: Style.normalText, StringConsts.appVersionTitle),
                 text: Text(style: Style.normalText, StringConsts.appVersion)),
-            div,
+            compact ? div : Container(),
             TextTile(
-                compact: true,
+                compact: compact,
                 title: Text(
                     style: Style.normalText,
                     StringConsts.actuators.values.boardNumber),
                 text: Text(style: Style.normalText, getBoardNumber)),
-            div,
+            compact ? div : Container(),
             TextTile(
-                compact: true,
+                compact: compact,
                 title: Text(
                     style: Style.normalText,
                     StringConsts.actuators.values.firmwareVersion),
                 text: Text(style: Style.normalText, getFirmware)),
-            div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.type), text: Text(style: Style.normalText, getType)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.angle), text: Text(style: Style.normalText, getAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.locked), text: Text(style: Style.normalText, getLocked)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.openAngle), text: Text(style: Style.normalText, getOpenAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.closedAngle), text: Text(style: Style.normalText, getClosedAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.lEDS), text: Text(style: Style.normalText, getLEDS)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.temperature), text: Text(style: Style.normalText, getTemp)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.autoManual), text: Text(style: Style.normalText, getAutoManual)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.bootloaderStatus), text: Text(style: Style.normalText, getBootLoader)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.workingTime), text: Text(style: Style.normalText, getWorkingTime)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.workingAngle), text: Text(style: Style.normalText, getWorkingAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.maximumDuty), text: Text(style: Style.normalText, getMaximumDuty)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.analogDeadbandBackwards), text: Text(style: Style.normalText, getDeadBandBackwards)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.analogDeadbandForwards), text: Text(style: Style.normalText, getDeadBandForwards)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.analogSignalMode), text: Text(style: Style.normalText, getAnalogSignal)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.backlash), text: Text(style: Style.normalText, getBacklash)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.batteryVoltage), text: Text(style: Style.normalText, getBatteryVoltage)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.buttonsEnabled), text: Text(style: Style.normalText, getButtonsEnabled)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.closedAngleAddition), text: Text(style: Style.normalText, getClosedAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.failsafeAngle), text: Text(style: Style.normalText, getFailsafeAngle)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.failsafeDelay), text: Text(style: Style.normalText, getFailsafeDelay)), div,
-            TextTile(compact: true, title: Text(style: Style.normalText, StringConsts.actuators.values.failsafeMode), text: Text(style: Style.normalText, getFailsafeMode)), div,
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title:
+                    Text(style: Style.normalText, StringConsts.actuators.type),
+                text: Text(style: Style.normalText, getType)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.angle),
+                text: Text(style: Style.normalText, getAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.locked),
+                text: Text(style: Style.normalText, getLocked)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.openAngle),
+                text: Text(style: Style.normalText, getOpenAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.closedAngle),
+                text: Text(style: Style.normalText, getClosedAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.lEDS),
+                text: Text(style: Style.normalText, getLEDS)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.temperature),
+                text: Text(style: Style.normalText, getTemp)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.autoManual),
+                text: Text(style: Style.normalText, getAutoManual)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.bootloaderStatus),
+                text: Text(style: Style.normalText, getBootLoader)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.workingTime),
+                text: Text(style: Style.normalText, getWorkingTime)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.workingAngle),
+                text: Text(style: Style.normalText, getWorkingAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.maximumDuty),
+                text: Text(style: Style.normalText, getMaximumDuty)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.analogDeadbandBackwards),
+                text: Text(style: Style.normalText, getDeadBandBackwards)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.analogDeadbandForwards),
+                text: Text(style: Style.normalText, getDeadBandForwards)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.analogSignalMode),
+                text: Text(style: Style.normalText, getAnalogSignal)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.backlash),
+                text: Text(style: Style.normalText, getBacklash)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.batteryVoltage),
+                text: Text(style: Style.normalText, getBatteryVoltage)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.buttonsEnabled),
+                text: Text(style: Style.normalText, getButtonsEnabled)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.closedAngleAddition),
+                text: Text(style: Style.normalText, getClosedAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.failsafeAngle),
+                text: Text(style: Style.normalText, getFailsafeAngle)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.failsafeDelay),
+                text: Text(style: Style.normalText, getFailsafeDelay)),
+            compact ? div : Container(),
+            TextTile(
+                compact: compact,
+                title: Text(
+                    style: Style.normalText,
+                    StringConsts.actuators.values.failsafeMode),
+                text: Text(style: Style.normalText, getFailsafeMode)),
+            compact ? div : Container(),
           ],
         ),
       ),
