@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -246,24 +247,34 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage> {
                     }
                   });
                 },
-                title: Text(device.alias),
-                subtitle: Text(device.name),
+                title: Text(device.name),
+                subtitle:
+                    Settings.devSettingsEnabled ? Text(device.address) : null,
                 trailing: (Actuator.connectedDeviceAddress == device.address)
-                    ? IconButton(
-                        onPressed: () {
-                          setState(() {
-                            disconnect();
-                            Actuator.connectingDeviceAddress = null;
-                            Actuator.connectedDeviceAddress = null;
-                            bluetoothManager.connectingDeviceAddress = null;
-                            bluetoothManager.connectedDeviceAddress = null;
-                          });
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                              child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                disconnect();
+                                Actuator.connectingDeviceAddress = null;
+                                Actuator.connectedDeviceAddress = null;
+                                bluetoothManager.connectingDeviceAddress = null;
+                                bluetoothManager.connectedDeviceAddress = null;
+                              });
 
-                          Future.delayed(const Duration(seconds: 3), () {
-                            setState(() {});
-                          });
-                        },
-                        icon: Icon(Icons.cancel, color: ColorManager.close),
+                              Future.delayed(const Duration(seconds: 3), () {
+                                setState(() {});
+                              });
+                            },
+                            icon: Icon(Icons.cancel, color: ColorManager.close),
+                          )),
+                          const SizedBox(height: 10),
+                          Expanded(
+                              child: Text(StringConsts.bluetooth.disconnect))
+                        ],
                       )
                     : (Actuator.connectingDeviceAddress == device.address)
                         ? const CircularProgressIndicator()

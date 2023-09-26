@@ -138,14 +138,13 @@ class BluetoothMessageHandler {
 
   Future<void> processResponse(List<String> messages) async {
     for (String message in messages) {
-      print("MESSAGE: ${message}");
+      print("MESSAGE: $message");
       switch (message[0]) {
         case codeRequestAngle: // a
           Actuator.connectedActuator.settings.angle =
               (double.parse(message.substring(1)) % 360);
           Actuator.connectedActuator.settings.rawAngle =
               double.parse(message.substring(1));
-          print("RAW ANGLE: ${Actuator.connectedActuator.settings.rawAngle}");
           break;
         case codeRequestLEDS: // l
           Actuator.connectedActuator.settings.leds =
@@ -359,7 +358,6 @@ class BluetoothMessageHandler {
               int.parse(message.split(",")[1]) == 1;
           break;
         case codeRequestAutoManual: // set auto manual : 734
-          print(message.split(","));
           Actuator.connectedActuator.settings.autoManual =
               int.parse(message.split(",")[1]);
           break;

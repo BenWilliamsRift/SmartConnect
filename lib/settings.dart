@@ -31,7 +31,8 @@ class Settings {
   static const int fahrenheit = 1;
   static const List<String> temperatureUnits = [
     "Celsius (\u2103)",
-    "Fahrenheit (\u2109)"];
+    "Fahrenheit (\u2109)"
+  ];
 
   static const int hoursMinutesSeconds = 0;
   static const int monthsWeekDays = 1;
@@ -105,7 +106,8 @@ class Settings {
   // by default converts a number from newton meters into either foot pounds or inch pounds
   // but by changing the source the input can convert to any of the three from any of the three
   // Source is the original format, wanted is the the wanted format
-  static double convertTorqueUnits({required double torque, int source=newtonMeter, int wanted=-1}) {
+  static double convertTorqueUnits(
+      {required double torque, int source = newtonMeter, int wanted = -1}) {
     double roundDouble(double value, int places) {
       num mod = pow(10.0, places);
       return ((value * mod).round().toDouble() / mod);
@@ -128,8 +130,7 @@ class Settings {
 
       // newton meters
       return roundDouble(torque, 2);
-    }
-    else if (source == inchPound) {
+    } else if (source == inchPound) {
       if (wanted == footPound) {
         // foot pound
         return roundDouble(torque / 12, 2);
@@ -140,8 +141,7 @@ class Settings {
 
       // inch pounds
       return roundDouble(torque, 2);
-    }
-    else if (source == footPound) {
+    } else if (source == footPound) {
       if (wanted == inchPound) {
         // inch pound
         return roundDouble(torque * 12, 2);
@@ -242,6 +242,7 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  // TODO Move dev settings and access code specific widgets into a function that returns them instead
   @override
   Widget build(BuildContext context) {
     ThemeNotification themeNotifier = ThemeNotification();
@@ -372,8 +373,8 @@ class _SettingsPageState extends State<SettingsPage> {
               advancedSettingsOpen && Settings.pidAccessUnlocked
                   ? Card(
                       child: ListTile(
-                      title: const Text(
-                        "PID Access Unlocked",
+                      title: Text(
+                        StringConsts.settings.pidAccessUnlocked,
                       ),
                       trailing: ElevatedButton(
                         onPressed: () {
@@ -381,15 +382,15 @@ class _SettingsPageState extends State<SettingsPage> {
                             // show confirmation to disable access
                           });
                         },
-                        child: const Text("Disable Access"),
+                        child: Text(StringConsts.settings.disableAccess),
                       ),
                     ))
                   : Container(),
               advancedSettingsOpen && Settings.testingAccessUnlocked
                   ? Card(
                       child: ListTile(
-                      title: const Text(
-                        "Testing Unlocked",
+                      title: Text(
+                        StringConsts.settings.testingUnlocked,
                       ),
                       trailing: ElevatedButton(
                         onPressed: () {
@@ -397,7 +398,7 @@ class _SettingsPageState extends State<SettingsPage> {
                             // show confirmation to disable access
                           });
                         },
-                        child: const Text("Disable Access"),
+                        child: Text(StringConsts.settings.disableAccess),
                       ),
                     ))
                   : Container(),
@@ -408,6 +409,15 @@ class _SettingsPageState extends State<SettingsPage> {
                       Text("Dev Settings"),
                       Expanded(child: Divider()),
                     ])
+                  : Container(),
+              Settings.devSettingsEnabled
+                  ? ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          Settings.devSettingsEnabled = false;
+                        });
+                      },
+                      child: Text(StringConsts.settings.disableAccess))
                   : Container(),
               Settings.devSettingsEnabled
                   ? SwitchTile(

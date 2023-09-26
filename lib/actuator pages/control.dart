@@ -212,6 +212,18 @@ class _ControlPageState extends State<ControlPage> {
                   style: Style.normalText,
                   Actuator.connectedActuator.modulation),
             ),
+            // Disclaimer
+            const Center(
+              child: Text(
+                  "*Hold the Auto/Manual Button for 5 seconds to change the mode*"),
+            ),
+            const SizedBox(height: 10),
+            const Center(
+              child: Text(
+                  textAlign: TextAlign.center,
+                  "**If you are experiencing problems disconnect and reconnect, if the problems persist use the /Report a Bug page\\ "
+                  "and explain the problem you are having in as much detail as possible**"),
+            )
           ],
         )));
   }

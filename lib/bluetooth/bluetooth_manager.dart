@@ -422,8 +422,7 @@ class BluetoothManager {
           }
         }
 
-        print(
-            "Num Of Requests: ${requests.length}, Requests: $requests Repeated Requests: $dupes");
+        // print("Num Of Requests: ${requests.length}, Requests: $requests Repeated Requests: $dupes");
         requests = [];
       });
     }

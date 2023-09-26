@@ -108,8 +108,9 @@ class Bluetooth {
   final String successfullyTurnedOn = "Bluetooth was successfully turned on";
   final String unsuccessfullyTurnedOn =
       "Bluetooth could not be turned on automatically, please turn it on manually";
+  final String disconnect = "Disconnect";
 
-  String disconnect() =>
+  String disconnectFrom() =>
       "Disconnect from ${Actuator.connectedActuator.boardNumber ?? 'device'}";
 }
 
@@ -348,6 +349,9 @@ class SettingsStrings {
 
   final String advancedSettings = "Advanced Settings";
   final String accessCodes = "Access Codes";
+  final String disableAccess = "Disable Access";
+  final String pidAccessUnlocked = "PID Access Unlocked";
+  final String testingUnlocked = "Testing Unlocked";
 
   final String specialBorders = "Special borders";
   final String visualDensity = "Visual density";
