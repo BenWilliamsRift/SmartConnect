@@ -5,12 +5,16 @@ import "package:http/http.dart" as http;
 import 'String_consts.dart';
 
 class WebController {
+  static const String riftDevUrl = "riftdev.co.uk";
+  static const String registerUrl = "https://www.riftdev.co.uk/register/";
+
+  static String get featurePassword => "$riftDevUrl/passwords.html";
+
   static Uri loginURL =
-      Uri.https("riftdev.co.uk", "/php/androidRetrievePasswords.php");
-  static Uri featurePasswordsUrl =
-      Uri.https("riftdev.co.uk", "/passwords.html");
+      Uri.https(riftDevUrl, "/php/androidRetrievePasswords.php");
+  static Uri featurePasswordsUrl = Uri.https(riftDevUrl, "/passwords.html");
   static Uri setGroupingUrl =
-      Uri.https("riftdev.co.uk", "/php/checkAccessPassword.php");
+      Uri.https(riftDevUrl, "/php/checkAccessPassword.php");
 
   Future<String> login(String username, String password) async {
     var response = await http.post(loginURL, body: {
@@ -35,7 +39,7 @@ class WebController {
 
   Future<String> checkAccessCodeRequest(String password) async {
     var response =
-        await http.post(setGroupingUrl, body: {"password": password});
+    await http.post(setGroupingUrl, body: {"password": password});
 
     return response.body;
   }

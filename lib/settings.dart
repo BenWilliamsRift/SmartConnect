@@ -12,7 +12,7 @@ import 'preference_manager.dart';
 import 'string_consts.dart';
 
 class Settings {
-  static bool devSettingsEnabled = true;
+  static bool devSettingsEnabled = false;
   static bool emulateConnectedActuator = false;
 
   static bool pidAccessUnlocked = true;
@@ -176,6 +176,10 @@ class Settings {
 
   static bool isDevEmail() {
     return _devEmails.contains(PersonData.currentEmail);
+  }
+
+  static void checkIsDev() {
+    devSettingsEnabled = isDevEmail();
   }
 }
 

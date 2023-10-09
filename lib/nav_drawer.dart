@@ -64,120 +64,111 @@ class _NavDrawerState extends State<NavDrawer> {
 
     Divider div = Divider(thickness: 3, color: ColorManager.navDrawDiv);
 
+    List<Widget> connectedWidgets = <Widget>[
+      Card(
+          color:
+              NavDrawController.selectedPage == StringConsts.actuators.control
+                  ? ColorManager.colorAccent
+                  : ColorManager.navDrawBackground,
+          child: ListTile(
+            title: Text(
+              StringConsts.actuators.control,
+              style: titleStyle,
+            ),
+            leading: const Icon(Icons.control_camera),
+            onTap: (() {
+              routeToPage(
+                  context, const ControlPage(name: StringConsts.control));
+              NavDrawController.selectedPage = StringConsts.actuators.control;
+            }),
+          )),
+      Card(
+          color: NavDrawController.selectedPage == StringConsts.basicSettings
+              ? ColorManager.colorAccent
+              : ColorManager.navDrawBackground,
+          child: ListTile(
+            title: Text(
+              StringConsts.basicSettings,
+              style: titleStyle,
+            ),
+            leading: const Icon(Icons.settings_outlined),
+            onTap: (() {
+              routeToPage(context,
+                  const BasicSettingsPage(name: StringConsts.basicSettings));
+              NavDrawController.selectedPage = StringConsts.basicSettings;
+            }),
+          )),
+      Card(
+          color: NavDrawController.selectedPage == StringConsts.calibration
+              ? ColorManager.colorAccent
+              : ColorManager.navDrawBackground,
+          child: ListTile(
+            title: Text(
+              StringConsts.calibration,
+              style: titleStyle,
+            ),
+            leading: const Icon(Icons.sync),
+            onTap: (() {
+              routeToPage(context,
+                  const CalibrationPage(name: StringConsts.calibration));
+              NavDrawController.selectedPage = StringConsts.calibration;
+            }),
+          )),
+      Card(
+          color: NavDrawController.selectedPage == StringConsts.features
+              ? ColorManager.colorAccent
+              : ColorManager.navDrawBackground,
+          child: ListTile(
+            title: Text(
+              StringConsts.features,
+              style: titleStyle,
+            ),
+            leading: const Icon(Icons.list_alt),
+            onTap: (() {
+              routeToPage(
+                  context, const FeaturesPage(name: StringConsts.features));
+              NavDrawController.selectedPage = StringConsts.features;
+            }),
+          )),
+      Card(
+          color: NavDrawController.selectedPage == StringConsts.updateFirmware
+              ? ColorManager.colorAccent
+              : ColorManager.navDrawBackground,
+          child: ListTile(
+            title: Text(
+              StringConsts.updateFirmware,
+              style: titleStyle,
+            ),
+            leading: const Icon(Icons.update),
+            onTap: (() {
+              routeToPage(context,
+                  const UpdateFirmwarePage(name: StringConsts.updateFirmware));
+              NavDrawController.selectedPage = StringConsts.updateFirmware;
+            }),
+          )),
+    ];
+
     final bool isConnected = BluetoothManager.isActuatorConnected ||
         Settings.emulateConnectedActuator;
+
+    final bool isFeaturesEnabled =
+        (isConnected && (Actuator.connectedActuator.failsafe) ||
+            (Actuator.connectedActuator.modulating) ||
+            (Actuator.connectedActuator.speedControl) ||
+            (Actuator.connectedActuator.wiggle) ||
+            (Settings.emulateConnectedActuator) ||
+            Settings.emulateConnectedActuator);
 
     final drawerItems = ListView(
       children: [
         drawerHeader,
         Divider(height: 1, thickness: 3, color: ColorManager.navDrawDiv),
         //  with actuator connected
+        (isConnected)
+            ? Column(mainAxisSize: MainAxisSize.min, children: connectedWidgets)
+            : Container(),
 
-        (isConnected)
-            ? Card(
-            color: NavDrawController.selectedPage ==
-                        StringConsts.actuators.control
-                    ? ColorManager.colorAccent
-                    : ColorManager.navDrawBackground,
-                child: ListTile(
-                  title: Text(
-                    StringConsts.actuators.control,
-                    style: titleStyle,
-                  ),
-                  leading: const Icon(Icons.control_camera),
-                  onTap: (() {
-                    routeToPage(
-                        context, const ControlPage(name: StringConsts.control));
-                    NavDrawController.selectedPage =
-                        StringConsts.actuators.control;
-                  }),
-                ))
-            : Container(),
-        (isConnected)
-            ? Card(
-            color:
-                    NavDrawController.selectedPage == StringConsts.basicSettings
-                        ? ColorManager.colorAccent
-                        : ColorManager.navDrawBackground,
-                child: ListTile(
-                  title: Text(
-                    StringConsts.basicSettings,
-                    style: titleStyle,
-                  ),
-                  leading: const Icon(Icons.settings_outlined),
-                  onTap: (() {
-                    routeToPage(
-                        context,
-                        const BasicSettingsPage(
-                            name: StringConsts.basicSettings));
-                    NavDrawController.selectedPage = StringConsts.basicSettings;
-                  }),
-                ))
-            : Container(),
-        (isConnected)
-            ? Card(
-            color:
-                    NavDrawController.selectedPage == StringConsts.calibration
-                        ? ColorManager.colorAccent
-                        : ColorManager.navDrawBackground,
-                child: ListTile(
-                  title: Text(
-                    StringConsts.calibration,
-                    style: titleStyle,
-                  ),
-                  leading: const Icon(Icons.sync),
-                  onTap: (() {
-                    routeToPage(context,
-                        const CalibrationPage(name: StringConsts.calibration));
-                    NavDrawController.selectedPage = StringConsts.calibration;
-                  }),
-                ))
-            : Container(),
-        (isConnected)
-            ? Card(
-            color: NavDrawController.selectedPage == StringConsts.features
-                    ? ColorManager.colorAccent
-                    : ColorManager.navDrawBackground,
-                child: ListTile(
-                  title: Text(
-                    StringConsts.features,
-                    style: titleStyle,
-                  ),
-                  leading: const Icon(Icons.list_alt),
-                  onTap: (() {
-                    routeToPage(context,
-                        const FeaturesPage(name: StringConsts.features));
-                    NavDrawController.selectedPage = StringConsts.features;
-                  }),
-                ))
-            : Container(),
-        (isConnected)
-            ? Card(
-            color: NavDrawController.selectedPage ==
-                        StringConsts.updateFirmware
-                    ? ColorManager.colorAccent
-                    : ColorManager.navDrawBackground,
-                child: ListTile(
-                  title: Text(
-                    StringConsts.updateFirmware,
-                    style: titleStyle,
-                  ),
-                  leading: const Icon(Icons.update),
-                  onTap: (() {
-                    routeToPage(
-                        context,
-                        const UpdateFirmwarePage(
-                            name: StringConsts.updateFirmware));
-                    NavDrawController.selectedPage =
-                        StringConsts.updateFirmware;
-                  }),
-                ))
-            : Container(),
-        (isConnected && (Actuator.connectedActuator.failsafe) ||
-                (Actuator.connectedActuator.modulating) ||
-                (Actuator.connectedActuator.speedControl) ||
-                (Actuator.connectedActuator.wiggle) ||
-                (Settings.devSettingsEnabled))
+        (isFeaturesEnabled)
             ? Row(children: [
                 Expanded(flex: 3, child: div),
                 Expanded(
@@ -188,29 +179,26 @@ class _NavDrawerState extends State<NavDrawer> {
               ])
             : Container(),
         ((isConnected && (Actuator.connectedActuator.torqueLimit)) ||
-                Settings.devSettingsEnabled)
+                Settings.emulateConnectedActuator)
             ? Card(
             color:
                     NavDrawController.selectedPage == StringConsts.torqueLimit
                         ? ColorManager.colorAccent
                         : ColorManager.navDrawBackground,
-            child: ListTile(
-              title: Text(
-                StringConsts.torqueLimit,
-                style: titleStyle
-              ),
-              leading: const Icon(RiftIcons.torqueLimit),
-              onTap: (() {
-                routeToPage(context,
+                child: ListTile(
+                  title: Text(StringConsts.torqueLimit, style: titleStyle),
+                  leading: const Icon(RiftIcons.torqueLimit),
+                  onTap: (() {
+                    routeToPage(context,
                         const TorqueLimitPage(name: StringConsts.torqueLimit));
                     NavDrawController.selectedPage = StringConsts.torqueLimit;
                   }),
-            )
-        ) : Container(),
+                ))
+            : Container(),
         ((isConnected && (Actuator.connectedActuator.failsafe)) ||
-                Settings.devSettingsEnabled)
+                Settings.emulateConnectedActuator)
             ? Card(
-            color: NavDrawController.selectedPage == StringConsts.failsafe
+                color: NavDrawController.selectedPage == StringConsts.failsafe
                     ? ColorManager.colorAccent
                     : ColorManager.navDrawBackground,
                 child: ListTile(
@@ -227,7 +215,7 @@ class _NavDrawerState extends State<NavDrawer> {
                 ))
             : Container(),
         ((isConnected && (Actuator.connectedActuator.modulating)) ||
-                Settings.devSettingsEnabled)
+                Settings.emulateConnectedActuator)
             ? Card(
             color: NavDrawController.selectedPage == StringConsts.modulating
                     ? ColorManager.colorAccent
@@ -246,7 +234,7 @@ class _NavDrawerState extends State<NavDrawer> {
                 ))
             : Container(),
         ((isConnected && (Actuator.connectedActuator.speedControl)) ||
-                Settings.devSettingsEnabled)
+                Settings.emulateConnectedActuator)
             ? Card(
             color:
                     NavDrawController.selectedPage == StringConsts.speedControl
@@ -268,7 +256,7 @@ class _NavDrawerState extends State<NavDrawer> {
                 ))
             : Container(),
         ((isConnected && (Actuator.connectedActuator.wiggle)) ||
-                Settings.devSettingsEnabled)
+                Settings.emulateConnectedActuator)
             ? Card(
             color: NavDrawController.selectedPage == StringConsts.wiggle
                     ? ColorManager.colorAccent

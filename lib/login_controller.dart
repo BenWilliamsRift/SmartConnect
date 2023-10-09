@@ -108,12 +108,12 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
+// login process
+// _handleSubmitted -> validateUsername -> if true -> signIn -> routedToLoginPage -> saveUserNamePassword -> finished
+
 class _LoginPageState extends State<LoginPage> with RestorationMixin {
   PersonData person = PersonData();
 
-  final String riftDevUrl = "www.riftdev.co.uk";
-  final String _registerUrl = "https://www.riftdev.co.uk/register/";
-  late final String loginUrl;
   late final String featurePassword;
 
   List<Actuator> actuators = [];
@@ -122,8 +122,6 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
   late TextEditingController passwordController;
 
   _LoginPageState() {
-    loginUrl = "$riftDevUrl/php/androidRetrievePasswords.php";
-    featurePassword = "$riftDevUrl/passwords.html";
     emailController = TextEditingController();
     passwordController = TextEditingController();
     encrypterAndDecrypter = EncrypterDecrypter();
@@ -145,7 +143,7 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
   }
 
   Future<void> _registerAccount() async {
-    if (!await launchUrl(Uri.parse(_registerUrl))) {
+    if (!await launchUrl(Uri.parse(WebController.registerUrl))) {
       // ignore: use_build_context_synchronously
       showSnackBar(
           context,
@@ -154,14 +152,34 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
           SnackBarAction(
               label: StringConsts.login.copyRegisterUrl,
               onPressed: () async {
-                await Clipboard.setData(ClipboardData(text: _registerUrl));
+                await Clipboard.setData(
+                    const ClipboardData(text: WebController.registerUrl));
               }));
     }
   }
 
   void signIn(final String username, final String password) {
-    logIn(username);
+    // tell the user they were signed in successfully
+    showSnackBar(context, StringConsts.login.complete, null, null);
+    // disconnect from any device currently connected
+    Actuator.connectedActuator.disconnect();
+
+    isLoggedIn = true;
+    updateFeaturePasswords();
+
+    // hide loading spinner
+    setState(() {
+      showLoading = false;
+    });
+
+    Settings.checkIsDev();
+
+    // save for quick login later on
     saveUsernamePassword(username, password);
+
+    routeToPage(
+        context, const ConnectToActuatorPage(name: StringConsts.control));
+    NavDrawController.selectedPage = StringConsts.connectToActuator;
 
     if (error != null) {
       showSnackBar(context, error!, null, null);
@@ -234,22 +252,6 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
     for (int i = 0; i < ActuatorConstants.numberOfFeatures; i++) {
       Actuator.connectedActuator.settings.setFeaturePassword(i, line[i + 1]);
     }
-  }
-
-  void logIn(String username) {
-    showSnackBar(context, StringConsts.login.complete, null, null);
-    Actuator.connectedActuator.disconnect();
-
-    isLoggedIn = true;
-    updateFeaturePasswords();
-    routeToPage(
-        context, const ConnectToActuatorPage(name: StringConsts.control));
-    NavDrawController.selectedPage = StringConsts.connectToActuator;
-
-    // hide loading spinner
-    setState(() {
-      showLoading = false;
-    });
   }
 
   late FocusNode _password;
@@ -361,11 +363,11 @@ class _LoginPageState extends State<LoginPage> with RestorationMixin {
           });
         }
       });
-      Future<bool> validated =
-          validateUsername(person.email, person.password);
 
-      // Delay the login for 1.5 secs
-      Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+      Future<bool> validated = validateUsername(person.email, person.password);
+
+      // Delay the login for 0.5 secs
+      Future.delayed(const Duration(milliseconds: 500), () {
         validated.then((value) {
           if (value == true) {
             showSnackBar(context, StringConsts.login.complete, null, null);
