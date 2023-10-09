@@ -84,9 +84,14 @@ class ActuatorSettings {
   int maximumDuty = 0;
 
   // ignore: non_constant_identifier_names
-  late double PIDP;
+  late double PIDP = 0;
+
+  String get pidP => PIDP.toString();
+
   // ignore: non_constant_identifier_names
-  late double PIDI;
+  late double PIDI = 0;
+
+  String get pidI => PIDI.toString();
 
   late bool startInManualMode;
   double backlash = 0;

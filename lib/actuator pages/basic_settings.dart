@@ -140,15 +140,27 @@ class _BasicSettingsPageState extends State<BasicSettingsPage> {
                     Settings.pidAccessUnlocked
                         ? TextInputTile(
                             onSaved: (String? value) {
-                              setState(() {});
+                              setState(() {
+                                bluetoothMessageHandler.setPIDP(value ??
+                                    Actuator.connectedActuator.settings.PIDP
+                                        .toString());
+                              });
                             },
+                            initialValue:
+                                Actuator.connectedActuator.settings.pidP,
                             title: Text(StringConsts.actuators.pidP))
                         : Container(),
                     Settings.pidAccessUnlocked
                         ? TextInputTile(
-                            onSaved: (String? value) {
-                              setState(() {});
+                        onSaved: (String? value) {
+                              setState(() {
+                                bluetoothMessageHandler.setPIDI(value ??
+                                    Actuator.connectedActuator.settings.PIDI
+                                        .toString());
+                              });
                             },
+                            initialValue:
+                                Actuator.connectedActuator.settings.pidI,
                             title: Text(StringConsts.actuators.pidI))
                         : Container(),
 
