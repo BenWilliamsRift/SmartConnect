@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:actuatorapp2/nav_drawer.dart';
+import 'package:actuatorapp2/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -189,29 +190,30 @@ class _ArcPainter extends CustomPainter {
   }
 }
 
-class ActuatorIndicator {
+class ActuatorAngleIndicator {
   static bool shouldBeRequesting() => NavDrawController.isSelectedPage(
       [StringConsts.control, StringConsts.calibration]);
 
-  static const _widgetSmall = ActuatorIndicatorWidget(radius: 100);
-  static const _widgetLarge = ActuatorIndicatorWidget(radius: 120);
+  static const _widgetSmall = ActuatorAngleIndicatorWidget(radius: 100);
+  static const _widgetLarge = ActuatorAngleIndicatorWidget(radius: 120);
 
   static Widget widget({required bool large}) =>
       large ? _widgetLarge : _widgetSmall;
 }
 
-class ActuatorIndicatorWidget extends StatefulWidget {
-  const ActuatorIndicatorWidget({Key? key, required this.radius})
+class ActuatorAngleIndicatorWidget extends StatefulWidget {
+  const ActuatorAngleIndicatorWidget({Key? key, required this.radius})
       : super(key: key);
 
   final double radius;
 
   @override
-  State<ActuatorIndicatorWidget> createState() =>
-      _ActuatorIndicatorWidgetState();
+  State<ActuatorAngleIndicatorWidget> createState() =>
+      _ActuatorAngleIndicatorWidgetState();
 }
 
-class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
+class _ActuatorAngleIndicatorWidgetState
+    extends State<ActuatorAngleIndicatorWidget> {
   late double radius;
 
   late _CirclePainter angleRing;
@@ -230,7 +232,7 @@ class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
 
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (mounted) {
-        if (ActuatorIndicator.shouldBeRequesting()) {
+        if (ActuatorAngleIndicator.shouldBeRequesting()) {
           setState(() {
             bluetoothMessageHandler.requestAngle();
           });
@@ -300,8 +302,16 @@ class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
     angleArc = _ArcPainter(
         color: ColorManager.angleRingColor,
         radius: radius,
-        angle: angle.toDouble()
-    );
+        angle: angle.toDouble());
+
+    List<_LinePainter> angleMarkers = [];
+
+    if (Settings.angleMarker > 0) {
+      for (double i = 0; i <= 360; i += Settings.angleMarker) {
+        angleMarkers.add(_LinePainter(
+            color: Colors.black, radius: radius, angle: i, lineThickness: 5));
+      }
+    }
 
     return CustomPaint(
       child: SizedBox(
@@ -311,28 +321,52 @@ class _ActuatorIndicatorWidgetState extends State<ActuatorIndicatorWidget> {
           children: [
             Center(
                 child: CustomPaint(
+                    size: Size(radius * 2, radius * 2), painter: angleRing)),
+            Settings.showAngleShadow
+                ? Center(
+                    child: CustomPaint(
+                        size: Size(radius * 2, radius * 2), painter: angleArc))
+                : Container(),
+            Center(
+                child: CustomPaint(
+                    size: Size(radius / 3.4, 10), painter: angleLine)),
+            Center(
+                child:
+                    CustomPaint(size: Size(radius / 3.4, 10), painter: closed)),
+            Center(
+                child:
+                    CustomPaint(size: Size(radius / 3.4, 10), painter: open)),
+            BluetoothManager.isActuatorConnected
+                ? Container()
+                : Center(
+                    heightFactor: 0,
+                    child: Text(
+                        style: const TextStyle(fontSize: 20),
+                        StringConsts.bluetooth.notConnected)),
+            BluetoothManager.isActuatorConnected
+                ? Container()
+                : Center(
                     child: CustomPaint(
                         size: Size(radius * 2, radius * 2),
-                        painter: angleRing))),
-            // Center(
-            //     child: CustomPaint(
-            //         child: CustomPaint(
-            //             size: Size(radius * 2, radius * 2), painter: angleArc))),
-            Center(
-                child: CustomPaint(
-                    child: CustomPaint(
-                        size: Size(radius / 3.4, 10), painter: angleLine))),
-            Center(
-                child: CustomPaint(
-                    child: CustomPaint(
-                        size: Size(radius / 3.4, 10), painter: closed))),
-            Center(
-                child: CustomPaint(
-                    child:
-                        CustomPaint(size: Size(radius / 3.4, 10), painter: open))),
-
-            BluetoothManager.isActuatorConnected ? Container() : Center(heightFactor: 0, child: Text(style: const TextStyle(fontSize: 20), StringConsts.bluetooth.notConnected)),
-            BluetoothManager.isActuatorConnected ? Container() : Center(child: CustomPaint(size: Size(radius * 2, radius * 2), painter: _CirclePainter(radius: radius + radius / 6, color: ColorManager.disabledRing, filled: true))),
+                        painter: _CirclePainter(
+                            radius: radius + radius / 6,
+                            color: ColorManager.disabledRing,
+                            filled: true))),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                for (_LinePainter line in angleMarkers)
+                  Center(
+                    child: Transform.translate(
+                      offset: Offset(0, radius),
+                      child: CustomPaint(
+                          size: Size(radius / 5.5, 0),
+                          willChange: false,
+                          painter: line),
+                    ),
+                  )
+              ],
+            ),
           ],
         ),
       ),

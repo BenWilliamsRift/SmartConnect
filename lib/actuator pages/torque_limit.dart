@@ -12,9 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class TorqueLimitPage extends StatefulWidget {
-  const TorqueLimitPage({Key? key, required this.name}) : super(key: key);
+  const TorqueLimitPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.torqueLimit;
 
   @override
   State<TorqueLimitPage> createState() => _TorqueLimitPageState();

@@ -5,6 +5,8 @@ import 'app_bar.dart';
 import 'nav_drawer.dart';
 import 'string_consts.dart';
 
+// TODO contact us
+// refactor
 // Change email system for inline system
 // Send to website form?
 // Queue for when disconnected from the internet

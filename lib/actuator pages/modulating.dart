@@ -11,9 +11,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class ModulatingPage extends StatefulWidget {
-  const ModulatingPage({Key? key, required this.name}) : super(key: key);
+  const ModulatingPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.modulating;
 
   @override
   State<ModulatingPage> createState() => _ModulatingPageState();

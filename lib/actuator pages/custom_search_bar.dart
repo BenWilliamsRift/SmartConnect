@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import '../color_manager.dart';
 import '../string_consts.dart';
 
-class SearchBar extends StatefulWidget {
-  const SearchBar({Key? key}) : super(key: key);
+class CustomSearchBar extends StatefulWidget {
+  const CustomSearchBar({Key? key}) : super(key: key);
 
   @override
-  State<SearchBar> createState() => _SearchBarState();
+  State<CustomSearchBar> createState() => _CustomSearchBarState();
 }
 
-class _SearchBarState extends State<SearchBar> {
+class _CustomSearchBarState extends State<CustomSearchBar> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(

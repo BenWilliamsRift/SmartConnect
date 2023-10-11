@@ -7,6 +7,18 @@ class StringConsts {
   static String appVersion = "0.1";
 
   static const String control = "Control";
+  static const String controlDisclaimer_1 =
+      "*Hold the Auto/Manual Button for 5 seconds to change the mode*";
+
+  static String controlDisclaimer_2(int part) {
+    if (part == 0) {
+      return "**If you are experiencing problems disconnect and reconnect, if the problems persist use the /";
+    } else if (part == 1) {
+      return "Report A Bug Page";
+    }
+    return "\\ and explain the problem you are having in as much detail as possible**";
+  }
+
   static const String basicSettings = "Basic Settings";
   static const String calibration = "Calibration";
   static const String features = "Features";
@@ -54,6 +66,8 @@ class StringConsts {
 
   static const String pullDownToRefresh = "Pull down to refresh";
   static const String refresh = "Refresh";
+
+  static const String degreeSymbol = "\u00B0";
 }
 
 class Statistics {
@@ -190,7 +204,10 @@ class ActuatorsStrings {
 
   final String open = "Open";
   final String close = "Close";
-  final String autoOrManual = "Auto/Manual";
+
+  String get autoOrManual => Actuator.connectedActuator.isAutoManual
+      ? "Switch to Auto"
+      : "Switch to Manual";
 
   final String startingAutoManual = "Starting Auto Manual";
   final String stoppingAutoManual = "Stopping Auto Manual";
@@ -348,6 +365,7 @@ class SettingsStrings {
   final String title = "Settings";
 
   final String advancedSettings = "Advanced Settings";
+  final String devSettings = "Developer Settings";
   final String accessCodes = "Access Codes";
   final String disableAccess = "Disable Access";
   final String pidAccessUnlocked = "PID Access Unlocked";
@@ -360,9 +378,11 @@ class SettingsStrings {
   final String saveLoginDetails = "Save login details";
   final String saveLoginDetailsSub =
       "Lets you close the app and stay logged in";
+  final String angleMarkers = "Angle Markers";
   final String temperature = "Temperature";
   final String torqueUnits = "Torque Units";
   final String timeUnits = "Time units";
+  final String showAngleShadow = "Show angle indicator shadow";
 
   final String appVersion = "App Version";
 }

@@ -367,7 +367,7 @@ class BluetoothMessageHandler {
             Actuator.connectedActuator.settings.autoManual =
                 int.parse(message.split(",")[1]);
             break;
-          case "154": // unused???? : 740
+          case "154": // unused???? : 740 maybe log data low highs bluetoothMessageHandler:687
             break;
           case "155": // logging information : 743
             break;

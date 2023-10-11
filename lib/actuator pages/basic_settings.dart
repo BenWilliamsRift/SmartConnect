@@ -17,9 +17,9 @@ import 'list_tiles.dart';
 bool isLocked = false;
 
 class BasicSettingsPage extends StatefulWidget {
-  const BasicSettingsPage({Key? key, required this.name}) : super(key: key);
+  const BasicSettingsPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.basicSettings;
 
   @override
   State<BasicSettingsPage> createState() => _BasicSettingsPageState();

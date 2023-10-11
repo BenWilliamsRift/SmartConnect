@@ -1,9 +1,7 @@
 import 'package:actuatorapp2/actuator%20pages/list_tiles.dart';
-import 'package:actuatorapp2/nav_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'String_consts.dart';
 import 'actuator/actuator.dart';
 import 'bluetooth/bluetooth_manager.dart';
 import 'color_manager.dart';
@@ -41,8 +39,6 @@ void showSnackBar(
 
 void routeToPage(BuildContext context, Widget page,
     {bool removeStack = false}) {
-  NavDrawController.selectedPage = StringConsts.none;
-
   if (removeStack) {
     while (Navigator.of(context).canPop()) {
       Navigator.of(context).pop();
@@ -51,7 +47,7 @@ void routeToPage(BuildContext context, Widget page,
         .pushReplacement(MaterialPageRoute<void>(builder: (context) => page));
   } else {
     Navigator.of(context)
-        .pushReplacement(MaterialPageRoute<void>(builder: (context) => page));
+        .push(MaterialPageRoute<void>(builder: (context) => page));
   }
 }
 

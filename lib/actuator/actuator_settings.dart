@@ -4,6 +4,7 @@ import 'package:actuatorapp2/bluetooth/bluetooth_message_handler.dart';
 import 'package:actuatorapp2/web_controller.dart';
 import 'package:flutter/foundation.dart';
 
+import '../String_consts.dart';
 import '../date_time.dart';
 import '../preference_manager.dart';
 import '../settings.dart';
@@ -41,14 +42,13 @@ class ActuatorSettings {
       this.indicationMode,
       this.reverseActing);
 
-  final String angleSymbol = "\u00B0";
-
   double angle = 0.0;
   double rawAngle = 0.0;
 
-  String get getAngle => "${angle.truncateToDouble()}$angleSymbol";
+  String get getAngle =>
+      "${angle.truncateToDouble()}${StringConsts.degreeSymbol}";
 
-  String get getRawAngle => "$rawAngle$angleSymbol";
+  String get getRawAngle => "$rawAngle${StringConsts.degreeSymbol}";
   int leds = 0;
   double temperature = 0.0;
 

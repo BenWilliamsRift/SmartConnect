@@ -72,9 +72,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
   String get getOpenAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getOpenAngle : StringConsts.bluetooth.notConnected;
   String get getClosedAngle => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getClosedAngle : StringConsts.bluetooth.notConnected;
   String get getLEDS => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.leds.toString().padRight(5, "0") : StringConsts.bluetooth.notConnected;
-  String get getTemp => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getTemperature.toString() : StringConsts.bluetooth.notConnected;
-  String get getAutoManual => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.autoManual.toString() : StringConsts.bluetooth.notConnected;
-  String get getBootLoader => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.inBootLoader.toString() : StringConsts.bluetooth.notConnected;
+  String get getTemp => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.getTemperature.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getAutoManual => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.isAutoManual.toString()
+      : StringConsts.bluetooth.notConnected;
+
+  String get getBootLoader => BluetoothManager.isActuatorConnected
+      ? Actuator.connectedActuator.settings.inBootLoader.toString()
+      : StringConsts.bluetooth.notConnected;
   String get getWorkingTime => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.workingTime.toString() : StringConsts.bluetooth.notConnected;
   String get getWorkingAngle =>BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.getWorkingAngle : StringConsts.bluetooth.notConnected;
   String get getMaximumDuty => BluetoothManager.isActuatorConnected ? Actuator.connectedActuator.settings.maximumDuty.toString() : StringConsts.bluetooth.notConnected;

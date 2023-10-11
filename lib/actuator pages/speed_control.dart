@@ -11,9 +11,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class SpeedControlPage extends StatefulWidget {
-  const SpeedControlPage({Key? key, required this.name}) : super(key: key);
+  const SpeedControlPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.speedControl;
 
   @override
   State<SpeedControlPage> createState() => _SpeedControlPageState();

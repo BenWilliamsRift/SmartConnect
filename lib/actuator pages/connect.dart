@@ -378,38 +378,7 @@ class _ConnectToActuatorPageState extends State<ConnectToActuatorPage> {
               child: RefreshIndicator(
                 onRefresh: _refreshList,
                 child: ListView(children: [
-                  // Stack(
-                  //   children: [
-                  // Box for the tutorial for scanning
-                  // Align(
-                  //   alignment: Alignment.center,
-                  //   child: Container(
-                  //       key: scanKey,
-                  //       child: SizedBox(
-                  //           width: MediaQuery.of(context).size.width /
-                  //               1.5,
-                  //           height:
-                  //               MediaQuery.of(context).size.height /
-                  //                   1.3)),
-                  // ),
-                  // (bluetoothManager.devices.isEmpty && !bluetoothManager.isScanning) ? Card(
-                  //         key: connectKey,
-                  //         child: ListTile(
-                  //             onTap: () {
-                  //               routeToPage(
-                  //                   context, const HelpPage());
-                  //             },
-                  //             title: Text(isDoingTut
-                  //                 ? StringConsts
-                  //                     .help.exampleActuatorName
-                  //                 : StringConsts.help.actuatorScan),
-                  //             subtitle: Text(isDoingTut
-                  //                 ? StringConsts
-                  //                     .help.exampleActuatorAddress
-                  //                 : StringConsts.help.pullDown))) : Container(),
                   for (Widget widget in sortedDevices()) widget
-                  // ],
-                  // ),
                 ]),
               ),
             )

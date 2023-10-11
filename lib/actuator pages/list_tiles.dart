@@ -348,10 +348,12 @@ class IconButtonTile extends StatefulWidget {
   final Icon icon;
   final Function() onPressed;
   final Function() onReleased;
+  final Widget? text;
 
   const IconButtonTile(
       {Key? key,
       this.backgroundColor,
+      this.text,
       required this.icon,
       required this.onPressed,
       required this.onReleased})
@@ -366,6 +368,7 @@ class _IconButtonTileState extends State<IconButtonTile> {
   late Icon icon;
   late Function() onPressed;
   late Function() onReleased;
+  late Widget text;
 
   @override
   Widget build(BuildContext context) {
@@ -373,6 +376,7 @@ class _IconButtonTileState extends State<IconButtonTile> {
     icon = widget.icon;
     onPressed = widget.onPressed;
     onReleased = widget.onReleased;
+    text = widget.text ?? Container();
 
     return Card(
         color: backgroundColor,
@@ -381,7 +385,13 @@ class _IconButtonTileState extends State<IconButtonTile> {
           onReleased: onReleased,
           backgroundColor: backgroundColor,
           buttonEnabled: false,
-          child: IconButton(onPressed: () {}, icon: icon),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              text,
+              IconButton(onPressed: () {}, icon: icon),
+            ],
+          ),
         ));
   }
 }
@@ -1047,7 +1057,7 @@ class _AutoManualButtonWidgetState extends State<AutoManualButtonWidget> {
       child: Button(
         style: ButtonStyle(
             backgroundColor: MaterialStateProperty.resolveWith((states) {
-          if (Actuator.connectedActuator.settings.autoManual == 1) {
+              if (Actuator.connectedActuator.isAutoManual) {
             return ColorManager.companyYellow;
           } else {
             return ColorManager.blue25;

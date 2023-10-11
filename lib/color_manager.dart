@@ -51,14 +51,22 @@ class ColorManager {
   // New app colors
   // App bar
   static get appBarBackground => colorPrimary;
+
   static get appBarBackgroundDark => colorPrimary;
+
+  static get link => Colors.blue;
 
   // Switch track
   static get switchTrackDisabled => disabled;
+
   static get switchTrackDisabledDark => Colors.purple.withOpacity(.48);
+
   static get switchTrackSelected => green2;
+
   static get switchTrackSelectedDark => Colors.white;
+
   static get switchTrackUnselected => red1;
+
   static get switchTrackUnselectedDark => Colors.black12;
 
   // Switch thumb

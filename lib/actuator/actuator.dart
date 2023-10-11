@@ -151,6 +151,8 @@ class Actuator {
   String get getTorqueBand =>
       "${Settings.convertTorqueUnits(torque: torqueBand.roundToDouble())}${Settings.getTorqueUnits()}";
 
+  bool get isAutoManual => settings.autoManual == 1;
+
   static List<String> indicationModes = [
     "Normal Two Way",
     "L Port 90",

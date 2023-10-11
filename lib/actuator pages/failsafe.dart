@@ -12,9 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class FailsafePage extends StatefulWidget {
-  const FailsafePage({Key? key, required this.name}) : super(key: key);
+  const FailsafePage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.failsafe;
 
   @override
   State<FailsafePage> createState() => _FailsafePageState();
@@ -79,35 +79,35 @@ class _FailsafePageState extends State<FailsafePage> {
                   Style.sizedWidth,
                   Expanded(
                       child: Button(
-                              child: Text(
-                                  style: Style.normalText,
-                                  StringConsts.actuators.writeToFlash),
-                              onPressed: () {
+                          child: Text(
+                              style: Style.normalText,
+                              StringConsts.actuators.writeToFlash),
+                          onPressed: () {
                             Actuator.writeToFlash(
                                 context, bluetoothMessageHandler);
                           })),
-                      Style.sizedWidth
-                    ]),
-                    DropDownTile(
-                        title: Text(
-                            style: Style.normalText,
-                            StringConsts.actuators.failsafeMode),
-                        items: Actuator.failsafeModes,
-                        value: Actuator.failsafeModes.elementAt(
-                            Actuator.connectedActuator.settings.failsafeMode),
-                        onChanged: (String? failsafeMode) {
-                          if (failsafeMode != null) {
-                            setState(() {
-                              Actuator.connectedActuator.settings.failsafeMode =
-                                  Actuator.failsafeModes.indexOf(failsafeMode);
-                              bluetoothMessageHandler.setFailsafeMode(failsafeMode);
-                            });
+                  Style.sizedWidth
+                ]),
+                DropDownTile(
+                    title: Text(
+                        style: Style.normalText,
+                        StringConsts.actuators.failsafeMode),
+                    items: Actuator.failsafeModes,
+                    value: Actuator.failsafeModes.elementAt(
+                        Actuator.connectedActuator.settings.failsafeMode),
+                    onChanged: (String? failsafeMode) {
+                      if (failsafeMode != null) {
+                        setState(() {
+                          Actuator.connectedActuator.settings.failsafeMode =
+                              Actuator.failsafeModes.indexOf(failsafeMode);
+                          bluetoothMessageHandler.setFailsafeMode(failsafeMode);
+                        });
 
-                            return Actuator.failsafeModes.elementAt(
-                                Actuator.connectedActuator.settings.failsafeMode);
-                          }
-                        }),
-                    TimePickerTile(
+                        return Actuator.failsafeModes.elementAt(
+                            Actuator.connectedActuator.settings.failsafeMode);
+                      }
+                    }),
+                TimePickerTile(
                     title: Text(
                         style: Style.normalText,
                         StringConsts.actuators.failsafeDelay),
@@ -122,7 +122,7 @@ class _FailsafePageState extends State<FailsafePage> {
                             Actuator.connectedActuator.failsafeDelay);
                       });
                     }),
-                    TextInputTile(
+                TextInputTile(
                     initialValue: Actuator
                         .connectedActuator.settings.failsafeAngle
                         .toString(),

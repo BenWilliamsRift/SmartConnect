@@ -12,9 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class CalibrationPage extends StatefulWidget {
-  const CalibrationPage({Key? key, required this.name}) : super(key: key);
+  const CalibrationPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.calibration;
 
   @override
   State<CalibrationPage> createState() => _CalibrationPageState();
@@ -93,9 +93,10 @@ class _CalibrationPageState extends State<CalibrationPage> {
             ]),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [ActuatorIndicator.widget(large: true)],
+              children: [ActuatorAngleIndicator.widget(large: true)],
             )
           ]),
+          Style.sizedHeight,
           Style.sizedHeight,
           Row(children: [
             Style.sizedWidth,
@@ -109,6 +110,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
               child: IconButtonTile(
                   icon: Icon(Icons.rotate_left_outlined,
                       color: ColorManager.actuatorIcon),
+                  text: Text(
+                      style: Style.normalText.copyWith(color: Colors.white),
+                      StringConsts.actuators.open),
                   backgroundColor: ColorManager.rotateLeftOutlinedButton,
                   onPressed: () {
                     setState(() {
@@ -123,6 +127,15 @@ class _CalibrationPageState extends State<CalibrationPage> {
             )),
             Style.sizedWidth,
             Expanded(
+                child: Button(
+              onPressed: () {
+                bluetoothMessageHandler.stopActuator();
+              },
+              backgroundColor: Style.darkBlue,
+              child: Text(style: Style.normalText, StringConsts.actuators.stop),
+            )),
+            Style.sizedWidth,
+            Expanded(
                 child: GestureDetector(
               onDoubleTap: () {
                 setState(() {
@@ -132,6 +145,9 @@ class _CalibrationPageState extends State<CalibrationPage> {
               child: IconButtonTile(
                 icon: Icon(Icons.rotate_right_outlined,
                     color: ColorManager.actuatorIcon),
+                text: Text(
+                    style: Style.normalText.copyWith(color: Colors.white),
+                    StringConsts.actuators.close),
                 backgroundColor: ColorManager.rotateRightOutlinedButton,
                 onPressed: () {
                   setState(() {
@@ -146,9 +162,15 @@ class _CalibrationPageState extends State<CalibrationPage> {
               ),
             )),
             Style.sizedWidth,
-            Expanded(child: AutoManualButton.widget)
           ]),
           Style.sizedWidth,
+          Row(
+            children: [
+              Style.sizedWidth,
+              Expanded(child: AutoManualButton.widget),
+              Style.sizedWidth,
+            ],
+          ),
           Row(children: [
             Style.sizedWidth,
             Expanded(

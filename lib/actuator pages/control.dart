@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../actuator/actuator.dart';
@@ -7,14 +8,15 @@ import '../app_bar.dart';
 import '../asset_manager.dart';
 import '../bluetooth/bluetooth_message_handler.dart';
 import '../color_manager.dart';
+import '../contact_us.dart';
 import '../nav_drawer.dart';
 import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class ControlPage extends StatefulWidget {
-  const ControlPage({Key? key, required this.name}) : super(key: key);
+  const ControlPage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.control;
 
   @override
   State<ControlPage> createState() => _ControlPageState();
@@ -78,9 +80,10 @@ class _ControlPageState extends State<ControlPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ActuatorIndicator.widget(large: false),
+                ActuatorAngleIndicator.widget(large: false),
               ],
             ),
+            Style.sizedHeight,
             Style.sizedHeight,
             Row(
               children: [
@@ -196,15 +199,27 @@ class _ControlPageState extends State<ControlPage> {
             ),
             // Disclaimer
             const Center(
-              child: Text(
-                  "*Hold the Auto/Manual Button for 5 seconds to change the mode*"),
+              child: Text(StringConsts.controlDisclaimer_1),
             ),
             const SizedBox(height: 10),
-            const Center(
-              child: Text(
-                  textAlign: TextAlign.center,
-                  "**If you are experiencing problems disconnect and reconnect, if the problems persist use the /Report a Bug page\\ "
-                  "and explain the problem you are having in as much detail as possible**"),
+
+            RichText(
+              text: TextSpan(children: [
+                TextSpan(
+                    text: StringConsts.controlDisclaimer_2(0), // part 1
+                    style: TextStyle(color: ColorManager.text)),
+                TextSpan(
+                    text: StringConsts.controlDisclaimer_2(1), // page link
+                    style: TextStyle(color: ColorManager.link),
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () {
+                        NavDrawController.navigateToPage(context,
+                            const ContactUsPage(), StringConsts.contactUs);
+                      }),
+                TextSpan(
+                    text: StringConsts.controlDisclaimer_2(2), // part 2
+                    style: TextStyle(color: ColorManager.text)),
+              ]),
             )
           ],
         )));

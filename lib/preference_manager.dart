@@ -5,6 +5,7 @@ import 'settings.dart';
 class PreferenceManager {
   static const String passwords = "passwords";
 
+  // TODO Remove the suffix and the prefix at the start of the write settings function instead
   static const String settingsPrefix = "settings";
   static const String isDarkModeSuffix = "isDarkMode";
   static const String twelveHourTimeSuffix = "twelveHourTime";
@@ -12,6 +13,8 @@ class PreferenceManager {
   static const String temperatureUnitsSuffix = "temperatureUnits";
   static const String torqueUnitsSuffix = "torqueUnits";
   static const String timeUnitsSuffix = "timeUnits";
+  static const String showAngleShadowSuffix = "angleShadow";
+  static const String angleMarkersSuffix = "angleMarkers";
 
   static const String loginPrefix = "login";
   static const String loginTimeSuffix = "time";

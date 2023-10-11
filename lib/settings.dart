@@ -11,6 +11,9 @@ import 'nav_drawer.dart';
 import 'preference_manager.dart';
 import 'string_consts.dart';
 
+// TODO Could try just having a list of settings and then using the data type
+// that they are construct a widget with a builder, so new settings could be created easily
+
 class Settings {
   static bool devSettingsEnabled = false;
   static bool emulateConnectedActuator = false;
@@ -33,6 +36,20 @@ class Settings {
     "Celsius (\u2103)",
     "Fahrenheit (\u2109)"
   ];
+
+  static int selectedAngleMarker = 0;
+  static const List<String> angleMarkers = [
+    "0",
+    "30",
+    "45",
+    "60",
+    "90",
+    "120",
+    "180"
+  ];
+
+  static int get angleMarker =>
+      int.parse(angleMarkers.elementAt(selectedAngleMarker));
 
   static const int hoursMinutesSeconds = 0;
   static const int monthsWeekDays = 1;
@@ -68,8 +85,10 @@ class Settings {
   static int selectedTorqueUnits = newtonMeter;
   static int selectedTimeUnits = hoursMinutesSeconds;
 
-  // TODO: time picker scrolling view instead of content
+  // TODO: implement time picker scrolling view instead of content
   static bool scrollContent = false;
+
+  static bool showAngleShadow = false;
 
   static int passwordMinLength = 6;
 
@@ -215,12 +234,82 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Widget get getDevWidgets => Column(mainAxisSize: MainAxisSize.min, children: [
+        ElevatedButton(
+            onPressed: () {
+              setState(() {
+                Settings.devSettingsEnabled = false;
+              });
+            },
+            child: Text(StringConsts.settings.disableAccess)),
+        SwitchTile(
+            title: const Text("Emulate Connection to Actuator"),
+            subtitle: const Text("Unlocks all features of the app"),
+            initValue: Settings.emulateConnectedActuator,
+            callback: (bool value) {
+              setState(
+                () {
+                  Settings.emulateConnectedActuator = value;
+                },
+              );
+            }),
+      ]);
+
+  Widget get getAdvancedWidgets => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextInputTile(
+            onSaved: (String? newValue) {
+              setState(() {
+                checkAccessCode(newValue ?? "");
+              });
+            },
+            keyboardType: TextInputType.text,
+            initialValue: "",
+            title: Text(StringConsts.settings.accessCodes),
+          ),
+          Settings.pidAccessUnlocked
+              ? Card(
+                  child: ListTile(
+                  title: Text(
+                    StringConsts.settings.pidAccessUnlocked,
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        // show confirmation to disable access
+                      });
+                    },
+                    child: Text(StringConsts.settings.disableAccess),
+                  ),
+                ))
+              : Container(),
+          Settings.testingAccessUnlocked
+              ? Card(
+                  child: ListTile(
+                  title: Text(
+                    StringConsts.settings.testingUnlocked,
+                  ),
+                  trailing: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        // show confirmation to disable access
+                      });
+                    },
+                    child: Text(StringConsts.settings.disableAccess),
+                  ),
+                ))
+              : Container(),
+        ],
+      );
+
   bool advancedSettingsOpen = false;
+  bool devSettingsOpen = false;
 
   void checkAccessCode(String key) {
     //TODO
     switch (key.toLowerCase()) {
-    // custom codes
+      // custom codes
       case "dev settings":
         Settings.devSettingsEnabled = !Settings.devSettingsEnabled;
         break;
@@ -248,9 +337,10 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  // TODO Move dev settings and access code specific widgets into a function that returns them instead
   @override
   Widget build(BuildContext context) {
+    Widget sizedBox = const SizedBox(height: 8);
+
     ThemeNotification themeNotifier = ThemeNotification();
     return Scaffold(
       appBar: AppBar(
@@ -270,7 +360,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           ListView(
             children: [
-              const SizedBox(height: 8),
+              sizedBox,
               SwitchTile(
                 title: Text(StringConsts.settings.isDarkMode),
                 initValue: Settings.isDarkMode,
@@ -284,6 +374,35 @@ class _SettingsPageState extends State<SettingsPage> {
                   themeNotifier.updateTheme(context);
                 },
               ),
+              SwitchTile(
+                title: Text(StringConsts.settings.showAngleShadow),
+                initValue: Settings.showAngleShadow,
+                callback: (bool value) {
+                  setState(() {
+                    Settings.showAngleShadow = value;
+                    writeSettingsToPrefs(
+                        "${PreferenceManager.settingsPrefix}-${PreferenceManager.showAngleShadowSuffix}",
+                        Settings.showAngleShadow);
+                  });
+                  themeNotifier.updateTheme(context);
+                },
+              ),
+              DropDownTile(
+                  items: Settings.angleMarkers,
+                  value: Settings.angleMarkers
+                      .elementAt(Settings.selectedAngleMarker),
+                  onChanged: (String? marker) {
+                    setState(() {
+                      Settings.selectedAngleMarker =
+                          Settings.angleMarkers.indexOf(marker!);
+                      writeSettingsToPrefs(
+                          "${PreferenceManager.settingsPrefix}-${PreferenceManager.angleMarkersSuffix}",
+                          Settings.selectedAngleMarker);
+                    });
+
+                    return Settings.selectedAngleMarker.toString();
+                  },
+                  title: Text(StringConsts.settings.angleMarkers)),
               DropDownTile(
                   items: Settings.temperatureUnits,
                   value: Settings.temperatureUnits
@@ -319,7 +438,7 @@ class _SettingsPageState extends State<SettingsPage> {
               DropDownTile(
                   items: Settings.timeUnits,
                   value:
-                      Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
+                  Settings.timeUnits.elementAt(Settings.selectedTimeUnits),
                   onChanged: (String? unit) {
                     setState(() {
                       Settings.selectedTimeUnits =
@@ -348,6 +467,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 }),
               ),
               // Advanced settings
+              sizedBox,
               GestureDetector(
                   onTap: () {
                     // open advanced settings
@@ -364,80 +484,33 @@ class _SettingsPageState extends State<SettingsPage> {
                             : Icons.arrow_drop_down_sharp)),
                     const Expanded(child: Divider(indent: 1, endIndent: 1)),
                   ])),
-              advancedSettingsOpen
-                  ? TextInputTile(
-                onSaved: (String? newValue) {
-                        setState(() {
-                          checkAccessCode(newValue ?? "");
-                        });
-                      },
-                      keyboardType: TextInputType.text,
-                      initialValue: "",
-                      title: Text(StringConsts.settings.accessCodes),
-                    )
-                  : Container(),
-              advancedSettingsOpen && Settings.pidAccessUnlocked
-                  ? Card(
-                      child: ListTile(
-                      title: Text(
-                        StringConsts.settings.pidAccessUnlocked,
-                      ),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            // show confirmation to disable access
-                          });
-                        },
-                        child: Text(StringConsts.settings.disableAccess),
-                      ),
-                    ))
-                  : Container(),
-              advancedSettingsOpen && Settings.testingAccessUnlocked
-                  ? Card(
-                      child: ListTile(
-                      title: Text(
-                        StringConsts.settings.testingUnlocked,
-                      ),
-                      trailing: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            // show confirmation to disable access
-                          });
-                        },
-                        child: Text(StringConsts.settings.disableAccess),
-                      ),
-                    ))
-                  : Container(),
+              advancedSettingsOpen ? getAdvancedWidgets : Container(),
               // Dev Settings
+              sizedBox,
               Settings.devSettingsEnabled
-                  ? const Row(children: [
-                      Expanded(child: Divider()),
-                      Text("Dev Settings"),
-                      Expanded(child: Divider()),
-                    ])
-                  : Container(),
-              Settings.devSettingsEnabled
-                  ? ElevatedButton(
-                      onPressed: () {
+                  ? GestureDetector(
+                      onTap: () {
+                        // open advanced settings
                         setState(() {
-                          Settings.devSettingsEnabled = false;
+                          devSettingsOpen = !devSettingsOpen;
                         });
                       },
-                      child: Text(StringConsts.settings.disableAccess))
+                      child: Row(children: [
+                        const Expanded(child: Divider(indent: 1, endIndent: 1)),
+                        Center(child: Text(StringConsts.settings.devSettings)),
+                        Center(
+                            child: Icon(devSettingsOpen
+                                ? Icons.arrow_drop_up_sharp
+                                : Icons.arrow_drop_down_sharp)),
+                        const Expanded(child: Divider(indent: 1, endIndent: 1)),
+                      ]))
                   : Container(),
-              Settings.devSettingsEnabled
-                  ? SwitchTile(
-                      title: const Text("Emulate Connection to Actuator"),
-                      subtitle: const Text("Unlocks all features of the app"),
-                      initValue: Settings.emulateConnectedActuator,
-                      callback: (bool value) {
-                        setState(
-                          () {
-                            Settings.emulateConnectedActuator = value;
-                          },
-                        );
-                      })
+              Settings.devSettingsEnabled && devSettingsOpen
+                  ? getDevWidgets
                   : Container(),
+              sizedBox,
+              sizedBox,
+              sizedBox,
             ],
           ),
         ],

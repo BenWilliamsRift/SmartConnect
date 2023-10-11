@@ -12,9 +12,9 @@ import '../string_consts.dart';
 import 'list_tiles.dart';
 
 class UpdateFirmwarePage extends StatefulWidget {
-  const UpdateFirmwarePage({Key? key, required this.name}) : super(key: key);
+  const UpdateFirmwarePage({Key? key}) : super(key: key);
 
-  final String name;
+  final String name = StringConsts.updateFirmware;
 
   @override
   State<UpdateFirmwarePage> createState() => _UpdateFirmwarePageState();
